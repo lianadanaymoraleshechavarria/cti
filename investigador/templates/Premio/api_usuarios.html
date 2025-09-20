@@ -1,0 +1,182 @@
+{% block js %}
+  <script src="{% static 'js/validations.js' %}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchInput = document.getElementById('user-search');
+      const dropdown = document.getElementById('user-dropdown');
+      const selectedUsersContainer = document.getElementById('selected-users');
+      const hiddenSelect = document.querySelector('select[name="premiados"]');
+      
+      // Almacenar usuarios seleccionados
+      const selectedUsers = new Map();
+      
+      // Cargar usuarios seleccionados inicialmente
+      Array.from(hiddenSelect.selectedOptions).forEach(option => {
+        selectedUsers.set(option.value, {
+          id: option.value,
+          name: option.textContent
+        });
+      });
+      
+      // Actualizar la lista de usuarios seleccionados
+      function updateSelectedUsers() {
+        selectedUsersContainer.innerHTML = '';
+        selectedUsers.forEach(user => {
+          const badge = document.createElement('span');
+          badge.className = 'user-badge';
+          badge.textContent = user.name;
+          
+          const removeBtn = document.createElement('button');
+          removeBtn.type = 'button';
+          removeBtn.textContent = '×';
+          removeBtn.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            selectedUsers.delete(user.id);
+            updateSelectedUsers();
+            updateHiddenSelect();
+          };
+          
+          badge.appendChild(removeBtn);
+          selectedUsersContainer.appendChild(badge);
+        });
+      }
+      
+      // Actualizar el select oculto
+      function updateHiddenSelect() {
+        // Deseleccionar todas las opciones
+        Array.from(hiddenSelect.options).forEach(option => {
+          option.selected = false;
+        });
+        
+        // Seleccionar las opciones correspondientes
+        selectedUsers.forEach(user => {
+          const option = hiddenSelect.querySelector(`option[value="${user.id}"]`);
+          if (option) {
+            option.selected = true;
+          } else {
+            // Si la opción no existe, crearla
+            const newOption = new Option(user.name, user.id, true, true);
+            hiddenSelect.appendChild(newOption);
+          }
+        });
+        
+        // Disparar evento de cambio
+        const event = new Event('change', { bubbles: true });
+        hiddenSelect.dispatchEvent(event);
+      }
+      
+      // Buscar usuarios
+      async function searchUsers(query) {
+        try {
+          dropdown.innerHTML = '<div class="p-2 text-center">Buscando usuarios...</div>';
+          dropdown.style.display = 'block';
+          
+           // Usar la URL correcta para la API con el prefijo correcto y guión bajo
+           const response = await fetch(`/Investigador/api_usuarios/?search=${encodeURIComponent(query)}`);
+           if (!response.ok) {
+             throw new Error('Error en la respuesta del servidor');
+           }
+          
+          const users = await response.json();
+          
+          // Limpiar el dropdown
+          dropdown.innerHTML = '';
+          
+          if (users.length === 0) {
+            const noResults = document.createElement('div');
+            noResults.className = 'p-2 text-center';
+            noResults.textContent = 'No se encontraron usuarios';
+            dropdown.appendChild(noResults);
+            return;
+          }
+          
+          // Añadir los usuarios al dropdown
+          users.forEach(user => {
+            const item = document.createElement('div');
+            item.className = 'user-select-item';
+            
+            // Crear estructura para mostrar información del usuario
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'user-name';
+            nameDiv.textContent = user.name;
+            
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'user-info';
+            
+            // Mostrar información adicional si está disponible
+            const infoTexts = [];
+            if (user.carnet) infoTexts.push(`Carnet: ${user.carnet}`);
+            if (user.area) infoTexts.push(`Área: ${user.area}`);
+            if (user.departamento) infoTexts.push(`Depto: ${user.departamento}`);
+            
+            infoDiv.textContent = infoTexts.join(' | ');
+            
+            item.appendChild(nameDiv);
+            if (infoTexts.length > 0) {
+              item.appendChild(infoDiv);
+            }
+            
+            // Verificar si el usuario ya está seleccionado
+            if (selectedUsers.has(user.id.toString())) {
+              item.classList.add('selected');
+              item.style.backgroundColor = '#e9ecef';
+            }
+            
+            item.onclick = () => {
+              if (selectedUsers.has(user.id.toString())) {
+                selectedUsers.delete(user.id.toString());
+              } else {
+                selectedUsers.set(user.id.toString(), {
+                  id: user.id.toString(),
+                  name: user.full_name || user.name
+                });
+              }
+              updateSelectedUsers();
+              updateHiddenSelect();
+              
+              // Actualizar estilo visual
+              item.classList.toggle('selected');
+              item.style.backgroundColor = item.classList.contains('selected') ? '#e9ecef' : '';
+            };
+            
+            dropdown.appendChild(item);
+          });
+        } catch (error) {
+          console.error('Error al buscar usuarios:', error);
+          dropdown.innerHTML = '<div class="p-2 text-center text-danger">Error al buscar usuarios</div>';
+        }
+      }
+      
+      // Eventos
+      searchInput.addEventListener('focus', () => {
+        if (searchInput.value.trim() === '') {
+          // Cargar usuarios iniciales
+          searchUsers('');
+        } else {
+          dropdown.style.display = 'block';
+        }
+      });
+      
+      // Evitar que el dropdown se cierre inmediatamente al hacer clic en él
+      dropdown.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+      });
+      
+      searchInput.addEventListener('blur', () => {
+        // Pequeño retraso para permitir clics en el dropdown
+        setTimeout(() => {
+          dropdown.style.display = 'none';
+        }, 200);
+      });
+      
+      searchInput.addEventListener('input', () => {
+        const query = searchInput.value.trim();
+        searchUsers(query);
+      });
+      
+      // Inicializar con los usuarios seleccionados
+      updateSelectedUsers();
+    });
+  </script>
+{% endblock %}

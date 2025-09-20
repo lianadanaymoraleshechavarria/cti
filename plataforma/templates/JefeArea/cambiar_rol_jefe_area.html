@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'Plataforma/css/estilobeta.css' %}">
+<style>
+    .rol-info {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        border-left: 4px solid #2c3e50;
+    }
+    .rol-actual {
+        font-weight: bold;
+        color: #2c3e50;
+    }
+    .input-container select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        background-color: white;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+    .input-container select:focus {
+        border-color: #80bdff;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    .btn-container {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+    }
+    .btn-cancel {
+        background-color: #6c757d;
+    }
+    .btn-cancel:hover {
+        background-color: #5a6268;
+    }
+    .alert {
+        margin-bottom: 20px;
+    }
+    .role-description {
+        background-color: #e9f7fe;
+        border-left: 4px solid #3498db;
+        padding: 10px 15px;
+        margin-bottom: 15px;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-form">
+    <div class="form-rol">
+        <div class="contact-info">
+            <h3 class="title">Cambiar Rol de Usuario (Jefe de Área)</h3>
+            <p class="text">
+                Como Jefe de Área, puede asignar los roles de Jefe de Departamento o Investigador a 
+                <strong>{{ usuario.get_full_name|default:usuario.username }}</strong>.
+            </p>
+            <div class="role-description">
+                <p><i class="fas fa-info-circle"></i> Como Jefe de Área, puede asignar los siguientes roles:</p>
+                <ul>
+                    <li>Jefe de Departamento</li>
+                    <li>Investigador</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="contact-form">
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="rol-info">
+                <p><i class="fas fa-user"></i> Usuario: <strong>{{ usuario.get_full_name|default:usuario.username }}</strong></p>
+                <p><i class="fas fa-envelope"></i> Email: <strong>{{ usuario.email }}</strong></p>
+                <p><i class="fas fa-user-tag"></i> Rol actual: <span class="rol-actual">{{ rol_actual }}</span></p>
+            </div>
+
+            <form method="POST" action="{% url 'CambiarRolJefeArea' usuario.id %}">
+                {% csrf_token %}
+                
+                <div class="input-container select-rol">
+                    <label for="role">Nuevo Rol *</label>
+                    <select name="role" id="role" class="input selector" required>
+                        <option value="">Seleccione un rol</option>
+                        {% for codigo, nombre in available_roles %}
+                            <option value="{{ codigo }}" 
+                                {% if usuario.rol == codigo %}selected{% endif %}>
+                                {{ nombre }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <small class="form-text text-muted">Seleccione cuidadosamente el nuevo rol para este usuario</small>
+                </div>
+
+                <div class="btn-container">
+                    <button type="submit" class="btn2">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                    <a href="{% url 'Usuarios' %}" class="btn2 btn-cancel">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

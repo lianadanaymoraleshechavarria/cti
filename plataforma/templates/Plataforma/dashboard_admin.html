@@ -1,0 +1,637 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'css/datatableSD.css' %}">
+<link rel="stylesheet" href="{% static 'css/Dashboard.css' %}">
+<style>
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main">
+    <main class="content-inside px-3 py-2">
+        <div class="container-fluid">
+            <!-- Year Filter Section -->
+            <div class="year-filter-container">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h5 class="year-filter-title mb-0">
+                            <i class="bx bx-calendar me-2"></i>
+                            Filtrar por Año
+                        </h5>
+                    </div>
+                    <div class="col-md-6">
+                        <select class="form-select year-select" id="yearFilter">
+                            <option value="all" {% if selected_year == 'all' %}selected{% endif %}>
+                                Todos los años
+                            </option>
+                            {% for year in available_years %}
+                            <option value="{{ year }}" {% if selected_year == year|stringformat:"s" %}selected{% endif %}>
+                                {{ year }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="row d-flex justify-content-center" id="statsCards">
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-box-one">
+                        <div class="inner">
+                            <h3 id="totalArticulos">{{ total_articulos }}</h3>
+                            <p>Total de Artículos</p>
+                        </div>
+                        <div class="icon">
+                            <i class="bx bx-file"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-box-one">
+                        <div class="inner">
+                            <h3 id="totalPremios">{{ total_premios }}</h3>
+                            <p>Total de Premios</p>
+                        </div>
+                        <div class="icon">
+                            <i class="bx bx-bar-chart"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-box-one">
+                        <div class="inner">
+                            <h3 id="totalProyectos">{{ total_proyectos }}</h3>
+                            <p>Total de Proyectos</p>
+                        </div>
+                        <div class="icon">
+                            <i class="bx bx-user-plus"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-box-one">
+                        <div class="inner">
+                            <h3 id="totalEventos">{{ total_eventos }}</h3>
+                            <p>Total de Eventos</p>
+                        </div>
+                        <div class="icon">
+                            <i class="bx bxs-pie-chart-alt-2"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <section>
+                <div class="row mt-4">
+                    <div class="col-lg-5 mb-lg-0 mb-4">
+                        <div class="chart-container">
+                            <div id="graficaInvestigador" style="height: 500px;"></div>
+                        </div>
+                    </div>
+                    <div class="col-lg-7 col-sm-12">
+                        <div class="card card-carousel overflow-hidden p-0">
+                            <div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
+                                <div class="carousel-inner border-radius-lg">
+                                    <div class="carousel-item">
+                                        <img src="{% static 'img/Uho 1.jpg' %}" class="d-block w-100" alt="...">
+                                        <div class="carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5">
+                                            <h5 class="text-white mb-1">
+                                                "La educación es el arma más poderosa que puedes usar para cambiar el mundo."
+                                                <br>Nelson Mandela
+                                            </h5>
+                                        </div>
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="{% static 'img/Uho 2.jpg' %}" class="d-block w-100" alt="...">
+                                        <div class="carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5">
+                                            <h5 class="text-white mb-1">UHo</h5>
+                                            <p>Espacio para Crecer</p>
+                                        </div>
+                                    </div>
+                                    <div class="carousel-item active">
+                                        <img src="{% static 'img/Uho 3.jpg' %}" class="d-block w-100" alt="...">
+                                        <div class="carousel-caption d-none d-md-block bottom-0 text-start start-0 ms-5">
+                                            <h4 class="text-white mb-1"></h4>
+                                            <h5>Universidad de Holguín</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="carousel-control-prev w-5 me-3" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next w-5 me-3" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Investigators Table -->
+            <section id="tablaTramites" style="padding-top:30px; padding-bottom: 15px;">
+                <div class="card card-a p-3 h-100">
+                    <div class="card-header">
+                        <h5 class="card-title title-t" style="text-align: start;">
+                            Investigadores
+                        </h5>
+                    </div>
+                    <table id="Investigadores" class="display table table-striped table-hover table-primary" style="width:100%; height: 100%;">
+                        <thead class="encabezado" style="background-color:#0d6efd;">
+                            <tr>
+                                <th scope="col" style="color: white; text-align: center;">No</th>
+                                <th scope="col" style="color: white; text-align: center;">Investigador</th>
+                                <th scope="col" style="color: white; text-align: center;">Email</th>
+                                <th scope="col" style="color: white; text-align: center;">Cargo</th>
+                                <th scope="col" style="color: white; text-align: center;">Categoría Docente</th>
+                                <th scope="col" style="color: white; text-align: center;">Categoría Científica</th>
+                                <th scope="col" style="color: white; text-align: center;">Área</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in investigadores %}
+                            <tr>
+                                <td style="text-align: center;">{{ forloop.counter }}</td>
+                                <td style="text-align: center;">{{ i.nombre }} {{ i.apellidos }}</td>
+                                <td style="text-align: center;">{{ i.email }}</td>
+                                <td style="text-align: center;">{{ i.cargo }}</td>
+                                <td style="text-align: center;">{{ i.categoria_docente }}</td>
+                                <td style="text-align: center;">{{ i.categoria_cientifica }}</td>
+                                <td style="text-align: center;">{{ i.area }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- User Summary Card -->
+                <div class="container mt-4">
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <div class="card user-summary-card shadow">
+                                <div class="card-header text-center">
+                                    <h4 class="mb-0">
+                                        <i class="bx bx-users me-2"></i>
+                                        Resumen de Usuarios
+                                    </h4>
+                                </div>
+                                <div class="card-body text-center">
+                                    <h1 class="display-1 mb-3">{{ total_usuarios }}</h1>
+                                    <p class="lead mb-0">Usuarios registrados en el sistema</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Pending Items Chart -->
+            <section class="col-md-12 col-sm-12" id="graficaBarMarcadores">
+                <div class="chart-container">
+                    <div id="marcadores"></div>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="{% static 'libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/pdfmake.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/bottons.colVis.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.responsive.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/Investigadores_expo.js' %}"></script>
+<script src="{% static 'libs/Highcharts/code/highcharts.js' %}"></script>
+<script src="{% static 'libs/Highcharts/code/modules/accessibility.js' %}"></script>
+<script src="{% static 'libs/Highcharts/code/modules/exporting.js' %}"></script>
+<script src="{% static 'libs/Highcharts/code/modules/offline-exporting.js' %}"></script>
+<script src="{% static 'libs/Highcharts/code/modules/export-data.js' %}"></script>
+<script src="{% static 'libs/Highcharts/graficos.js' %}"></script>
+
+<script>
+$(document).ready(function() {
+    // Global chart variables
+    let investigadoresChart, pendientesChart;
+    let loadingTimeout;
+    
+    // Initial data
+    let dataGraficaInvestigadores = {{ data_grafica_investigadores|safe }};
+    let dataGraficaEstados = {{ datos_gráfico_pendientes|safe }};
+
+    // Initialize charts
+    function initializeCharts() {
+        // Investigators Chart
+        investigadoresChart = Highcharts.chart('graficaInvestigador', {
+            chart: {
+                type: 'column',
+                animation: {
+                    duration: 1000
+                }
+            },
+            title: {
+                text: 'Cantidad de<br>Investigadores por<br>Área',
+                style: {
+                    fontSize: '16px',
+                    fontWeight: 'bold'
+                }
+            },
+            xAxis: {
+                categories: dataGraficaInvestigadores.map(function(item) { 
+                    return item.area__nombre_area || item.area || 'Sin especificar'; 
+                }),
+                labels: {
+                    rotation: -45,
+                    style: {
+                        fontSize: '12px'
+                    }
+                }
+            },
+            yAxis: {
+                title: {
+                    text: 'Cantidad de Investigadores'
+                },
+                min: 0
+            },
+            plotOptions: {
+                column: {
+                    borderRadius: 5,
+                    dataLabels: {
+                        enabled: true,
+                        format: '{point.y}'
+                    }
+                }
+            },
+            series: [{
+                name: 'Investigadores',
+                data: dataGraficaInvestigadores.map(function(item) { return item.count; }),
+                color: '#667eea'
+            }],
+            exporting: {
+                enabled: true,
+                buttons: {
+                    contextButton: {
+                        menuItems: ['downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
+                    }
+                }
+            }
+        });
+
+        // Pending Items Pie Chart
+        pendientesChart = Highcharts.chart('marcadores', {
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie',
+                animation: {
+                    duration: 1000
+                }
+            },
+            title: {
+                text: 'Cantidad de Premios, Proyectos, Eventos, Programas y Artículos Pendientes',
+                style: {
+                    fontSize: '16px',
+                    fontWeight: 'bold'
+                }
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.y}</b><br>Porcentaje: <b>{point.percentage:.1f}%</b>'
+            },
+            accessibility: {
+                point: {
+                    valueSuffix: '%'
+                }
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.name}</b>: {point.y}'
+                    },
+                    showInLegend: true
+                }
+            },
+            series: [{
+                name: 'Total',
+                colorByPoint: true,
+                data: [
+                    {name: 'Artículos', y: dataGraficaEstados['Artículos'], color: '#FF6B6B'},
+                    {name: 'Premios', y: dataGraficaEstados['Premios'], color: '#4ECDC4'},
+                    {name: 'Proyectos', y: dataGraficaEstados['Proyectos'], color: '#45B7D1'},
+                    {name: 'Eventos', y: dataGraficaEstados['Eventos'], color: '#96CEB4'},
+                    {name: 'Programas', y: dataGraficaEstados['Programas'], color: '#FFEAA7'}
+                ]
+            }],
+            exporting: {
+                enabled: true,
+                buttons: {
+                    contextButton: {
+                        menuItems: ['downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
+                    }
+                }
+            }
+        });
+    }
+
+    // Update statistics cards with animation
+    function updateStatsCards(data) {
+        const cards = [
+            {id: '#totalArticulos', value: data.totals.articulos},
+            {id: '#totalPremios', value: data.totals.premios},
+            {id: '#totalProyectos', value: data.totals.proyectos},
+            {id: '#totalEventos', value: data.totals.eventos}
+        ];
+
+        cards.forEach(function(card) {
+            const $element = $(card.id);
+            const currentValue = parseInt($element.text()) || 0;
+            const newValue = card.value;
+            
+            // Animate number change
+            $({count: currentValue}).animate({count: newValue}, {
+                duration: 1000,
+                step: function() {
+                    $element.text(Math.floor(this.count));
+                },
+                complete: function() {
+                    $element.text(newValue);
+                }
+            });
+        });
+    }
+
+    // Show loading overlay
+    function showLoading() {
+        $('#loadingOverlay').css('display', 'flex');
+        // Add timeout to prevent infinite loading issues
+        loadingTimeout = setTimeout(function() {
+            if ($('#loadingOverlay').css('display') === 'flex') {
+                hideLoading();
+                showToast('Error: Tiempo de espera agotado', 'danger');
+            }
+        }, 30000); // 30 seconds timeout
+    }
+
+    // Hide loading overlay
+    function hideLoading() {
+        clearTimeout(loadingTimeout);
+        $('#loadingOverlay').hide();
+    }
+
+    // Show toast notification
+    function showToast(message, type = 'success') {
+        const toastHtml = `
+            <div class="toast align-items-center text-white bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        `;
+        
+        // Create toast container if it doesn't exist
+        if (!$('#toastContainer').length) {
+            $('body').append('<div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>');
+        }
+        
+        const $toast = $(toastHtml);
+        $('#toastContainer').append($toast);
+        
+        const toast = new bootstrap.Toast($toast[0]);
+        toast.show();
+        
+        // Remove toast element after it's hidden
+        $toast.on('hidden.bs.toast', function() {
+            $(this).remove();
+        });
+    }
+
+      // Year filter change handler
+  $('#yearFilter').on('change', function() {
+    const selectedYear = $(this).val();
+    
+    // Eliminar la carga visual
+    // showLoading(); // Comentar o eliminar esta línea
+    
+    // Make AJAX request to get filtered data
+    $.ajax({
+        url: '{% url "api_dashboard_data" %}',
+        method: 'GET',
+        data: {
+            year: selectedYear
+        },
+        success: function(data) {
+            // Update statistics cards
+            updateStatsCards(data);
+            
+            // Update charts with error handling
+            updateCharts(data, function() {
+                // hideLoading(); // Comentar o eliminar esta línea
+            });
+            
+            // Update URL without page reload
+            const newUrl = new URL(window.location);
+            if (selectedYear === 'all') {
+                newUrl.searchParams.delete('year');
+            } else {
+                newUrl.searchParams.set('year', selectedYear);
+            }
+            window.history.pushState({}, '', newUrl);
+            
+            // Show success message
+            const yearText = selectedYear === 'all' ? 'todos los años' : selectedYear;
+            showToast(`Dashboard actualizado para ${yearText}`, 'success');
+        },
+        error: function(xhr, status, error) {
+            console.error('Error fetching dashboard data:', error);
+            showToast('Error al actualizar el dashboard. Por favor, intente nuevamente.', 'danger');
+            // hideLoading(); // Comentar o eliminar esta línea
+        }
+    });
+  });
+
+
+
+    // Function to update charts with callback
+    function updateCharts(data, callback) {
+        try {
+            // Clear existing charts
+            if (investigadoresChart) {
+                investigadoresChart.destroy();
+            }
+            if (pendientesChart) {
+                pendientesChart.destroy();
+            }
+            
+            // Create new charts
+            investigadoresChart = Highcharts.chart('graficaInvestigador', {
+                chart: {
+                    type: 'column',
+                    animation: {
+                        duration: 1000
+                    }
+                },
+                title: {
+                    text: 'Cantidad de<br>Investigadores por<br>Área',
+                    style: {
+                        fontSize: '16px',
+                        fontWeight: 'bold'
+                    }
+                },
+                xAxis: {
+                    categories: data.charts.investigadores.map(function(item) {
+                        return item.area__nombre_area || item.area || 'Sin especificar';
+                    }),
+                    labels: {
+                        rotation: -45,
+                        style: {
+                            fontSize: '12px'
+                        }
+                    }
+                },
+                yAxis: {
+                    title: {
+                        text: 'Cantidad de Investigadores'
+                    },
+                    min: 0
+                },
+                plotOptions: {
+                    column: {
+                        borderRadius: 5,
+                        dataLabels: {
+                            enabled: true,
+                            format: '{point.y}'
+                        }
+                    }
+                },
+                series: [{
+                    name: 'Investigadores',
+                    data: data.charts.investigadores.map(function(item) { 
+                        return item.count; 
+                    }),
+                    color: '#667eea'
+                }],
+                exporting: {
+                    enabled: true,
+                    buttons: {
+                        contextButton: {
+                            menuItems: ['downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
+                        }
+                    }
+                },
+                // Error handling
+                load: function() {
+                    callback();
+                },
+                error: function() {
+                    console.error('Error loading investigators chart');
+                    callback();
+                }
+            });
+
+            pendientesChart = Highcharts.chart('marcadores', {
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie',
+                    animation: {
+                        duration: 1000
+                    }
+                },
+                title: {
+                    text: 'Cantidad de Premios, Proyectos, Eventos, Programas y Artículos Pendientes',
+                    style: {
+                        fontSize: '16px',
+                        fontWeight: 'bold'
+                    }
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.y}</b><br>Porcentaje: <b>{point.percentage:.1f}%</b>'
+                },
+                accessibility: {
+                    point: {
+                        valueSuffix: '%'
+                    }
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b>{point.name}</b>: {point.y}'
+                        },
+                        showInLegend: true
+                    }
+                },
+                series: [{
+                    name: 'Total',
+                    colorByPoint: true,
+                    data: [
+                        {name: 'Artículos', y: data.pending['Artículos'], color: '#FF6B6B'},
+                        {name: 'Premios', y: data.pending['Premios'], color: '#4ECDC4'},
+                        {name: 'Proyectos', y: data.pending['Proyectos'], color: '#45B7D1'},
+                        {name: 'Eventos', y: data.pending['Eventos'], color: '#96CEB4'},
+                        {name: 'Programas', y: data.pending['Programas'], color: '#FFEAA7'}
+                    ]
+                }],
+                exporting: {
+                    enabled: true,
+                    buttons: {
+                        contextButton: {
+                            menuItems: ['downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
+                        }
+                    }
+                },
+                // Error handling
+                load: function() {
+                    callback();
+                },
+                error: function() {
+                    console.error('Error loading pending items chart');
+                    callback();
+                }
+            });
+        } catch (error) {
+            console.error('Error updating charts:', error);
+            callback();
+        }
+    }
+
+    // Initialize charts on page load
+    initializeCharts();
+
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', function(event) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const year = urlParams.get('year') || 'all';
+        $('#yearFilter').val(year).trigger('change');
+    });
+});
+</script>
+{% endblock %}

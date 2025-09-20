@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Conatiner CSS -->
+{% block css %}
+<link rel="stylesheet" href=" {% static 'Plataforma/css/estilobeta.css' %}">
+<style>
+.btn1:hover{
+    background-color: transparent;
+    color: #585252;
+}
+</style>
+{% endblock %}
+<!-- End Conatiner CSS -->
+
+{% block content %}
+<div id="error-container">
+
+</div>
+<div class="container-form">
+    <div class="form">
+        <div class="contact-form">
+            <span class="circle one"></span>
+            <span class="circle two"></span>
+            <form action="." method="POST">
+                {% csrf_token %}
+                <h3 class="title">Crear Departamento</h3>
+                <div class="input-container">
+                    <input type="text" name="nombre_departamento" class="input" required id="departamento">
+                    <label for="">Nombre</label>
+                    <span>Nombre</span>
+                </div>
+                <div class="input-container">
+                    <select name="area" class="input" id="area">
+                        <option value=""></option>
+                        {% for area in areas %}
+                            <option value="{{ area.id }}">{{ area.nombre_area }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="">Área</label>
+                    <span>Área</span>
+                </div>
+                <input type="submit" value="Crear departamento" class="btn1" id="boton">
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- Conatiner JS -->
+{% block js %}
+<script src="{% static 'Plataforma/js/FormularioSelect.js' %}"></script>
+<script src="{% static 'Plataforma/js/Crear departamento.js' %}"></script>
+{% endblock %}
+<!-- End Conatiner JS -->

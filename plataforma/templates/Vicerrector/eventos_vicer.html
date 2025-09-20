@@ -1,0 +1,319 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Container CSS -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/Dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'css/datatableSD.css' %}">
+<style>
+  .filtros-container {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .filtro-grupo {
+    flex: 1;
+    min-width: 200px;
+  }
+  
+  .filtro-grupo label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+  
+  .filtro-grupo select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+  }
+  
+  .btn-filtrar {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .btn-filtrar:hover {
+    background-color: #0069d9;
+  }
+  
+  .btn-limpiar {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .btn-limpiar:hover {
+    background-color: #5a6268;
+  }
+  
+  .filtros-acciones {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+  }
+  
+  /* Additional styles for modalidad filter */
+  .modalidad-filter {
+    margin-top: 20px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main" style="padding-top:60px;">
+  <main class="content-inside px-3 py-2">
+    <div class="container-fluid">
+      <div class="container-fluid">
+        <!--Table Element-->
+        <section id="tablaEventos">
+          <div class="card card-a p-3 h-100">
+            <div class="card-header">
+              <h5 class="card-title title-t" style="text-align: start;">
+                Eventos
+              </h5>
+              <div class="boot d-flex flex-wrap justify-content-start align-items-center">
+                <a href="{% url 'Evento_Create' %}" class="btn1 m-2 btn btn-success btn-sm text-decoration-none">Añadir</a>
+              </div>
+              
+              <!-- Filtros -->
+              <div class="filtros-container">
+                <div class="filtro-grupo">
+                  <label for="filtro-area">Filtrar por Área:</label>
+                  <select id="filtro-area" class="form-select">
+                    <option value="">Todas las áreas</option>
+                    {% for area in areas %}
+                      <option value="{{ area.nombre_area }}">{{ area.nombre_area }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                
+                <div class="filtro-grupo">
+                  <label for="filtro-departamento">Filtrar por Departamento:</label>
+                  <select id="filtro-departamento" class="form-select">
+                    <option value="">Todos los departamentos</option>
+                    {% for departamento in departamentos %}
+                      <option value="{{ departamento.nombre_departamento }}" 
+                              data-area="{{ departamento.area.nombre_area|default_if_none:'' }}">
+                          {{ departamento.nombre_departamento }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                </div>
+                
+                <div class="filtro-grupo">
+                  <label for="filtro-modalidad">Filtrar por Modalidad:</label>
+                  <select id="filtro-modalidad" class="form-select">
+                    <option value="">Todas las modalidades</option>
+                    {% for modalidad in modalidades %}
+                      <option value="{{ modalidad.modalidad }}">{{ modalidad.modalidad }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                
+                <div class="filtros-acciones">
+                  <button id="btn-limpiar-filtros" class="btn-limpiar">Limpiar filtros</button>
+                </div>
+              </div>
+            </div>
+            
+            <table id="Eventos" class="display table table-striped table-hover table-primary" style="width:100%; height: 100%;">
+              <thead class="encabezado">
+                <tr>
+                  <th scope="col" style="color: white; text-align: center;">No</th>
+                  <th scope="col" style="color: white; text-align: center;">Título</th>
+                  <th scope="col" style="color: white; text-align: center;">Fecha</th>
+                  <th scope="col" style="color: white; text-align: center;">Modalidad</th>
+                  <th scope="col" style="color: white; text-align: center;">Área</th>
+                  <th scope="col" style="color: white; text-align: center;">Departamento</th>
+                  <th scope="col" style="color: white; text-align: center;">Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for e in eventos %}
+                  <tr>
+                    <td style="text-align: center;">{{forloop.counter}}</td>
+                    <td style="text-align: center;">
+                      <a class="details" style="color:blue" href="{% url 'Evento_Detail_Vicerrector' e.id %}">
+                        {{e.titulo}}
+                      </a>
+                    </td>
+                    <td style="text-align: start;">{{e.fecha}}</td>
+                    <td style="text-align: start;">{{e.modalidad}}</td>
+                    <td style="text-align: start;">{{e.area.nombre_area}}</td>
+                    <td style="text-align: start;">{{e.departamento.nombre_departamento}}</td>
+                    <td style="text-align: start;">
+                      <a class="cambiar-estado" style="text-decoration:none" href="{% url 'Cambiar_Estado_Evento' e.id %}">
+                        {{e.aprobacion}}
+                      </a>
+                    </td>
+                  </tr>  
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+        
+        <section class="mb-2 row row-gap-1">
+          <section class="col-md-6 col-sm-12" id="graficaTiposEvento">
+            <div class="card">
+              <div class="p-2">
+                <div id="grafTiposEvento"></div>
+              </div>
+            </div>
+          </section>
+          <section class="col-md-6 col-sm-12" id="graficaModalidades">
+            <div class="card">
+              <div class="p-2">
+                <div id="grafModalidades"></div>
+              </div>
+            </div>
+          </section>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'Plataforma/libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/pdfmake.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/bottons.colVis.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.responsive.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>
+<script src="{% static 'libs/Highcharts/code/highcharts.js' %}"></script>
+<script src="{% static 'libs/Highcharts/code/modules/accessibility.js' %}"></script>
+<script src="{% static 'libs/Highcharts/code/modules/exporting.js' %}"></script>
+<script src="{% static 'libs/Highcharts/code/modules/offline-exporting.js' %}"></script>
+<script src="{% static 'libs/Highcharts/code/modules/export-data.js' %}"></script>
+
+<script>
+$(document).ready(function() {
+    // Initialize DataTable
+    var table = $('#Eventos').DataTable({
+        responsive: true,
+        dom: 'Bfrtip',
+        buttons: [
+            'copy', 'csv', 'excel', 'pdf', 'print'
+            ],
+            language: {
+              url: "{% static 'Plataforma/libs/Datatable/dataTableLenguage.json' %}"
+          },
+    });
+    
+    // Area filter logic
+    $('#filtro-area').on('change', function() {
+        var area = $(this).val();
+        table.column(4).search(area).draw();
+        
+        // Update department dropdown based on selected area
+        if (area) {
+            $('#filtro-departamento option').hide();
+            $('#filtro-departamento option[data-area="' + area + '"]').show();
+            $('#filtro-departamento option[value=""]').show();
+        } else {
+            $('#filtro-departamento option').show();
+        }
+        $('#filtro-departamento').val('');
+    });
+    
+    // Department filter logic
+    $('#filtro-departamento').on('change', function() {
+        var depto = $(this).val();
+        table.column(5).search(depto).draw();
+    });
+    
+    // Modalidad filter logic
+    $('#filtro-modalidad').on('change', function() {
+        var modalidad = $(this).val();
+        table.column(3).search(modalidad).draw();
+    });
+    
+    // Clear filters button
+    $('#btn-limpiar-filtros').on('click', function() {
+        $('#filtro-area, #filtro-departamento, #filtro-modalidad').val('');
+        table.search('').columns().search('').draw();
+        $('#filtro-departamento option').show();
+    });
+    
+    // Charts initialization
+    var tiposEventoData = {{ tipos_eventos_json|safe }};
+    var modalidadesData = {{ modalidad_eventos_json|safe }};
+    
+// Chart for event types
+Highcharts.chart('grafTiposEvento', {
+  chart: { type: 'pie' },
+  title: { text: 'Distribución por Tipo de Evento' },
+  series: [{
+      name: 'Cantidad',
+      colorByPoint: true,
+      data: tiposEventoData.map(item => ({
+          name: item.tipo || 'No especificado',  // Manejo de valores nulos
+          y: item.count
+      }))
+  }],
+  plotOptions: {
+      pie: {
+          allowPointSelect: true,
+          cursor: 'pointer',
+          dataLabels: {
+              enabled: true,
+              format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+          }
+      }
+  }
+});
+
+// Chart for modalities
+Highcharts.chart('grafModalidades', {
+  chart: { type: 'column' },
+  title: { text: 'Eventos por Modalidad' },
+  xAxis: {
+      type: 'category',
+      title: { text: 'Modalidad' }
+  },
+  yAxis: {
+      title: { text: 'Cantidad de Eventos' }
+  },
+  series: [{
+      name: 'Eventos',
+      colorByPoint: true,
+      data: modalidadesData.map(item => ({
+          name: item.modalidad || 'No especificada',  // Manejo de valores nulos
+          y: item.count
+      }))
+  }],
+  plotOptions: {
+      column: {
+          colorByPoint: true
+      }
+  }
+});
+});
+
+</script>
+{% endblock %}

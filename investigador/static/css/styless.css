@@ -1,0 +1,229 @@
+:root {
+    --primary: #222e58;
+    --secondary: #49842A;
+    --accent1: #7FC957;
+    --accent2: #1E5227;
+    --accent3: #D2E160;
+    --text: #424045;
+    --textSoft: #65626A;
+    --borders: #E0DFE2;
+    --backgroundSoft: #f9f9f9;
+    --info: #C7DCFF;
+    --success: #CFF1CF;
+    --warning: #FFE08A;
+    --error: #B03A3A;
+
+    --focus-shadow: 0px 0px 0px 3.2px rgba(114, 190, 68, 0.4);
+    --card-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.3);
+}
+
+.badge-aprobado {
+    background-color: var(--success);
+    color: var(--accent2);
+    border: 1px solid #A6DDA6;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.badge-rechazado {
+    background-color: #F2DADA;
+    border: 1px solid #D99C9C;
+    color: #424045;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.badge-pendiente {
+    background-color: #fff3cd;
+    border: 1px solid #ffe69c;
+    color: #664d03;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.badge-rol {
+    font-size: 0.75rem;
+    padding: 0.15rem 0.4rem;
+    border-radius: 0.25rem;
+    margin-left: 0.5rem;
+}
+
+.badge-creador {
+    background-color: var(--info);
+    border: 1px solid #A4C6F3;
+    color: var(--primary);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.badge-colaborador {
+    background-color: var(--borders);
+    border: 1px solid #C4C3C6;
+    color: var(--text);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.row-colaborador {
+    background-color: rgba(108, 117, 125, 0.05);
+}
+
+/* Nuevos estilos para participantes */
+.participantes-lista {
+    max-height: 100px;
+    overflow-y: auto;
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+}
+
+.participante-item {
+    padding: 2px 0;
+    border-bottom: 1px dashed #eee;
+}
+
+.participante-item:last-child {
+    border-bottom: none;
+}
+
+.participante-secundario {
+    color: var(--text);
+}
+
+.participantes-contador {
+    background-color: var(--borders);
+    border: 1px solid #C4C3C6;
+    color: var(--text);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    margin-left: 5px;
+}
+
+.participantes-tooltip {
+    position: relative;
+    cursor: pointer;
+}
+
+.participantes-tooltip:hover .participantes-tooltip-content {
+    display: block;
+}
+
+.participantes-tooltip-content {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    border-radius: 4px;
+    padding: 8px;
+    z-index: 1000;
+    width: 200px;
+    box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.3);
+    left: 0;
+    top: 100%;
+}
+
+.boton-add {
+    background: linear-gradient(135deg, #7FC957, #49842A);
+    border: none;
+    border-radius: 35px;
+    width: 35px;
+    height: 35px;
+    padding: 3px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: white;
+    line-height: 30px;
+    text-align: center;
+    cursor: pointer;
+    margin-left: 5px;
+    margin-bottom: 0 !important;
+    transition: all 0.2s ease-in-out;
+}
+
+.boton-add.btn:hover,
+.boton-add.btn:focus,
+.boton-form.btn:hover,
+.boton-form.btn:focus {
+    background: linear-gradient(to right, #7FC957, #49842A) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+    color: white !important;
+}
+
+.boton-form {
+    padding: 6px 10px;
+    font-size: 1rem;
+    background: linear-gradient(to right, #7FC957, #49842A);
+    border: none;
+    border-radius: 35px;
+    min-width: 140px;
+    width: auto;
+    height: 40px;
+    font-weight: 700;
+    color: white;
+    line-height: 30px;
+    text-align: center;
+    cursor: pointer;
+    margin-left: 5px;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-cancelar {
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    background-color: var(--backgroundSoft);
+    color: var(--primary);
+    border: none;
+    border-radius: 35px;
+    width: 140px;
+    height: 40px;
+    font-weight: 700;
+    line-height: 30px;
+    text-align: center;
+    cursor: pointer;
+    margin-left: 5px;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-cancelar.btn:hover,
+.btn-cancelar.btn:focus {
+    color: var(--primary) !important;
+    background: #e0e0e0 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+.pagination .page-link {
+    color: var(--primary)
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--secondary);
+    border-color: var(--secondary);
+    color: white;
+}
+
+.pagination .page-link:hover {
+    background-color: #e9ecef;
+}
+
+.pagination {
+  margin-top: 1rem !important;
+}
+
+.form-control:focus {
+    color: #424045;
+    background-color: #ffffff;
+    border-color: var(--borders);
+    outline: 0;
+    box-shadow: 0px 0px 0px 3.2px rgba(114, 190, 68, 0.4);
+}

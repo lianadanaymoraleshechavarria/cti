@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Container CSS -->
+{% block css %}
+<link rel="stylesheet" href=" {% static 'Plataforma/css/estilobeta.css' %}">
+{% endblock %}
+<!-- End Container CSS -->
+
+{% block content %}
+<div id="error-container"></div>
+
+<div class="container-form">
+    <div class="form">
+        {% if messages %}
+        {% for message in messages %}
+          {% if message.tags == 'success' %}
+            <div style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem; z-index: 2000;"
+                class="alert alert-success alert-dismissible fade show" role="alert">
+          {% elif message.tags == 'error' %}
+            <div style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem; z-index: 2000;"
+                class="alert alert-danger alert-dismissible fade show" role="alert">
+          {% endif %}
+            {{ message }}
+              <button style="font-size: 10px; border-bottom: none; position: relative; box-shadow: none;" type="button"
+                class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+        {% endif %}
+        
+        <div class="contact-form">
+            <span class="circle one"></span>
+            <span class="circle two"></span>
+            
+            <form action="." method="POST">
+                {% csrf_token %}
+                <h3 class="title">Nuevo Tipo de Evento</h3>
+                
+                <!-- Nombre -->
+                <div class="input-container">
+                    <input type="text" name="nombre" class="input" required id="id_nombre" value="{{ form.nombre.value|default_if_none:'' }}">
+                    <label for="id_nombre">Nombre</label>
+                    <span>Nombre</span>
+                    {% if form.nombre.errors %}
+                        <div class="text-danger">{{ form.nombre.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <!-- Descripción -->
+                <div class="input-container textarea">
+                    <textarea name="descripcion" class="input" id="id_descripcion">{{ form.descripcion.value|default_if_none:'' }}</textarea>
+                    <label for="id_descripcion">Descripción (opcional)</label>
+                    <span>Descripción</span>
+                    {% if form.descripcion.errors %}
+                        <div class="text-danger">{{ form.descripcion.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="btn">
+                    <input type="submit" value="Crear" class="btn1" id="boton">
+                    <a href="{% url 'TipoEvento_List' %}" class="btn2">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- Container JS -->
+{% block js %}
+<script src="{% static 'Plataforma/js/FormularioSelect.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        // Validar que el nombre esté completo
+        const nombre = document.getElementById('id_nombre').value.trim();
+        
+        if (!nombre) {
+            isValid = false;
+            alert('Por favor complete el nombre del tipo de evento');
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+        }
+    });
+    
+    // Cerrar automáticamente los mensajes después de 5 segundos
+    setTimeout(function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 5000);
+});
+</script>
+{% endblock %}

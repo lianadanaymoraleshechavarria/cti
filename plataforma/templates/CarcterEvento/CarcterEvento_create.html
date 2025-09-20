@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Conatiner CSS -->
+{% block css %}
+<link rel="stylesheet" href=" {% static 'Plataforma/css/estilobeta.css' %}">
+{% endblock %}
+<!-- End Conatiner CSS -->
+
+{% block content %}
+<div id="error-container">
+
+</div>
+<div class="container-form">
+    <div class="form">
+        {% if messages %}
+        {% for message in messages %}
+          {% if message.tags == 'success' %}
+            <div style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem; z-index: 2000;"
+                class="alert alert-success alert-dismissible fade show" role="alert">
+          {% elif message.tags == 'error' %}
+            <div style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem; z-index: 2000; "
+                class="alert alert-danger alert-dismissible fade show" role="alert">
+          {% endif %}
+            {{ message }}
+              <button style="font-size: 10px; border-bottom: none; position: relative; box-shadow: none;" type="button"
+                class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+        {% endif %}
+        <div class="contact-form">
+            <span class="circle one"></span>
+            <span class="circle two"></span>
+            <form action="." method="POST">
+                {% csrf_token %}
+                <h3 class="title">Crear caracter</h3>
+                <div class="input-container">
+                    <input type="text" name="nombre_caracter_evento" class="input" required id="caracter">
+                    <label for="">Nombre</label>
+                    <span>Nombre</span>
+                </div>
+                <input type="submit" value="Crear area" class="btn1" id="boton">
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- Conatiner JS -->
+{% block js %}
+<script src="{% static 'Plataforma/js/FormularioSelect.js' %}"></script>
+<script src="{% static 'Plataforma/js/Crear area.js' %}"></script>
+{% endblock %}
+<!-- End Conatiner JS -->

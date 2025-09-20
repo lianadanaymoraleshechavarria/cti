@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Conatiner CSS -->
+    <link rel="stylesheet" href="{% static 'Usuarios/css/Login.css' %}">
+    <link rel="stylesheet" href="{% static 'Usuarios/libs/boxicons-2.1.4/css/boxicons.min.css' %}">
+    <link rel="stylesheet" href="{% static 'Usuarios/libs/Bootstrap/css/bootstrap.min.css' %}">
+    <link rel="icon" type="image/png" sizes="50x50" href="{% static 'Usuarios/img/Id UHo-03.png' %}">
+    
+    <!-- End Conatiner CSS -->
+    <title> Sistema de gestión de resultados e indicadores de Ciencia, Tecnología e 
+        Innovación de la Universidad de Holguín</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="login-container">
+            {% if validlink %}
+            <form method="POST">
+                {% csrf_token %}
+                <img class="logo" style="margin-left:50px;" src="{% static 'Usuarios/img/Id UHo-01.png' %}" alt="">
+                <h2 style="color:#222e58;">Cambiar Contraseña</h2>
+                <div class="text">
+                    <p>Por favor, introduzca su contraseña nueva dos veces para verificar que la ha escrito
+                        correctamente.</p>
+                </div>
+                <div class="input-container">
+                    {{ form.new_password1 }}
+                    <label for="">Contraseña</label>
+                    <span>Contraseña</span>
+                  </div>
+                  <div class="input-container mb-3">
+                    {{ form.new_password2 }}
+                    <label for="">Repetir contraseña</label>
+                    <span>Repetir contraseña</span>
+                  </div>
+                <input type="submit" class="btn1" id="boton" value="Cambiar Contraseña">
+            </form>
+            <div id="error-container">
+
+            </div>
+            {% else %}
+            <p>El link de Restablecimiento es inválido, posiblemente porque ya fue usado. Por favor solicite un nuevo
+                restablecimiento de contraseña</p>
+            {% endif %}
+        </div>
+    </div>
+    <!-- Conatiner JS -->
+    <script src="{% static 'Usuarios/js/jquery-3.7.1.js' %}"></script>
+    <script src="{% static 'Usuarios/js/popper.min.js' %}"></script>
+    <script src="{% static 'Usuarios/js/FormularioSelect.js' %}"></script>
+    <script src="{% static 'Usuarios/js/InputCC.js' %}"></script>
+    <script src="{% static 'Usuarios/libs/Bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <!-- End Conatiner JS -->
+
+</body>
+
+</html>

@@ -1,0 +1,214 @@
+  {% extends "base.html" %}
+  {% load static %}
+  
+    {% block css %}
+      <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+    {% endblock %}
+  
+  
+    {% block content %}
+      <div class="content" >
+        <div class="col">
+          <div class="container-form">
+            <div class="form">
+              <div class="container-fluid py-4">
+                <div class="row">
+                  <div id="error-container">
+
+                  </div>
+                  <div class="col-md-12">
+                    <div class="card">
+                      {% if messages %}
+                      {% for message in messages %}
+                        {% if message.tags == 'success' %}
+                          <div style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem; z-index: 2000;"
+                              class="alert alert-success alert-dismissible fade show" role="alert">
+                        {% elif message.tags == 'error' %}
+                          <div style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem; z-index: 2000; "
+                              class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {% endif %}
+                          {{ message }}
+                            <button style="font-size: 10px; border-bottom: none; position: relative; box-shadow: none;" type="button"
+                              class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                          </div>
+                      {% endfor %}
+                    {% endif %}
+                      <div class="card-header pb-0">
+                        <div class="title">
+                          <h3 class="title-text p-3">Solicitud de Proyecto</h3>
+                          <p class="text">
+                              Por favor, complete todos los campos requeridos para enviar su solicitud.
+                              Su informaci&oacute;n es vital para procesar su solicitud de manera adecuada.
+                          </p>
+                        </div>
+                      </div>
+                      <form  id="formu" method="POST">
+                        {% csrf_token %}
+                        <div class="card-body">
+                          <div class="row">
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group">
+                                <label for="example-text-input" class="form-control-label">Nombre del Proyecto</label>
+                                {{form.nombre_proyecto}}
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group">
+                                <label for="example-text-input" class="form-control-label">Jefe del Proyecto</label>
+                                {{form.jefe_proyecto}}
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Área</label>
+                                {{form.area}}
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group">
+                                <label for="example-text-input" class="form-control-label">Departamento</label>
+                                {{form.departamento}}
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Tipo de Proyecto</label>
+                                {{form.tipo_proyecto}}
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Subtipo de Proyecto</label>
+                                {{form.subtipo_proyecto}}
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Entidades Participantes</label>
+                                {{form.entidades_participantes}}
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group">
+                                <label for="example-text-input" class="form-control-label">Sector Estratégico</label>
+                                {{form.sector_estrategico}}
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Línea de Investigación</label>
+                                {{form.linea_investigacion}}
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Fecha de Inicio</label>
+                                {{form.fecha_inicio}}
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Fecha de Cierre</label>
+                                {{form.fecha_cierre}}
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4" style="padding-bottom:20px;">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Estado del Proyecto</label>
+                                {{form.estado_proyecto}}
+                              </div>
+                            </div>
+                            <hr class="horizontal dark">
+                            <h4 class="textt text-sm">Participantes en el Proyecto</h4>
+                            <div class="col-md-5 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Cantidad de Profesores</label>
+                                {{form.cantidad_profesores_trabajadores_uho}}
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Cantidad de Estudiantes Contratados</label>
+                                {{form.cantidad_estudiantes_contratados}}
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4" style="padding-bottom:20px;">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Cantidad de Otras Entidades</label>
+                                {{form.cantidad_participantes_otras_entidades}}
+                              </div>
+                            </div>
+                            <hr class="horizontal dark">
+                            <h4 class="textt text-sm">Colaboradores del Proyecto</h4>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Cantidad de Profesores</label>
+                                {{form.cantidad_profesores_colaboradores_uho}}
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Cantidad de Estudiantes de GC</label>
+                                {{form.cantidad_estudiantes_grupos_cientificos}}
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Cantidad de Otras Entidades</label>
+                                {{form.cantidad_colaboradores_otras_entidades}}
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-6">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Cantidad de Estudiantes de Segundo Año en Adelante</label>
+                                {{form.cantidad_estudiantes_segundo_adelante}}
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-6" style="padding-bottom:20px;">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Cantidad de Cuadros de la UHo</label>
+                                {{form.cantidad_cuadros_uho}}
+                              </div>
+                            </div>
+                            <hr class="horizontal dark">
+                            <h4 class="textt text-sm">Presupuesto del Proyecto</h4>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label"> Planificado en el Año</label>
+                                {{form.presupuesto_planificado}}
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Ejecutado en el Primer Semestre</label>
+                                {{form.presupuesto_ejecutado_primer_semestre}}
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Ejecutado en el Segundo Semestre</label>
+                                {{form.presupuesto_ejecutado_segundo_semestre}}
+                              </div>
+                            </div>
+                          </div>   
+                        </div>
+                        <div class="boot d-flex flex-wrap justify-content-center align-items-center">
+                          <button type="submit" id="boton" class="btn btn-primary btn-sm m-2">Guardar</button>
+                          <a href="{% url 'Proyecto_List_Investigador' %}" class="btn btn-primary btn-sm m-2 text-decoration-none">Cancelar</a> 
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>    
+        </div>
+      </div>
+    {% endblock %}
+    
+    {% block js %}
+      <script src = "{% static 'js/validations.js' %}"></script>
+    {% endblock %}
+  
+ 

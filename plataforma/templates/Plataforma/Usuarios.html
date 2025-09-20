@@ -1,0 +1,362 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Container CSS -->
+{% block css %}
+<link rel="stylesheet" href=" {% static 'Plataforma/css/Dashboard.css' %}">
+<link rel="stylesheet" href=" {% static 'Plataforma/libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'Plataforma/libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'Plataforma/libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'Plataforma/css/datatable.css' %}">
+<style>
+  .filtros-container {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .filtro-grupo {
+    flex: 1;
+    min-width: 200px;
+  }
+  
+  .filtro-grupo label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+  
+  .filtro-grupo select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+  }
+  
+  .btn-filtrar {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .btn-filtrar:hover {
+    background-color: #0069d9;
+  }
+  
+  .btn-limpiar {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .btn-limpiar:hover {
+    background-color: #5a6268;
+  }
+  
+  .filtros-acciones {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+  }
+</style>
+{% endblock %}
+<!-- End Container CSS -->
+
+{% block content %}
+<main class="content-inside px-3 py-2 mx-2">
+    <div class="row">
+        <nav class="pt-2">
+            <div class="card-header grupo">
+                <h5 class="card-title">
+                    Administración
+                </h5>
+                <a href="{% url 'Registrar' %}" class="btn btn-primary btn-sm ">Crear</a>
+            </div>
+            <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
+                <button class="nav-link active text-primary" style="color:black;" id="nav-general-tab" data-bs-toggle="tab" data-bs-target="#nav-general" type="button" role="tab" aria-controls="nav-general" aria-selected="true"><i class=""></i><b>Usuarios</b></button>
+            </div>
+        </nav>
+        
+        <!-- Filtros -->
+        <div class="filtros-container">
+          <div class="filtro-grupo">
+            <label for="filtro-area">Filtrar por Área:</label>
+            <select id="filtro-area" class="form-select">
+              <option value="">Todas las áreas</option>
+              {% for area in areas %}
+                <option value="{{ area.nombre_area }}">{{ area.nombre_area }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <div class="filtro-grupo">
+            <label for="filtro-departamento">Filtrar por Departamento:</label>
+            <select id="filtro-departamento" class="form-select">
+              <option value="">Todos los departamentos</option>
+              {% for departamento in departamentos %}
+                <option value="{{ departamento.nombre_departamento }}" 
+                        data-area="{{ departamento.area.nombre_area|default_if_none:'' }}">
+                  {{ departamento.nombre_departamento }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+        
+          
+          <div class="filtros-acciones">
+            <button id="btn-limpiar-filtros" class="btn-limpiar">Limpiar filtros</button>
+          </div>
+        </div>
+        
+    <section class="tab-content" id="nav-tabContent" >
+     <div class="tab-pane fade show active" id="nav-general" role="tabpanel" aria-labelledby="nav-general-tab"> 
+        <div class="card">
+            <div class="p-2">
+            <table id="Usuarios" class="display table table-striped table-hover table-primary" style="width:100%">
+                <thead class="encabezado">
+                    <tr>
+                        <th scope="col" style="color: white; text-align: start;">#</th>
+                        <th scope="col" style="color: white; text-align: start;">Usuario</th>
+                        <th scope="col" style="color: white; text-align: start;">Teléfono</th>
+                        <th scope="col" style="color: white; text-align: start;">Email</th>
+                        <th scope="col" style="color: white; text-align: start;">Última Conexión</th>
+                        <th scope="col" style="color: white; text-align: start;">Área</th>
+                        <th scope="col" style="color: white; text-align: start;">Departamento</th>
+                        <th scope="col" style="color: white; text-align: start;">Rol</th>
+                        <th scope="col" style="color: white; text-align: start;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr data-area="{{ usuario.perfil.area.nombre_area|default:'' }}" 
+                        data-departamento="{{ usuario.perfil.departamento.nombre_departamento|default:'' }}" 
+                        data-categoria="{{ usuario.perfil.categoria_docente.nombre_categoria_docente|default:'' }}">
+                        <td style="text-align: start;">{{ forloop.counter }}</td>
+                        <td style="text-align: start;">{{ usuario.username }}</td>
+                        <td style="text-align: start;">
+                            {% if usuario.telefono %}
+                            {{ usuario.telefono }}
+                            {% else %}
+                            N/A
+                            {% endif %}
+                        </td>
+                        <td style="text-align: start;">
+                            {% if usuario.email %}
+                            <a class="iconos" href="mailto:{{ usuario.email }}">{{ usuario.email }}</a>
+                            {% else %}
+                            N/A
+                            {% endif %}
+                        </td>
+                        
+                        <td style="text-align: start;">
+                            {% if usuario.last_login %}
+                            {{ usuario.last_login }}
+                            {% else %}
+                            N/A
+                            {% endif %}
+                        </td>
+                        <td style="text-align: start;">{{ usuario.area }}</td>
+                        <td style="text-align: start;">{{ usuario.departamento }}</td>
+                        <td style="text-align: start;">
+                            <a class="iconos" href="{% url 'CambiarRol' usuario.id %}">
+                                {% with usuario.rol as rol_actual %}
+                                    {{ rol_actual }}
+                                {% endwith %}
+                            </a>
+                        </td>
+                        <td style="text-align: center; font-size: 1.2rem;">
+                            <a class="iconos p-2" data-bs-toggle="modal" data-bs-target="#Usuario{{ usuario.id }}"><i class="ico fas fa-solid fa-trash-can"></i></a>
+                        </td>
+                    </tr>
+                    <!-- Modal -->
+                    <div class="modal fade" id="Usuario{{ usuario.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel" style="color:black"><i class="bi bi-exclamation-triangle"
+                                style="color:black"></i> Advertencia</h5>
+                            <button type="button" class="btn-close cerrar" data-bs-dismiss="modal" aria-label="Close" style="box-shadow: none"></button>
+                            </div>
+                            <div class="modal-body" style="color:black">
+                            ¿Desea eliminar este usuario?
+                            </div>
+                            <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancelar</button>
+                            <a href="{% url 'EliminarUsuario' usuario.id %}" class="btn btn-primary">Aceptar</a>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        </div>
+     </div>
+    </section>
+</main>
+{% endblock %}
+
+<!-- Container JS -->
+{% block js%}
+<script src="{% static 'Plataforma/libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.buttons.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/jszip.min.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/pdfmake.min.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/vfs_fonts.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/buttons.html5.min.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/buttons.print.min.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/bottons.colVis.min.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.responsive.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>
+
+<script>
+    $(document).ready(function() {
+        // Inicializar DataTable
+        var table = $('#Usuarios').DataTable({
+            responsive: true,
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ],
+            language: {
+                url: "{% static 'Plataforma/libs/Datatable/dataTableLenguage.json' %}"
+            },
+            columnDefs: [
+                { targets: [0,8], orderable: false } // Columnas No y Acciones no ordenables
+            ]
+        });
+    
+        // Almacenar todas las opciones de departamento inicialmente
+        var allDepartamentos = $('#filtro-departamento').html();
+        
+        // Función para actualizar departamentos según área seleccionada
+        function actualizarDepartamentos() {
+          var areaSeleccionada = $('#filtro-area').val();
+          var $departamentoSelect = $('#filtro-departamento');
+          
+          // Restaurar todas las opciones primero
+          $departamentoSelect.html(allDepartamentos);
+          
+          // Si se seleccionó un área específica, filtrar los departamentos
+          if (areaSeleccionada) {
+            // Crear un nuevo conjunto de opciones
+            var opcionesVisibles = $('<option value="">Todos los departamentos</option>');
+            
+            // Agregar solo los departamentos que pertenecen al área seleccionada
+            $departamentoSelect.find('option').each(function() {
+              var $option = $(this);
+              if ($option.val() !== "" && $option.data('area') === areaSeleccionada) {
+                opcionesVisibles = opcionesVisibles.add($option.clone());
+              }
+            });
+            
+            // Reemplazar todas las opciones con las filtradas
+            $departamentoSelect.html(opcionesVisibles);
+          }
+          
+          // Resetear el valor seleccionado
+          $departamentoSelect.val('');
+          
+          // Debug
+          console.log("Opciones de departamento después de filtrar:", 
+            $('#filtro-departamento option').map(function() {
+              return $(this).text() + " (área: " + $(this).data('area') + ")";
+            }).get());
+        }
+
+        // Función para aplicar filtros a la tabla
+        function aplicarFiltros() {
+          // Obtener valores de los filtros
+          var areaSeleccionada = $('#filtro-area').val();
+          var departamentoSeleccionado = $('#filtro-departamento').val();
+          
+          // Limpiar todos los filtros primero
+          table.columns().search('').draw();
+          
+          // Aplicar filtros de forma secuencial
+          if (areaSeleccionada) {
+            // Usar expresión regular exacta para el área
+            table.column(5).search('^' + areaSeleccionada + '$', true, false).draw();
+          }
+          
+          if (departamentoSeleccionado) {
+            // Usar expresión regular exacta para el departamento
+            table.column(6).search('^' + departamentoSeleccionado + '$', true, false).draw();
+          }
+          
+          // Debug
+          console.log("Filtros aplicados - Área:", areaSeleccionada, "Departamento:", departamentoSeleccionado);
+        }
+
+        // Evento cambio en filtro de área
+        $('#filtro-area').on('change', function() {
+          var areaSeleccionada = $(this).val();
+          
+          // Actualizar departamentos disponibles
+          actualizarDepartamentos();
+          
+          // Resetear el filtro de departamento
+          $('#filtro-departamento').val('');
+          
+          // Aplicar filtros
+          aplicarFiltros();
+          
+          // Debug
+          console.log("Área seleccionada:", areaSeleccionada);
+        });
+
+        // Evento cambio en filtro de departamento
+        $('#filtro-departamento').on('change', function() {
+          // Aplicar filtros
+          aplicarFiltros();
+          
+          // Debug
+          console.log("Departamento seleccionado:", $(this).val());
+        });
+
+        // Botón limpiar filtros
+        $('#btn-limpiar-filtros').on('click', function() {
+          // Limpiar valores de los filtros
+          $('#filtro-area').val('');
+          $('#filtro-departamento').val('');
+          
+          // Restaurar todos los departamentos
+          $('#filtro-departamento').html(allDepartamentos);
+          
+          // Limpiar todos los filtros
+          table.columns().search('').draw();
+          
+          // Debug
+          console.log("Filtros limpiados");
+        });
+    
+        // Inicializar departamentos
+        actualizarDepartamentos();
+        
+        // Debug: Verificar estructura de columnas
+        console.log("Índices de columnas:");
+        $('#Usuarios thead th').each(function(index) {
+            console.log(index + ": " + $(this).text().trim());
+        });
+        
+        // Debug: Verificar datos de áreas y departamentos
+        console.log("Datos de áreas y departamentos:");
+        {% for departamento in departamentos %}
+            console.log("Departamento: {{ departamento.nombre_departamento }}, Área: {{ departamento.area.nombre_area|default:'Ninguna' }}");
+        {% endfor %}
+    });
+    </script>
+{% endblock %}

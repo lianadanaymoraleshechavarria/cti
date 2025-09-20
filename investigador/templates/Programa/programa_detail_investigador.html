@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">{{ programa.nombre }}</h1>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    Detalles del Programa
+                </div>
+                <div class="card-body">
+                    <p><strong>Descripción:</strong> {{ programa.descripcion|safe }}</p>
+
+                    <div class="mb-3">
+                        <strong>Tipo de Programa:</strong>
+                        <span class="badge bg-secondary">{{ programa.tipo_programa }}</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Organismo:</strong> {{ programa.organismo }}
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Entidad Ejecutora:</strong> {{ programa.entidad_ejecutora }}
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Fecha Inicio:</strong> {{ programa.fecha_inicio|date:"d/m/Y" }}
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Fecha Fin:</strong> {{ programa.fecha_fin|date:"d/m/Y" }}
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Código Programa:</strong> {{ programa.codigo_programa }}
+                    </div>
+
+                    <p><strong>Monto Total:</strong> ${{ programa.monto_total|intcomma }}</p>
+                    <p><strong>Monto UHO:</strong> ${{ programa.monto_uho|intcomma }}</p>
+                    <p><strong>Estado:</strong>
+                        {% if programa.activo %}
+                            <span class="badge bg-success">Activo</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inactivo</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    Entidades Participantes
+                </div>
+                <div class="card-body">
+                    {% if programa.entidades_participantes.all %}
+                        <ul class="list-group list-group-flush">
+                            {% for entidad in programa.entidades_participantes.all %}
+                                <li class="list-group-item">
+                                    <strong>Nombre:</strong> {{ entidad.nombre }}<br>
+                                    <strong>Rol:</strong> {{ entidad.rol }}<br>
+                                    <strong>Tipo:</strong> {{ entidad.tipo }}<br>
+                                    <strong>Estado Participación:</strong>
+                                    {% if entidad.estado_participacion %}
+                                        <span class="badge bg-success">Activa</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Inactiva</span>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No hay entidades participantes registradas.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    Participantes UHO
+                </div>
+                <div class="card-body">
+                    {% if programa.participantes_uho.all %}
+                        <ul class="list-group list-group-flush">
+                            {% for participante in programa.participantes_uho.all %}
+                                <li class="list-group-item">
+                                    <strong>Nombre:</strong> {{ participante.nombre }}<br>
+                                    <strong>Tipo Participación:</strong> {{ participante.tipo_participacion }}<br>
+                                    <strong>Rol:</strong> {{ participante.rol }}<br>
+                                    <strong>Estado:</strong>
+                                    {% if participante.estado %}
+                                        <span class="badge bg-success">Activo</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Inactivo</span>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No hay participantes UHO registrados.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    Acciones
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'programas:programa_update' programa.pk %}" class="btn btn-primary btn-sm">Editar</a>
+                    <a href="{% url 'programas:programa_delete' programa.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
+                    <a href="{% url 'programas:programa_list' %}" class="btn btn-secondary btn-sm">Volver a la lista</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

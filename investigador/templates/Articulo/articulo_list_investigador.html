@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'css/datatableSD.css' %}">
+<link rel="stylesheet" href="{% static 'css/styless.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="tabla" id="Articulo">
+  <div class="card-header">
+    <h5 class="card-title title-t" style=" text-align:center;">
+      Historial de Artículos
+    </h5>
+  </div>
+  <div class="boot d-flex flex-wrap justify-content-start align-items-center" style="margin-bottom: 20px;">
+    <a href="{% url 'Articulo_Revista_Create' %}" style="width: auto;" class="btn boton-form">
+      <i class="fas fa-plus"></i> Nuevo</a>
+  </div>
+  <div class="table-responsive">
+    <p><strong>Total:</strong> {{ articulo|length }} artículos</p>
+    <table id="Articulos" class="display table table-striped table-hover" style="width:100%; height: 100%;">
+    <thead class="encabezado">
+      <tr>
+        <th scope="col">No</th>
+        <th scope="col">Título</th>
+        <th scope="col">Fecha</th>
+        <th scope="col">Autores</th>
+        <th scope="col">Rol</th>
+        <th scope="col">Estado</th>
+        <th scope="col" style="text-align: center;">Opciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for a in articulo %}
+      <tr class="{% if not a.es_creador %}row-colaborador{% endif %}">
+        <td style=" text-align: center;">{{forloop.counter}}</td>
+        <td style=" text-align: start;">{{a.titulo}}</td>
+        <td style=" text-align: start;">{{a.fecha_creacion|date:"d/m/Y"}}</td>
+        <td style=" text-align: start;">
+          {% if a.autores %}
+          <div class="participantes-tooltip">
+            <span class="autores-expandibles">
+              {{a.usuario}} y {{a.autores.all|length}} más
+            </span>
+            <div class="participantes-tooltip-content">
+              <ul class="participantes-lista">
+                <li class="participante-item participante-principal">
+                  {{a.usuario}} <span class="badge-rol badge-creador">Autor Principal</span>
+                </li>
+                {% for autor in a.autores.all %}
+                <li class="participante-item participante-secundario">
+                  {{autor.nombre}} {{autor.apellidos}}
+                  <span class="badge-rol badge-colaborador">Co-autor</span>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+          {% else %}
+          {{a.usuario}} <span class="participantes-contador">0</span>
+          {% endif %}
+          </ul>
+        </td>
+        <td style=" text-align: center;">
+          {% if a.es_creador %}
+          <span class="badge-rol badge-creador">Creador</span>
+          {% else %}
+          <span class="badge-rol badge-colaborador">Colaborador</span>
+          {% endif %}
+        </td>
+        <td style="text-align: start;">
+          <span
+            class="badge-{% if a.aprobacion == 'Aprobado' %}aprobado{% elif a.aprobacion == 'Rechazado' %}rechazado{% else %}pendiente{% endif %}">
+            {{a.aprobacion}}
+          </span>
+        </td>
+        <td style=" text-align: center;">
+          <a href="{% url 'Articulo_Detail_Investigador' a.id %}"> <i class="ico fas fa-solid fa-info-circle"></i></a>
+          {% if a.aprobacion != "Aprobado" and a.es_creador %}
+          <a
+            href="{% if a.es_tipo %}{% url 'Articulo_Revista_Update_Investigador' a.id %}{% else %}{% url 'Articulo_Publicacion_Update_Investigador' a.id %}{% endif %}">
+            <i class="ico fas fa-solid fa-pen-to-square"></i></a>
+          <a class="iconos" data-bs-toggle="modal" data-bs-target="#Articulo{{ a.id }}"><i
+              class="ico fas fa-solid fa-trash-can"></i></a>
+          {% endif %}
+        </td>
+      </tr>
+      <!-- Modal -->
+      <div class="modal fade" id="Articulo{{ a.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel" style="color:black"><i class="bi bi-exclamation-triangle"
+                  style="color:black"></i> Eliminar</h5>
+              <button type="button" class="btn-close cerrar" data-bs-dismiss="modal" aria-label="Close"
+                style="box-shadow: none"></button>
+            </div>
+            <div class="modal-body" style="color:black">
+              ¿Desea eliminar el Artículo seleccionado?
+              Esta acci&oacute;n ser&aacute; permanente.
+            </div>
+            <div class="modal-footer">
+              <a href="{% url 'Articulo_Delete_Investigador' a.id  %}" class="btn btn-success">Aceptar</a>
+              <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Cancelar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="option bgs">
+    <div class="bg-active" id="bg-active"></div>
+  </div>
+</section>
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+<!--Botones DataTables-->
+<script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/pdfmake.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/bottons.colVis.min.js' %}"></script>
+<!--DataTables responsivo-->
+<script src="{% static 'libs/Datatable/JS/dataTables.responsive.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>
+<!--Inicializar DataTables-->
+<script src="{% static 'libs/Datatable/JS/Articulos.js' %}"></script>
+
+<script>
+  $(document).ready(function () {
+    // Inicializar tooltips de Bootstrap si están disponibles
+    if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+      });
+    }
+  });
+</script>
+{% endblock %}

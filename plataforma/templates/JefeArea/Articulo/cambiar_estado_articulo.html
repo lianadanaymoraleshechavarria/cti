@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Conatiner CSS -->
+{% block css %}
+<link rel="stylesheet" href=" {% static 'Plataforma/css/estilobeta.css' %}">
+{% endblock %}
+<!-- End Conatiner CSS -->
+
+{% block content %}
+<div class="container-form">
+    <div class="form-rol">
+        <div class="contact-form">
+            <span class="circle one"></span>
+            <span class="circle two"></span>
+            <form  method="POST">
+                {% csrf_token %}
+                <h3 class="title">Cambiar</h3>  
+    <!-- Mostrar mensajes aquí -->
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert"
+             style="position: fixed; right: 20px; top: 50px; z-index: 1000;">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+                <div class="input-container select-rol">
+                    <input type="hidden" name="estado">
+                    <div class="input selector">
+                    </div>
+                    <label for="">Estado del Artículo</label>
+                    <span>Estado del Artículo</span>
+                  </div>
+                  <div class="select-options" name="role">
+                    {% for estado in estados %}
+                    <div aria-valuetext="{{estado}}" value="{{estado}}" class="element">{{estado}}</div>
+                    {% endfor %}
+                  </div>
+                
+                  <div class="btn">
+                    <input type="submit" value="Aceptar" class="btn2">
+                    <a href="{% url 'Articulo_List_JefeArea' %}" class="btn2">Cancelar</a>
+                   
+                  </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- Conatiner JS -->
+{% block js %}
+<script src="{% static 'Plataforma/js/Cambio Estado Articulo.js' %}"></script>
+
+
+{% endblock %}
+<!-- End Conatiner JS -->

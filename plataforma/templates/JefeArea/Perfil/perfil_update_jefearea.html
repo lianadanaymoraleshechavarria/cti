@@ -1,0 +1,122 @@
+  {% extends "base.html" %}
+  {% load static %}
+  
+    {% block css %}
+      <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+    {% endblock %}
+  
+  
+    {% block content %}
+      <div class="content" >
+        <div class="col">
+          <div class="container-form">
+            <div class="form">
+              <div class="container-fluid py-4">
+                <div class="row">
+                  <div id="error-container">
+
+                  </div>
+                  <div class="col-md-12">
+                    <div class="card">
+                      {% if messages %}
+                      {% for message in messages %}
+                        {% if message.tags == 'success' %}
+                          <div style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem; z-index: 2000;"
+                              class="alert alert-success alert-dismissible fade show" role="alert">
+                        {% elif message.tags == 'error' %}
+                          <div style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem; z-index: 2000; "
+                              class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {% endif %}
+                          {{ message }}
+                            <button style="font-size: 10px; border-bottom: none; position: relative; box-shadow: none;" type="button"
+                              class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                          </div>
+                      {% endfor %}
+                    {% endif %}
+                      <div class="card-header pb-0">
+                        <div class="title">
+                          <h3 class="title-text p-3">Modificar Perfil</h3>
+                        </div>
+                      </div>
+                      <form  id="formu" method="POST">
+                        {% csrf_token %}
+                        <div class="card-body">
+                          <div class="row">
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group">
+                                <label for="text-input" class="form-control-label">Nombre</label>
+                                {{form.nombre}}
+                              </div>
+                            </div>
+                            
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group">
+                                <label for="example-text-input" class="form-control-label">Apellidos</label>
+                                {{form.apellidos}}
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group">
+                                <label for="example-text-input" class="form-control-label">Carnet de Identidad</label>
+                                {{form.ci}}
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Correo Electrónico</label>
+                                {{form.email}}
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group">
+                                <label for="example-text-input" class="form-control-label">Número de Móvil</label>
+                                {{form.telefono}}
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Cargo que ocupa</label>
+                                {{form.cargo}}
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group">
+                                <label for="example-text-input" class="form-control-label">Categoría Docente</label>
+                                {{form.categoria_docente}}
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group">
+                                <label for="example-text-input" class="form-control-label">Categoría Científica</label>
+                                {{form.categoria_cientifica}}
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Departamento</label>
+                                {{form.departamento}}
+                              </div>
+                            </div>
+                          
+                          </div>   
+                        </div>
+                        <div class="boot d-flex flex-wrap justify-content-center align-items-center">
+                          <button type="submit" id="boton" class="btn btn-primary btn-sm m-2">Aceptar</button>
+                          <a href="{% url 'Perfil_Detail_JefeArea' %}" class="btn btn-primary btn-sm m-2 text-decoration-none">Cancelar</a> 
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>    
+        </div>
+      </div>
+    {% endblock %}
+    
+    {% block js %}
+      <script src = "{% static 'js/validations.js' %}"></script>
+    {% endblock %}
+  
+ 

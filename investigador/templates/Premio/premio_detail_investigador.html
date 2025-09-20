@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="content">
+  <div class="col">
+    <div class="container-form">
+      <div class="form">
+        <div class="container-fluid py-4">
+          <div class="card">
+            <div class="title">
+              <h3 class="title-text p-3">Detalles del Premio</h3>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="seccion-formulario">
+                    <h5>Datos del premio</h5>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="form-group d-flex align-items-end icon-input">
+                          <div class="w-100">
+                            <label class="form-control-label">Tipo de Premio</label>
+                            <div class="input-wrapper">
+                              <i class="fas fa-trophy" style="margin-right: 5px;"></i>
+                              <input type="text" class="form-control readonly-input" value="{{ premio.tipo }}" readonly>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <div class="w-100">
+                            <label class="form-control-label">Carácter de Premio</label>
+                            <input type="text" class="form-control readonly-input" value="{{ premio.caracter }}"
+                              readonly>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group d-flex align-items-end icon-input">
+                          <div class="w-100">
+                            <label class="form-control-label">Título</label>
+                            <input type="text" class="form-control readonly-input" value="{{ premio.titulo }}" readonly>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group d-flex align-items-end icon-input">
+                          <div class="w-100">
+                            <label class="form-control-label">Institución</label>
+                            <div class="input-wrapper">
+                              <i class="fas fa-building" style="margin-right: 5px;"></i>
+                              <input type="text" class="form-control readonly-input" value="{{ premio.institucion }}"
+                                readonly>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label class="form-control-label">Fecha</label>
+                          <input type="text" class="form-control readonly-input" value="{{ premio.fecha_create }}"
+                            readonly>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group icon-input">
+                            <label class="form-control-label">Diploma del premio</label>
+                            {% if premio.diploma %}
+                            <div class="current-file-info-disabled">
+                                  <strong>Archivo actual:</strong>
+                                  <a href="{{ premio.diploma.url }}" target="_blank" class="current-file-link">
+                                    <i class="fas fa-paperclip me-1"></i>
+                                      Ver diploma
+                                  </a>
+                                </div>
+                                {% else %}
+                                  <input type="text" class="form-control readonly-input" value="No existe diploma del premio" readonly>
+                                {% endif %}
+                        </div>
+                      </div>
+                      <div class="col-md-12">
+                        <div class="form-group">
+                          <label class="form-control-label">Premiados</label>
+                          <div class="form-control readonly-input" style="height: auto; min-height: 38px;">
+                            {% if premio.premiados.all %}
+                            <div class="d-flex flex-wrap">
+                              {% for premiado in premio.premiados.all %}
+                                <span class="autor-badge">
+                                  {% if premiado.usuario %}
+                                    {{ premiado.usuario.username }}
+                                  {% elif premiado.colaborador %}
+                                    {{ premiado.colaborador.nombre }} {{ premiado.colaborador.apellidos }}
+                                  {% else %}
+                                    Desconocido
+                                  {% endif %}
+                                </span>
+                              {% endfor %}
+                            </div>
+                            {% else %}
+                            <span class="text-muted">No hay premiados</span>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                  <!-- Información adicional -->
+                  <div class="seccion-formulario">
+                    <h5>Información Adicional</h5>
+                    <div class="row">
+                      {% if premio.proyecto %}
+                      <div class="col-md-12">
+                        <div class="form-group">
+                          <label class="form-control-label">Proyecto asociado</label>
+                          <input type="text" class="form-control readonly-input"
+                            value="{{ premio.proyecto.nombre_proyecto }}" readonly>
+                        </div>
+                      </div>
+                      {% else %}
+                      <div class="col-md-12">
+                        <div class="form-group">
+                          <label class="form-control-label">No hay proyectos asociado</label>
+                        </div>
+                      </div>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  <!-- Botones -->
+                  <div class="row mt-4">
+                    <div class="col-md-12 text-center">
+                      <a href="{% url 'Premio_List_Investigador' %}" class="btn btn-cancelar ml-3">
+                        <i class="fas fa-arrow-left me-2"></i>Volver</a>
+                      <a href="{% url 'Premio_Update_Investigador' premio.id %}" class="btn boton-form ml-3">
+                        <i class="fas fa-solid fa-pen-to-square"></i> Editar</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'js/validations.js' %}"></script>
+{% endblock %}

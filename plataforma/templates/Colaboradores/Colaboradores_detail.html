@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Container CSS -->
+{% block css %}
+<link rel="stylesheet" href=" {% static 'Plataforma/css/estilobeta.css' %}">
+<style>
+    /* Estilos adicionales si son necesarios */
+    .input-container {
+        position: relative;
+        margin: 20px 0;
+    }
+    
+    .input-container label {
+        position: absolute;
+        top: 50%;
+        left: 15px;
+        transform: translateY(-50%);
+        transition: all 0.3s ease;
+        pointer-events: none;
+        color: #999;
+    }
+    
+    .input-container input:focus + label,
+    .input-container input:valid + label {
+        top: 0;
+        font-size: 12px;
+        background: #fff;
+        padding: 0 5px;
+    }
+    
+    .input-container span {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: #ddd;
+    }
+    
+    .btn1 {
+        background: #4CAF50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background 0.3s;
+    }
+    
+    .btn1:hover {
+        background: #45a049;
+    }
+    
+    .text-danger {
+        color: #dc3545;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+</style>
+{% endblock %}
+<!-- End Container CSS -->
+
+{% block content %}
+<div id="error-container"></div>
+
+<div class="container-form">
+    <div class="form">
+        {% if messages %}
+        {% for message in messages %}
+          {% if message.tags == 'success' %}
+            <div style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem; z-index: 2000;"
+                class="alert alert-success alert-dismissible fade show" role="alert">
+          {% elif message.tags == 'error' %}
+            <div style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem; z-index: 2000;"
+                class="alert alert-danger alert-dismissible fade show" role="alert">
+          {% endif %}
+            {{ message }}
+              <button style="font-size: 10px; border-bottom: none; position: relative; box-shadow: none;" type="button"
+                class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+        {% endif %}
+        
+        <div class="contact-form">
+            <span class="circle one"></span>
+            <span class="circle two"></span>
+            
+            <form action="." method="POST">
+                {% csrf_token %}
+                <h3 class="title">Nuevo Colaborador</h3>
+                
+                <!-- Nombre -->
+                <div class="input-container">
+                    <input type="text" name="nombre" class="input" required id="id_nombre" value="{{ form.nombre.value|default_if_none:'' }}">
+                    <label for="id_nombre">Nombre</label>
+                    <span>Nombre</span>
+                    {% if form.nombre.errors %}
+                        <div class="text-danger">{{ form.nombre.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <!-- Apellidos -->
+                <div class="input-container">
+                    <input type="text" name="apellidos" class="input" required id="id_apellidos" value="{{ form.apellidos.value|default_if_none:'' }}">
+                    <label for="id_apellidos">Apellidos</label>
+                    <span>Apellidos</span>
+                    {% if form.apellidos.errors %}
+                        <div class="text-danger">{{ form.apellidos.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <!-- ORCID -->
+                <div class="input-container">
+                    <input type="text" name="orci" class="input" id="id_orci" value="{{ form.orci.value|default_if_none:'' }}" placeholder="0000-0001-2345-6789">
+                    <label for="id_orci">ORCID (opcional)</label>
+                    <span>ORCID</span>
+                    {% if form.orci.errors %}
+                        <div class="text-danger">{{ form.orci.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <!-- Google Académico -->
+                <div class="input-container">
+                    <input type="url" name="google_academico" class="input" id="id_google_academico" value="{{ form.google_academico.value|default_if_none:'' }}" placeholder="https://scholar.google.com/citations?user=ID">
+                    <label for="id_google_academico">Google Académico</label>
+                    <span>Google Académico</span>
+                    {% if form.google_academico.errors %}
+                        <div class="text-danger">{{ form.google_academico.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <!-- ResearchGate -->
+                <div class="input-container">
+                    <input type="url" name="rgate" class="input" id="id_rgate" value="{{ form.rgate.value|default_if_none:'' }}" placeholder="https://www.researchgate.net/profile/Nombre_Apellido">
+                    <label for="id_rgate">ResearchGate</label>
+                    <span>ResearchGate</span>
+                    {% if form.rgate.errors %}
+                        <div class="text-danger">{{ form.rgate.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <input type="submit" value="Guardar Colaborador" class="btn1" id="boton">
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- Container JS -->
+{% block js %}
+<script src="{% static 'Plataforma/js/FormularioSelect.js' %}"></script>
+<script>
+// Validación adicional si es necesaria
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        // Validar que al menos nombre y apellidos estén completos
+        const nombre = document.getElementById('id_nombre').value.trim();
+        const apellidos = document.getElementById('id_apellidos').value.trim();
+        
+        if (!nombre || !apellidos) {
+            isValid = false;
+            alert('Por favor complete nombre y apellidos');
+        }
+        
+        // Validación adicional para ORCID si existe
+        const orcid = document.getElementById('id_orci').value.trim();
+        if (orcid && !/^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/.test(orcid)) {
+            isValid = false;
+            alert('El formato de ORCID no es válido. Debe ser: 0000-0000-0000-0000');
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+        }
+    });
+    
+    // Cerrar automáticamente los mensajes después de 5 segundos
+    setTimeout(function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 5000);
+    
+    // Efectos para los inputs
+    const inputs = document.querySelectorAll('.input');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentNode.querySelector('label').style.color = '#4CAF50';
+            this.parentNode.querySelector('span').style.background = '#4CAF50';
+        });
+        
+        input.addEventListener('blur', function() {
+            this.parentNode.querySelector('label').style.color = '#999';
+            this.parentNode.querySelector('span').style.background = '#ddd';
+        });
+    });
+});
+</script>
+{% endblock %}
+<!-- End Container JS -->

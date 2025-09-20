@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Container CSS -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'Plataforma/css/Dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'Plataforma/libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'Plataforma/libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'Plataforma/libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'Plataforma/css/datatable.css' %}">
+<style>
+    .card-header.CategoriaCientifica {
+        background-color: #2c3e50;
+        color: white;
+    }
+    .table-primary {
+        --bs-table-bg: #f8f9fa;
+    }
+</style>
+{% endblock %}
+<!-- End Container CSS -->
+
+{% block content %}
+<main class="content-inside px-3 py-2">
+    <section id="tablaCategoriasCientificas">
+        <div class="card">
+            <div class="card-header CategoriaCientifica">
+                <h5 class="card-title">
+                    Categorías Científicas
+                </h5>
+                <a href="{% url 'CategoriaCientifica_create' %}" class="btn btn-primary btn-sm">Crear Categoría</a>
+            </div>
+            <div class="p-2">
+                <table id="CategoriasCientificas" class="display table table-striped table-hover table-primary" style="width:100%">
+                    <thead class="encabezado">
+                        <tr>
+                            <th scope="col" style="color: white; text-align: start;">#</th>
+                            <th scope="col" style="color: white; text-align: start;">Nombre de la Categoría</th>
+                            <th scope="col" style="color: white; text-align: center;">Opciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for categoria in categorias_cientificas %}
+                        <tr>
+                            <td style="text-align: start;">{{ forloop.counter }}</td>
+                            <td style="text-align: start;">{{ categoria.nombre_categoria_cientifica }}</td>
+                            <td style="text-align: center; font-size: 1.2rem;">
+                                <a class="iconos p-2" href="{% url 'CategoriaCientifica_Update' categoria.id %}" title="Editar">
+                                    <i class="fas fa-solid fa-pen-to-square"></i>
+                                </a>
+                                <a class="iconos p-2" data-bs-toggle="modal" data-bs-target="#CategoriaCientifica{{ categoria.id }}" title="Eliminar">
+                                    <i class="fas fa-solid fa-trash-can"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <!-- Modal de Confirmación -->
+                        <div class="modal fade" id="CategoriaCientifica{{ categoria.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel" style="color:black">
+                                            <i class="bi bi-exclamation-triangle" style="color:black"></i> Confirmación
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="box-shadow: none"></button>
+                                    </div>
+                                    <div class="modal-body" style="color:black">
+                                        ¿Está seguro que desea eliminar la categoría "{{ categoria.nombre_categoria_cientifica }}"?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <form method="post" action="{% url 'CategoriaCientifica_Delete' categoria.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" style="text-align: center;">No hay categorías científicas registradas</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
+<!-- Container JS -->
+{% block js %}
+<script src="{% static 'Plataforma/libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.buttons.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/jszip.min.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/pdfmake.min.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/vfs_fonts.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/buttons.html5.min.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/buttons.print.min.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.responsive.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>
+<script>
+$(document).ready(function() {
+    $('#CategoriasCientificas').DataTable({
+        responsive: true,
+        language: {
+            url: "{% static 'Plataforma/libs/Datatable/dataTableLenguage.json' %}"
+        },
+        dom: 'Bfrtip',
+        buttons: [
+            'copy', 'csv', 'excel', 'pdf', 'print'
+        ],
+        columnDefs: [
+            { orderable: false, targets: [2] } // Deshabilitar ordenamiento para columna de opciones
+        ]
+    });
+});
+</script>
+{% endblock %}
+<!-- End Container JS -->

@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'css/datatableSD.css' %}">
+<link rel="stylesheet" href="{% static 'css/styless.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="tabla" id="Curriculo">
+  <div class="card-header">
+    <h5 class="card-title" style="text-align:center;">
+      Mi Currículo
+    </h5>
+  </div>
+
+  <div class="boot d-flex flex-wrap justify-content-start align-items-center" style="margin-bottom: 20px;">
+    <a href="{% url 'Evento_Create' %}" class="btn boton-form m-2">Añadir Evento</a>
+    <a href="{% url 'Articulo_Revista_Create' %}" class="btn boton-form m-2">Añadir Articulo</a>
+    <a href="{% url 'Articulo_Publicacion_Create' %}" class="btn boton-form m-2">Añadir
+      Publicación</a>
+    <a href="{% url 'Premio_Create' %}" class="btn boton-form m-2">Añadir Premio</a>
+    <a href="{% url 'Programa_Create' %}" class="btn boton-form m-2">Añadir Programa</a>
+    <a href="{% url 'Proyecto_Create' %}" class="btn boton-form m-2">Añadir Proyecto</a>
+  </div>
+
+  <!-- Contenedor de filtros personalizados -->
+  <div class="filters-container" style="margin-bottom: 20px;">
+    <div class="filter-group">
+      <label for="filter-tipo">Marcador:</label>
+      <select id="filter-tipo" class="filter-select">
+        <option value="">Todos</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="filter-rol">Rol:</label>
+      <select id="filter-rol" class="filter-select">
+        <option value="">Todos</option>
+        <option value="Creador">Creador</option>
+        <option value="Colaborador">Colaborador</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="filter-estado">Estado:</label>
+      <select id="filter-estado" class="filter-select">
+        <option value="">Todos</option>
+        <option value="Aprobado">Aprobado</option>
+        <option value="Pendiente">Pendiente</option>
+        <option value="Rechazado">Rechazado</option>
+      </select>
+    </div>
+  </div>
+<div class="table-responsive">
+  <table id="Curriculos" class="table table-striped text-light">
+    <thead class="encabezado">
+      <tr>
+        <th scope="col">No</th>
+        <th scope="col">Título</th>
+        <th scope="col">Año</th>
+        <th scope="col">Marcador</th>
+        <th scope="col">Rol</th>
+        <th scope="col">Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for resultado in resultados %}
+      <tr class="{% if not resultado.es_creador %}row-colaborador{% endif %}">
+        <td style="text-align:start;">{{ forloop.counter }}</td>
+        <td style="text-align:start;">{{ resultado.nombre|truncatechars:40 }}</td>
+        <td style="text-align:start;">{{ resultado.fecha_create|date:"Y" }}</td>
+        <td style="text-align:start;">
+          <span class="badge-tipo badge-{{ resultado.tipo_resultado|lower }}">
+            {{ resultado.tipo_resultado|capfirst }}
+          </span>
+        </td>
+        <td style="text-align:start;">
+          {% if resultado.es_creador %}
+          <span class="badge-rol badge-creador">Creador</span>
+          {% else %}
+          <span class="badge-rol badge-colaborador">Colaborador</span>
+          {% endif %}
+        </td>
+        <td style="text-align:start;">
+          {% if resultado.aprobacion %}
+          <span
+            class="badge-{% if resultado.aprobacion == 'Aprobado' %}aprobado{% elif resultado.aprobacion == 'No Válido' %}rechazado{% else %}pendiente{% endif %}">
+            {% if resultado.aprobacion == 'Aprobado' %}
+            <i class="fas fa-check-circle me-1"></i>
+            {% elif resultado.aprobacion == 'No Válido' %}
+              <i class="fas fa-times-circle me-1"></i>
+            {% else %}
+              <i class="fas fa-hourglass-half me-1"></i>
+            {% endif %}
+            {{ resultado.aprobacion }}
+          </span>
+          {% else %}
+          N/A
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div> 
+</section>
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/pdfmake.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/bottons.colVis.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.responsive.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>
+
+<script>
+  $(document).ready(function () {
+    var table = $('#Curriculos').DataTable({
+      responsive: true,
+      dom: 'Bfrtip',
+      buttons: [
+        'copy', 'csv', 'excel', 'pdf', 'print', 'colvis'
+      ],
+      language: {
+        url: "{% static 'libs/Datatable/dataTableLenguage.json' %}"
+      },
+      columnDefs: [
+        { orderable: false, targets: [3, 5, 7] }, // Columnas no ordenables
+        { searchable: false, targets: [0] } // Columna No no buscable
+      ]
+    });
+
+    // Función para extraer el texto del badge
+    function extractBadgeText(html) {
+      var div = document.createElement('div');
+      div.innerHTML = html;
+      return div.textContent.trim();
+    }
+
+    // Aplicar filtros personalizados
+    $('#filter-tipo').on('change', function () {
+      table.column(3).search(this.value).draw();
+    });
+
+    $('#filter-rol').on('change', function () {
+      table.column(5).search(this.value).draw();
+    });
+
+    $('#filter-estado').on('change', function () {
+      table.column(7).search(this.value).draw();
+    });
+
+    // Inicializar filtros con los valores únicos de la tabla
+    function initFilters() {
+      // Tipo (columna 3)
+      var tipos = table.column(3, { search: 'applied' }).data().unique().sort();
+      tipos.each(function (d, j) {
+        var text = extractBadgeText(d);
+        if (text) {
+          $('#filter-tipo').append('<option value="' + text + '">' + text + '</option>');
+        }
+      });
+
+      // Estado (columna 7)
+      var estados = table.column(7, { search: 'applied' }).data().unique().sort();
+      estados.each(function (d, j) {
+        var text = extractBadgeText(d);
+        if (text && text !== 'N/A') {
+          $('#filter-estado').append('<option value="' + text + '">' + text + '</option>');
+        }
+      });
+    }
+
+    // Llamar a la inicialización después de que DataTables esté listo
+    table.on('init', function () {
+      initFilters();
+    });
+
+    // Estilo para botones de exportación
+    $('.dt-buttons .btn').addClass('btn-sm btn-secondary');
+  });
+</script>
+{% endblock %}

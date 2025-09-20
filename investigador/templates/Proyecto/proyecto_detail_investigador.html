@@ -1,0 +1,222 @@
+  {% extends "base.html" %}
+  {% load static %}
+  
+    {% block css %}
+      <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+    {% endblock %}
+  
+  
+    {% block content %}
+      <div class="content" >
+        <div class="col">
+          <div class="container-form">
+            <div class="form">
+              <div class="container-fluid py-4">
+                <div class="row">
+                  <div id="error-container">
+
+                  </div>
+                  <div class="col-md-12">
+                    <div class="card">
+                      {% if messages %}
+                      {% for message in messages %}
+                        {% if message.tags == 'success' %}
+                          <div style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem; z-index: 2000;"
+                              class="alert alert-success alert-dismissible fade show" role="alert">
+                        {% elif message.tags == 'error' %}
+                          <div style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem; z-index: 2000; "
+                              class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {% endif %}
+                          {{ message }}
+                            <button style="font-size: 10px; border-bottom: none; position: relative; box-shadow: none;" type="button"
+                              class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                          </div>
+                      {% endfor %}
+                    {% endif %}
+                      <div class="card-header pb-0">
+                        <div class="title">
+                          <h3 class="title-text p-3">Detalles del Proyecto</h3>
+                        </div>
+                      </div>
+                      <form  id="formu" method="POST">
+                        {% csrf_token %}
+                        <div class="card-body">
+                          <div class="row">
+                            <div class="col-md-12">
+                              <div class="form-group">
+                                <label for="text-input" class="form-control-label">Código del Proyecto</label>
+                                <input type="text" name="autores" id="autores" class="form-control" required value="{{ proyecto.codigo_proyecto }}" required disabled>
+                              </div>
+                            </div>
+                            
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group">
+                                <label for="example-text-input" class="form-control-label">Nombre del Proyecto</label>
+                                <input type="text" name="autores" id="autores" class="form-control" required value="{{ proyecto.nombre_proyecto }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group">
+                                <label for="example-text-input" class="form-control-label">Jefe del Proyecto</label>
+                                <input type="text" name="autores" id="autores" class="form-control" required value="{{ proyecto.jefe_proyecto }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Área</label>
+                                <input type="text" name="autores" id="autores" class="form-control" required value="{{ proyecto.area }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group">
+                                <label for="example-text-input" class="form-control-label">Departamento</label>
+                                <input type="text" name="autores" id="autores" class="form-control" required value="{{ proyecto.departamento }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Tipo de Proyecto</label>
+                                <input type="text" name="autores" id="autores" class="form-control" required value="{{ proyecto.tipo_proyecto }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Subtipo de Proyecto</label>
+                                <input type="text" name="autores" id="autores" class="form-control" required value="{{ proyecto.subtipo_proyecto }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Entidades Participantes</label>
+                                <input type="text" name="autores" id="autores" class="form-control" required value="{{ proyecto.entidades_participantes }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group">
+                                <label for="example-text-input" class="form-control-label">Sector Estratégico</label>
+                                <input type="text" name="autores" id="autores" class="form-control" required value="{{ proyecto.sector_estrategico }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Línea de Investigación</label>
+                                <input type="text" name="autores" id="autores" class="form-control" required value="{{ proyecto.linea_investigacion }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Fecha de Inicio</label>
+                                <input type="text" name="autores" id="autores" class="form-control" required value="{{ proyecto.fecha_inicio }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Fecha de Cierre</label>
+                                <input type="text" name="autores" id="autores" class="form-control" required value="{{ proyecto.fecha_cierre }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4" style="padding-bottom:20px;">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Estado del Proyecto</label>
+                                <input type="text" name="autores" id="autores" class="form-control" required value="{{ proyecto.estado_proyecto }}" required disabled>
+                              </div>
+                            </div>
+                            <hr class="horizontal dark">
+                            <h4 class="textt text-sm">Participantes en el Proyecto</h4>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Cantidad de Profesores</label>
+                                <input type="text" name="autores" id="autores" class="form-control" required value="{{ proyecto.cantidad_profesores_trabajadores_uho }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Cantidad de Estudiantes Contratados</label>
+                                <input type="text" name="autores" id="autores" class="form-control" required value="{{ proyecto.cantidad_estudiantes_contratados }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4" style="padding-bottom:20px;">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Cantidad de Otras Entidades</label>
+                                <input type="text" name="autores" id="autores" class="form-control" required value="{{ proyecto.cantidad_participantes_otras_entidades }}" required disabled>
+                              </div>
+                            </div>
+                            <hr class="horizontal dark">
+                            <h4 class="textt text-sm">Colaboradores del Proyecto</h4>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Cantidad de Profesores Colaboradores</label>
+                                <input type="text" name="autores" id="autores" class="form-control" required value="{{ proyecto.cantidad_profesores_colaboradores_uho }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Cantidad de Estudiantes de GC</label>
+                                <input type="text" name="autores" id="autores" class="form-control" required value="{{ proyecto.cantidad_estudiantes_grupos_cientificos }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Cantidad de Otras Entidades</label>
+                                <input type="text" name="autores" id="autores" class="form-control" required value="{{ proyecto.cantidad_colaboradores_otras_entidades }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-6">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Cantidad de Estudiantes de Segundo Año en Adelante</label>
+                                <input type="text" name="autores" id="autores" class="form-control" required value="{{ proyecto.cantidad_estudiantes_segundo_adelante }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-6" style="padding-bottom:20px;">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Cantidad de Cuadros de la UHo</label>
+                                <input type="text" name="autores" id="autores" class="form-control" required value="{{ proyecto.cantidad_cuadros_uho }}" required disabled>
+                              </div>
+                            </div>
+                            <hr class="horizontal dark">
+                            <h4 class="textt text-sm">Presupuesto del Proyecto</h4>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label"> Planificado en el Año</label>
+                                <input type="text" name="autores" id="autores" class="form-control" required value="{{ proyecto.presupuesto_planificado }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label"> Ejecutado en el Primer Semestre</label>
+                                <input type="text" name="autores" id="autores" class="form-control" required value="{{ proyecto.presupuesto_ejecutado_primer_semestre }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label"> Ejecutado en el Segundo Semestre</label>
+                                <input type="text" name="autores" id="autores" class="form-control" required value="{{ proyecto.presupuesto_ejecutado_segundo_semestre }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Estado del Proyecto</label>
+                                <input type="text" name="autores" id="autores" class="form-control" required value="{{ proyecto.aprobacion}}" required disabled>
+                              </div>
+                            </div>
+                          </div>   
+                        </div>
+                        <div class="boot d-flex flex-wrap justify-content-center align-items-center">
+                          <a href="{% url 'Proyecto_List_Investigador' %}" class="btn btn-primary btn-sm m-2 text-decoration-none">Atrás</a> 
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>    
+        </div>
+      </div>
+    {% endblock %}
+    
+    {% block js %}
+      <script src = "{% static 'js/validations.js' %}"></script>
+    {% endblock %}
+  
+ 

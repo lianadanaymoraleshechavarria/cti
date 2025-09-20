@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Conatiner CSS -->
+{% block css %}
+<link rel="stylesheet" href=" {% static 'css/Dashboard.css' %}">
+<link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'css/datatableSD.css' %}">
+{% endblock %}
+<!-- End Conatiner CSS -->
+
+{% block content %}
+<main class="content-inside px-3 py-2">
+    <section id="tablaAreas">
+        <div class="card">
+            <div class="card-header Area">
+                <h5 class="card-title">
+                    Areas
+                </h5>
+                <a href="{% url 'Area_create' %}" class="btn btn-primary btn-sm ">Crear Area</a>
+            </div>
+            <div class="p-2">
+            <table id="Areas" class="display table table-striped table-hover table-primary"
+                style="width:100%; height: 100%;">
+                <thead class="encabezado">
+                    <tr>
+                        <th scope="col" style="color: white; text-align: start;">#</th>
+                        <th scope="col" style="color: white; text-align: start;">Nombre del Area</th>
+                        <th scope="col" style="color: white; text-align: center;">Opción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for area in object_list %}
+                    <tr>
+                        <td style="text-align: start;">{{ forloop.counter }}</td>
+                        <td style="text-align: start;">{{area.nombre_area}}</td>
+                        <td style="text-align: center; font-size: 1.2rem;">
+                            <a class="iconos p-2" href="{% url "Area_Update" area.id %}"><i class=" fas fa-solid fa-pen-to-square"></i></a>
+                            <a class="iconos p-2" data-bs-toggle="modal" data-bs-target="#Area{{ area.id }}"><i class="fas fa-solid fa-trash-can"></i></a>
+                        </td>
+                    </tr>
+                    <!-- Modal -->
+                    <div class="modal fade" id="Area{{ area.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel" style="color:black"><i class="bi bi-exclamation-triangle"
+                                style="color:black"></i> Advertencia</h5>
+                            <button type="button" class="btn-close cerrar" data-bs-dismiss="modal" aria-label="Close" style="box-shadow: none"></button>
+                            </div>
+                            <div class="modal-body" style="color:black">
+                            ¿Desea eliminar esta Area?
+                            </div>
+                            <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancelar</button>
+                            <a href="{% url 'Area_Delete' area.id %}" class="btn btn-primary">Aceptar</a>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

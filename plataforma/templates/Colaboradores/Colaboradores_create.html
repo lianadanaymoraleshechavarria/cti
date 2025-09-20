@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="content">
+    <div class="col">
+        <div class="container-form">
+            <div class="form">
+                <div class="container-fluid py-4">
+                    <div class="card">
+                        <div class="title">
+                            <h3 class="title-text p-3">Nuevo Colaborador</h3>
+                        </div>
+                        <form action="." method="POST">
+                            {% csrf_token %}
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="seccion-formulario">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label required-field">Nombre</label>
+                                                        {{ form.nombre }}
+                                                        {% for error in form.nombre.errors %}
+                                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label
+                                                            class="form-control-label required-field">Apellidos</label>
+                                                        {{ form.apellidos }}
+                                                        {% for error in form.apellidos.errors %}
+                                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">ORCID</label>
+                                                        {{ form.orci }}
+                                                        {% for error in form.orci.errors %}
+                                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Google Académico</label>
+                                                        {{ form.google_academico }}
+                                                        {% for error in form.orci.errors %}
+                                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Research Gate</label>
+                                                        {{ form.rgate }}
+                                                        {% for error in form.rgate.errors %}
+                                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12 text-center">
+                                                <a href="{% url 'Colaboradores_List' %}"
+                                                    class="btn btn-cancelar ml-3">Cancelar</a>
+                                                <button type="submit" class="btn boton-form">
+                                                    <i class="fas fa-check"></i> Guardar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- Container JS -->
+{% block js %}
+<script src="{% static 'Plataforma/js/FormularioSelect.js' %}"></script>
+<script>
+    // Validación adicional si es necesaria
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('form');
+
+        form.addEventListener('submit', function (e) {
+            let isValid = true;
+
+            // Validar que al menos nombre y apellidos estén completos
+            const nombre = document.getElementById('id_nombre').value.trim();
+            const apellidos = document.getElementById('id_apellidos').value.trim();
+
+            if (!nombre || !apellidos) {
+                isValid = false;
+                alert('Por favor complete nombre y apellidos');
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+
+        // Cerrar automáticamente los mensajes después de 5 segundos
+        setTimeout(function () {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function (alert) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    });
+</script>
+{% endblock %}
+<!-- End Container JS -->

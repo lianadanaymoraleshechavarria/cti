@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Container CSS -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'Plataforma/css/estilobeta.css' %}">
+{% endblock %}
+<!-- End Container CSS -->
+
+{% block content %}
+<div id="error-container">
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            <strong>Por favor corrige los errores siguientes:</strong>
+            <ul>
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <li>{{ field.label }}: {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+</div>
+<div class="container-form">
+    <div class="form">
+        <div class="contact-form">
+            <span class="circle one"></span>
+            <span class="circle two"></span>
+            <form action="." method="POST">
+                {% csrf_token %}
+                <h3 class="title">Editar Característica de Evento</h3>
+                <div class="input-container">
+                    {{ form.nombre_caracter_evento }}
+                    <label for="id_nombre_caracter_evento">Nombre de la Característica</label>
+                    <span>Nombre de la Característica</span>
+                </div>
+                <input type="submit" value="Actualizar Característica" class="btn1" id="boton">
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- Container JS -->
+{% block js %}
+<script src="{% static 'Plataforma/js/FormularioSelect.js' %}"></script>
+<script src="{% static 'Plataforma/js/CrearCaracteristica.js' %}"></script>
+{% endblock %}
+<!-- End Container JS -->

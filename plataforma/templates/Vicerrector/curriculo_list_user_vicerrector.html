@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+  <link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+  <link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+  <link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+  <link rel="stylesheet" href="{% static 'css/datatableSD.css' %}">
+{% endblock %}
+
+{% block content %}
+  <section class="tabla" id="Curriculo">
+    <div class="card card-a p-3 h-100">
+      <div class="card-header">
+        <h5 class="card-title title-t" style=" text-align: center;">
+          <i class="bi bi-file-earmark-text-fill"></i>
+          Currículum de {{ perfil_investigador.nombre }} {{ perfil_investigador.apellidos }}
+        </h5>
+      </div>
+      
+      <table id="Curriculos" class="display table table-striped table-hover table-bg-successy" style="width:100%; height: 100%;">
+        <thead class="encabezado">
+          <tr>
+            <th scope="col" style="color: white; text-align: center;">No</th>
+            <th scope="col" style="color: white; text-align: center;">Tipo</th>
+            <th scope="col" style="color: white; text-align: center;">Fecha de Creación</th>
+            <th scope="col" style="color: white; text-align: center;">Nombre</th>
+            <th scope="col" style="color: white; text-align: center;">Departamento</th>
+            <th scope="col" style="color: white; text-align: center;">Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for resultado in resultados %}
+            <tr>
+                <td style="text-align: center;">{{ forloop.counter }}</td>
+                <td style="text-align: start;">{{ resultado.tipo_resultado|capfirst }}</td>
+                <td style="text-align: center;">{{ resultado.fecha_create }}</td>
+                <td style="text-align: start;">{{ resultado.nombre }}</td>
+                <td style="text-align: center;">{{ resultado.departamento }}</td>
+                <td style="text-align: center;">{{ resultado.aprobacion }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="option bgs">
+      <div class="bg-active" id="bg-active"></div>
+    </div>
+  </section>
+{% endblock %}
+   
+{% block js %}
+  <script src="{% static 'libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/dataTables.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+  <!--Botones DataTables-->  
+  <script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/pdfmake.min.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/bottons.colVis.min.js' %}"></script>  
+  <!--DataTables responsivo-->
+  <script src="{% static 'libs/Datatable/JS/dataTables.responsive.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>  
+  <!--Inicializar DataTables-->
+  <script src="{% static 'libs/Datatable/JS/Curriculos.js' %}"></script>
+{% endblock %}

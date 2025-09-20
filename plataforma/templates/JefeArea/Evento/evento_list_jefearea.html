@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+  <link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+  <link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+  <link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+  <link rel="stylesheet" href="{% static 'css/datatableSD.css' %}">
+  <style>
+    /* Estilos para participantes */
+    .participantes-lista {
+      max-height: 100px;
+      overflow-y: auto;
+      padding: 0;
+      margin: 0;
+      list-style-type: none;
+    }
+    
+    .participante-item {
+      padding: 2px 0;
+      border-bottom: 1px dashed #eee;
+    }
+    
+    .participante-item:last-child {
+      border-bottom: none;
+    }
+    
+    .participante-principal {
+      font-weight: bold;
+    }
+    
+    .participante-secundario {
+      font-style: italic;
+      color: #666;
+    }
+    
+    .participantes-contador {
+      background-color: #f8f9fa;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      margin-left: 5px;
+    }
+    
+    .participantes-tooltip {
+      position: relative;
+      cursor: pointer;
+    }
+    
+    .participantes-tooltip:hover .participantes-tooltip-content {
+      display: block;
+    }
+    
+    .participantes-tooltip-content {
+      display: none;
+      position: absolute;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 8px;
+      z-index: 1000;
+      width: 200px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      left: 0;
+      top: 100%;
+    }
+    
+    .autores-expandibles {
+      cursor: pointer;
+      color: #007bff;
+    }
+    
+    .autores-expandibles:hover {
+      text-decoration: underline;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <section class="tabla" id="Premio">
+    {% if messages %}
+      {% for message in messages %}
+        {% if message.tags == 'success' %}
+          <div style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem; z-index: 2000;"
+              class="alert alert-success alert-dismissible fade show" role="alert">
+        {% elif message.tags == 'error' %}
+          <div style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem; z-index: 2000; "
+              class="alert alert-danger alert-dismissible fade show" role="alert">
+        {% endif %}
+          {{ message }}
+            <button style="font-size: 10px; border-bottom: none; position: relative; box-shadow: none;" type="button"
+              class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+      {% endfor %}
+    {% endif %}
+    <div class="card card-a p-3 h-100">
+      <div class="card-header">
+        <h5 class="card-title title-t" style=" text-align: start;">
+            Premios
+        </h5>
+        <div class="boot d-flex flex-wrap justify-content-start align-items-center">
+          <a href="{% url 'Evento_Create' %}" class="btn1 m-2 btn btn-success btn-sm text-decoration-none">Añadir</a>
+        </div>
+      <table id="Premios" class="display table table-striped table-hover table-primary" style="width:100%; height: 100%;">
+        <thead class="encabezado">
+          <tr>
+            <th scope="col" style="color: white; text-align: center;">No</th>
+            <th scope="col" style="color: white; text-align: center;">Título</th>
+            <th scope="col" style="color: white; text-align: center;">Fecha</th>
+            <th scope="col" style="color: white; text-align: center;">Participantes</th>
+            <th scope="col" style="color: white; text-align: center;">Area</th>
+            <th scope="col" style="color: white; text-align: center;">Estado</th>
+            <th scope="col" style="color: white; text-align: center;">Opciones</th>
+            
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in premios %}
+            <tr>
+              <td style=" text-align: center;">{{forloop.counter}}</td>
+              <td style=" text-align: start;">{{p.titulo}}</td>
+              <td style=" text-align: start;">{{p.fecha}}</td>
+              <td style=" text-align: start;">
+                {% if p.participantes %}
+                  <div class="participantes-tooltip">
+                    <span class="autores-expandibles">
+                      {{p.usuario}} y {{p.participantes|length}} más
+                    </span>
+                    <div class="participantes-tooltip-content">
+                      <ul class="participantes-lista">
+                        <li class="participante-item participante-principal">
+                          {{p.usuario}} <span class="badge-rol badge-creador">Autor Principal</span>
+                        </li>
+                        {% for participante in p.participantes %}
+                          <li class="participante-item participante-secundario">
+                            {{participante.nombre}} {{participante.apellidos}}
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    </div>
+                  </div>
+                {% else %}
+                  {{p.usuario}}
+                {% endif %}
+              </td>
+              <td style=" text-align: start;">{{p.area}}</td>
+              <td style=" text-align: start;"><a class="cambiar-estado" style=" text-decoration: none; " href="{% url "Cambiar_Estado_Premio" p.id %}">{{ p.aprobacion }}</a></td>
+              <td style=" text-align: center;">
+                <a href= "{% url 'Premio_Detail_JefeArea' p.id %}"> <i class="ico fas fa-solid fa-info-circle"></i></a>
+                <a class="iconos" data-bs-toggle="modal" data-bs-target="#Premio{{ p.id }}"><i class="ico fas fa-solid fa-trash-can"></i></a>
+               
+              </td>
+            </tr>
+            <!-- Modal -->
+            <div class="modal fade" id="Premio{{ p.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel" style="color:black"><i class="bi bi-exclamation-triangle"
+                      style="color:black"></i> Eliminar</h5>
+                    <button type="button" class="btn-close cerrar" data-bs-dismiss="modal" aria-label="Close" style="box-shadow: none"></button>
+                  </div>
+                  <div class="modal-body" style="color:black">
+                    ¿Desea eliminar el Premio seleccionado?
+                    Esta acci&oacute;n ser&aacute; permanente.
+                  </div>
+                  <div class="modal-footer">
+                    <a href="{% url 'Premio_Delete_JefeArea' p.id  %}" class="btn btn-primary">Aceptar</a>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancelar</button>
+                    
+                  </div>
+                </div>
+              </div>
+            </div>     
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="option bgs">
+      <div class="bg-active" id="bg-active"></div>
+    </div>
+  </section>
+{% endblock %}
+   
+{% block js %}
+  <script src="{% static 'libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/dataTables.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+  <!--Botones DataTables-->  
+  <script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/pdfmake.min.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/bottons.colVis.min.js' %}"></script>  
+  <!--DataTables responsivo-->
+  <script src="{% static 'libs/Datatable/JS/dataTables.responsive.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>  
+  <!--Inicializar DataTables-->
+  <script src="{% static 'libs/Datatable/JS/premios.js' %}"></script>
+{% endblock %}

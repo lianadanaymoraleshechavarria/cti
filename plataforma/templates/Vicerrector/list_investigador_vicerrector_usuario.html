@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'css/datatableSD.css' %}">
+<style>
+  .filtros-container {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .filtro-grupo {
+    flex: 1;
+    min-width: 200px;
+  }
+  
+  .filtro-grupo label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+  
+  .filtro-grupo select, .filtro-grupo input {
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+  }
+  
+  .btn-filtrar {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .btn-filtrar:hover {
+    background-color: #0069d9;
+  }
+  
+  .btn-limpiar {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .btn-limpiar:hover {
+    background-color: #5a6268;
+  }
+  
+  .filtros-acciones {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+  }
+
+  @media (max-width: 768px) {
+    .filtro-grupo {
+      min-width: 100%;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="tabla" id="Investigador">
+  <div class="card card-a p-3 h-100">
+    <div class="card-header">
+      <h5 class="card-title title-t" style="text-align: start;">
+        <i class="fas fa-id-card" style="color:#93ba22"></i>
+        Gestionar Usuarios
+      </h5>
+      
+      <!-- Filtros -->
+      <div class="filtros-container">
+        <div class="filtro-grupo">
+          <label for="filtro-area">Filtrar por Área:</label>
+          <select id="filtro-area" class="form-select">
+            <option value="">Todas las áreas</option>
+            {% for area in areas %}
+              <option value="{{ area.nombre_area }}">{{ area.nombre_area }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        
+        <div class="filtro-grupo">
+          <label for="filtro-departamento">Filtrar por Departamento:</label>
+          <select id="filtro-departamento" class="form-select">
+            <option value="">Todos los departamentos</option>
+            {% for departamento in departamentos %}
+              <option value="{{ departamento.nombre_departamento }}" 
+                      data-area="{{ departamento.area.nombre_area|default_if_none:'' }}">
+                {{ departamento.nombre_departamento }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        
+        <div class="filtro-grupo">
+          <label for="filtro-rol">Filtrar por Rol:</label>
+          <select id="filtro-rol" class="form-select">
+            <option value="">Todos los roles</option>
+            {% for rol in roles %}
+              <option value="{{ rol }}">{{ rol }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        
+        <div class="filtros-acciones">
+          <button id="btn-limpiar-filtros" class="btn-limpiar">Limpiar filtros</button>
+        </div>
+      </div>
+    </div>
+    
+    <table id="Investigadores" class="display table table-striped table-hover table-primary" style="width:100%">
+      <thead class="encabezado">
+        <tr>
+          <th>No</th>
+          <th>Investigador</th>
+          <th>Email</th>
+          <th>Rol</th>
+          <th>Área</th>
+          <th>Departamento</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in usuarios %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ u.username }}</td>
+            <td>{{ u.email }}</td>
+            <td>{{ u.rol }}</td>
+            <td>{{ u.area.nombre_area|default:"-" }}</td>
+            <td>{{ u.departamento.nombre_departamento|default:"-" }}</td>
+            <td class="text-center">
+              {% if u.rol != 'Administrador' and u.rol != 'Vicerrector' %}
+                <a href="{% url 'CambiarRolVicerrector' u.id %}" class="btn btn-sm btn-primary">Cambiar Rol</a>
+              {% endif %}
+              <a href="{% url 'Curriculo_Investigador_Vicerrector' u.id %}" class="btn btn-sm btn-info">
+                Currículo
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+   
+{% block js %}
+<script src="{% static 'libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.js' %}"></script>  
+<script src="{% static 'libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>  
+<script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>  
+<script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>  
+<script src="{% static 'libs/Datatable/JS/pdfmake.min.js' %}"></script>  
+<script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>  
+<script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>  
+<script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>  
+<script src="{% static 'libs/Datatable/JS/bottons.colVis.min.js' %}"></script>  
+<script src="{% static 'libs/Datatable/JS/dataTables.responsive.js' %}"></script>  
+<script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>
+  
+<script>
+  $(document).ready(function() {
+    // Inicializar DataTable
+    var table = $('#Investigadores').DataTable({
+      responsive: true,
+      dom: 'Bfrtip',
+      buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+      language: {
+        url: "{% static 'libs/Datatable/dataTableLenguage.json' %}"
+      },
+      columnDefs: [
+        { targets: [0], orderable: true, searchable: false }, // Columna No
+        { targets: [6], orderable: false, searchable: false } // Columna Acciones
+      ]
+    });
+  
+    // Almacenar todas las opciones de departamento inicialmente
+    var allDepartamentos = $('#filtro-departamento').html();
+    
+    // Función para actualizar departamentos según área seleccionada
+    function actualizarDepartamentos() {
+      var areaSeleccionada = $('#filtro-area').val();
+      var $departamentoSelect = $('#filtro-departamento');
+      
+      // Restaurar todas las opciones primero
+      $departamentoSelect.html(allDepartamentos);
+      
+      // Si se seleccionó un área específica, filtrar los departamentos
+      if (areaSeleccionada) {
+        // Crear un nuevo conjunto de opciones
+        var opcionesVisibles = $('<option value="">Todos los departamentos</option>');
+        
+        // Agregar solo los departamentos que pertenecen al área seleccionada
+        $departamentoSelect.find('option').each(function() {
+          var $option = $(this);
+          if ($option.val() !== "" && $option.data('area') === areaSeleccionada) {
+            opcionesVisibles = opcionesVisibles.add($option.clone());
+          }
+        });
+        
+        // Reemplazar todas las opciones con las filtradas
+        $departamentoSelect.html(opcionesVisibles);
+      }
+      
+      // Resetear el valor seleccionado
+      $departamentoSelect.val('');
+    }
+
+    // Función para aplicar filtros a la tabla
+    function aplicarFiltros() {
+      // Obtener valores de los filtros
+      var areaSeleccionada = $('#filtro-area').val();
+      var departamentoSeleccionado = $('#filtro-departamento').val();
+      var rolSeleccionado = $('#filtro-rol').val();
+      
+      // Limpiar todos los filtros primero
+      table.columns().search('').draw();
+      
+      // Aplicar filtros de forma secuencial
+      if (areaSeleccionada) {
+        // Usar expresión regular exacta para el área
+        table.column(4).search('^' + areaSeleccionada + '$', true, false).draw();
+      }
+      
+      if (departamentoSeleccionado) {
+        // Usar expresión regular exacta para el departamento
+        table.column(5).search('^' + departamentoSeleccionado + '$', true, false).draw();
+      }
+      
+      if (rolSeleccionado) {
+        // Usar expresión regular exacta para el rol
+        table.column(3).search('^' + rolSeleccionado + '$', true, false).draw();
+      }
+      
+      // Debug
+      console.log("Filtros aplicados - Área:", areaSeleccionada, "Departamento:", departamentoSeleccionado, "Rol:", rolSeleccionado);
+    }
+
+    // Eventos de filtros
+    $('#filtro-area').on('change', function() {
+      var areaSeleccionada = $(this).val();
+      
+      // Actualizar departamentos disponibles
+      actualizarDepartamentos();
+      
+      // Resetear el filtro de departamento
+      $('#filtro-departamento').val('');
+      
+      // Aplicar filtros
+      aplicarFiltros();
+      
+      // Debug
+      console.log("Área seleccionada:", areaSeleccionada);
+      console.log("Departamentos disponibles:", $('#filtro-departamento option').map(function() {
+        return $(this).text();
+      }).get());
+    });
+
+    $('#filtro-departamento').on('change', function() {
+      // Aplicar filtros
+      aplicarFiltros();
+      
+      // Debug
+      console.log("Departamento seleccionado:", $(this).val());
+    });
+
+    $('#filtro-rol').on('change', function() {
+      // Aplicar filtros
+      aplicarFiltros();
+      
+      // Debug
+      console.log("Rol seleccionado:", $(this).val());
+    });
+
+    // Botón limpiar filtros
+    $('#btn-limpiar-filtros').on('click', function() {
+      // Limpiar valores de los filtros
+      $('#filtro-area, #filtro-departamento, #filtro-rol').val('');
+      
+      // Restaurar todos los departamentos
+      $('#filtro-departamento').html(allDepartamentos);
+      
+      // Limpiar todos los filtros
+      table.columns().search('').draw();
+      
+      // Debug
+      console.log("Filtros limpiados");
+    });
+    
+    // Inicializar departamentos
+    actualizarDepartamentos();
+    
+    // Debug: Verificar opciones de departamento
+    console.log("Opciones de departamento iniciales:", $('#filtro-departamento').html());
+  });
+  </script>
+{% endblock %}

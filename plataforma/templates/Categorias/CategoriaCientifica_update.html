@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Container CSS -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'Plataforma/css/estilobeta.css' %}">
+<style>
+    .error-message {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    #error-container {
+        margin: 0 auto;
+        max-width: 600px;
+    }
+    .alert {
+        margin-bottom: 20px;
+    }
+
+</style>
+{% endblock %}
+<!-- End Container CSS -->
+
+{% block content %}
+<div id="error-container">
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+    
+    {% if form.errors %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Por favor corrige los siguientes errores:</strong>
+            <ul class="mb-0">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <li>{{ field.label }}: {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endif %}
+</div>
+
+<div class="container-form">
+    <div class="form">
+        <div class="contact-form">
+            <span class="circle one"></span>
+            <span class="circle two"></span>
+            <form action="." method="POST" id="categoria-cientifica-form">
+                {% csrf_token %}
+                <h3 class="title">Editar Categoría Científica</h3>
+                
+                <div class="input-container">
+                    <input type="text"
+                           name="{{ form.nombre_categoria_cientifica.name }}"
+                           id="{{ form.nombre_categoria_cientifica.id_for_label }}"
+                           class="input"
+                           value="{{ form.nombre_categoria_cientifica.value|default_if_none:'' }}"
+                           {% if form.nombre_categoria_cientifica.field.required %}required{% endif %}>
+                    <label for="{{ form.nombre_categoria_cientifica.id_for_label }}">Nombre de la categoría</label>
+                    <span>Nombre de la categoría</span>
+                    <div id="nombre-error" class="error-message"></div>
+                </div>
+                
+                <input type="submit" value="Actualizar Categoría" class="btn1" id="boton">
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- Container JS -->
+{% block js %}
+<script src="{% static 'Plataforma/js/FormularioSelect.js' %}"></script>
+<script>
+$(document).ready(function() {
+    // Form validation
+    $('#categoria-cientifica-form').on('submit', function(e) {
+        let isValid = true;
+        const nombre = $('#id_nombre_categoria_cientifica').val().trim();
+        
+        // Clear previous errors
+        $('.error-message').text('');
+        
+        // Validate nombre_categoria_cientifica
+        if (nombre === '') {
+            $('#nombre-error').text('Este campo es obligatorio');
+            isValid = false;
+        } else if (nombre.length > 50) {
+            $('#nombre-error').text('El nombre no puede exceder los 50 caracteres');
+            isValid = false;
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+        }
+    });
+
+    // Input animation
+    const inputs = document.querySelectorAll(".input");
+    
+    function focusFunc() {
+        let parent = this.parentNode;
+        parent.classList.add("focus");
+    }
+    
+    function blurFunc() {
+        let parent = this.parentNode;
+        if (this.value == "") {
+            parent.classList.remove("focus");
+        }
+    }
+    
+    inputs.forEach((input) => {
+        input.addEventListener("focus", focusFunc);
+        input.addEventListener("blur", blurFunc);
+    });
+
+    // Initialize floating label if field has value
+    if ($('#id_nombre_categoria_cientifica').val() !== '') {
+        $('#id_nombre_categoria_cientifica').parent().addClass('focus');
+    }
+});
+</script>
+{% endblock %}
+<!-- End Container JS -->

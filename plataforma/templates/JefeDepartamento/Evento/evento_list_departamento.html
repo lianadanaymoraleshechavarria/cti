@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+  <link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+  <link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+  <link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+  <link rel="stylesheet" href="{% static 'css/datatableSD.css' %}">
+  <link rel="stylesheet" href="{% static 'css/styless.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="tabla" id="Evento">
+  <div class="card-header">
+    <h5 class="card-title" style=" text-align:center;">
+      Eventos
+    </h5>
+  </div>
+  <div class="boot d-flex flex-wrap justify-content-start align-items-center" style="margin-bottom: 20px;">
+    <a href="{% url 'Evento_Create' %}" class="btn boton-form">
+      <i class="fas fa-plus"></i> Nuevo</a>
+  </div>
+  <div class="table-responsive">
+    <p><strong>Total:</strong> {{ evento|length }} eventos</p>    
+    <table id="Eventos" class="display table table-striped table-hover table-primary" style="width:100%; height: 100%;">
+      <thead class="encabezado">
+        <tr>
+            <th scope="col">No</th>
+            <th scope="col">Título</th>
+            <th scope="col">Tipo</th>
+            <th scope="col">Modalidad</th>
+            <th scope="col">Institución</th>
+            <th scope="col">Fecha</th>
+            <th scope="col">Participantes</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Opciones</th>
+        </tr>
+        </thead>
+        <tbody>
+          {% for e in eventos %}
+            <tr>
+              <td style=" text-align: center;">{{forloop.counter}}</td>
+              <td style=" text-align:start;">{{e.titulo}}</td>
+              <td style=" text-align:start;">{{e.tipo}}</td>
+              <td style=" text-align:start;">{{e.modalidad}}</td>
+              <td style=" text-align:start;">{{e.institucion}}</td>
+              <td style="text-align:start;">{{ e.fecha_create|date:"d/m/Y" }}</td>
+              <td style="text-align:start;">
+          {% if e.autores %}
+          <div class="participantes-tooltip">
+            <div class="participantes-info">
+              <span class="participantes-texto">{{e.usuario}}</span>
+              <span class="participantes-contador">{{ e.contador_autores }}</span>
+            </div>
+            <div class="participantes-tooltip-content">
+              <ul class="participantes-lista">
+                <li class="participante-item participante-principal">
+                  {{ e.usuario }}<span class="badge-rol badge-creador">Creador</span>
+                </li>
+                {% for c in e.autores.all %}
+                 {% if c.usuario and c.usuario.id != e.usuario.id %}
+                <li class="participante-item participante-secundario">
+                   {{ c.usuario.get_full_name|default:c.usuario.username }}
+                  <span class="badge-rol badge-colaborador">Colaborador</span>
+                </li>
+                {% elif c.colaborador %}
+                    <li class="participante-item participante-secundario">
+                      {{ c.colaborador.nombre }} {{ c.colaborador.apellidos }}
+                      <span class="badge-rol badge-colaborador">Colaborador</span>
+                    </li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+          {% endif %}
+              </td>
+              <td style="text-align:start;">
+                <a class="cambiar-estado" style=" text-decoration: none; " href="{% url "Cambiar_Estado_Evento" e.id %}">
+                  <span style="display: inline-flex; align-items: center; gap: 0.3rem;" class="badge-{% if e.aprobacion == 'Aprobado' %}aprobado{% elif e.aprobacion == 'No Válido' %}rechazado{% else %}pendiente{% endif %}">
+                    {% if e.aprobacion == 'Aprobado' %}
+                    <i class="fas fa-check-circle me-1"></i>
+                    {% elif e.aprobacion == 'No Válido' %}
+                      <i class="fas fa-times-circle me-1"></i>
+                    {% else %}
+                      <i class="fas fa-hourglass-half me-1"></i>
+                    {% endif %}
+                    {{e.aprobacion}}
+                  </span>
+                </a>
+              </td>
+              <td style=" text-align: center;">
+                <a href= "{% url 'Evento_Detail_JefeDepartamento' e.id %}"><i class="detail fa-solid fa-info-circle mx-1 fs-6"></i></a>
+                <a class="iconos" data-bs-toggle="modal" data-bs-target="#Eventos{{ e.id }}"><i class="delete fas fa-solid fa-trash-can mx-1 fs-6"></i></a>
+              </td>
+            </tr>
+            <!-- Modal -->
+            <div class="modal fade" id="Eventos{{ e.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"><i class="bi bi-exclamation-triangle"></i> Eliminar</h5>
+                    <button type="button" class="btn-close cerrar" data-bs-dismiss="modal" aria-label="Close" style="box-shadow: none"></button>
+                  </div>
+                  <div class="modal-body">
+                    ¿Desea eliminar el Evento seleccionado?
+                    Esta acci&oacute;n ser&aacute; permanente.
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-cancelar" data-bs-dismiss="modal">Cancelar</button>
+                    <a href="{% url 'Evento_Delete_JefeDepartamento' e.id  %}" class="btn boton-form">
+                      <i class="fas fa-check"></i> Aceptar</a>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>     
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="option bgs">
+      <div class="bg-active" id="bg-active"></div>
+    </div>
+  </section>
+{% endblock %}
+   
+{% block js %}
+  <script src="{% static 'libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/dataTables.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+  <!--Botones DataTables-->  
+  <script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/pdfmake.min.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/bottons.colVis.min.js' %}"></script>  
+  <!--DataTables responsivo-->
+  <script src="{% static 'libs/Datatable/JS/dataTables.responsive.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>  
+  <!--Inicializar DataTables-->
+  <script src="{% static 'libs/Datatable/JS/Eventos.js' %}"></script>
+{% endblock %}

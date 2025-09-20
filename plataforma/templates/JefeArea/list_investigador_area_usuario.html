@@ -1,0 +1,359 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'css/datatableSD.css' %}">
+<style>
+  .filtros-container {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .filtro-grupo {
+    flex: 1;
+    min-width: 200px;
+  }
+  
+  .filtro-grupo label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+  
+  .filtro-grupo select, .filtro-grupo input {
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+  }
+  
+  .btn-filtrar {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .btn-filtrar:hover {
+    background-color: #0069d9;
+  }
+  
+  .btn-limpiar {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .btn-limpiar:hover {
+    background-color: #5a6268;
+  }
+  
+  .filtros-acciones {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+  }
+  
+  .badge-role {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: normal;
+  }
+  
+  .badge-investigador {
+    background-color: #4caf50;
+    color: white;
+  }
+  
+  .badge-jefe {
+    background-color: #2196f3;
+    color: white;
+  }
+  
+  .no-profile {
+    font-style: italic;
+    color: #999;
+  }
+
+  @media (max-width: 768px) {
+    .filtro-grupo {
+      min-width: 100%;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="tabla" id="Investigador">
+  {% if messages %}
+  <div class="messages mb-3">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if area_actual %}
+  <div class="alert alert-info mb-3">
+    <i class="fas fa-building"></i> Área actual: <strong>{{ area_actual }}</strong>
+  </div>
+  {% endif %}
+
+  <div class="card card-a p-3 h-100">
+    <div class="card-header">
+      <h5 class="card-title title-t" style="text-align: start;">
+        <i class="fas fa-id-card" style="color:#93ba22"></i>
+        Gestionar Usuarios
+      </h5>
+      
+      <!-- Filtros -->
+      <div class="filtros-container">
+        <div class="filtro-grupo">
+          <label for="filtro-departamento">Filtrar por Departamento:</label>
+          <select id="filtro-departamento" class="form-select">
+            <option value="">Todos los departamentos</option>
+            {% for departamento in departamentos %}
+              <option value="{{ departamento.nombre_departamento }}">
+                {{ departamento.nombre_departamento }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        
+        <div class="filtro-grupo">
+          <label for="filtro-rol">Filtrar por Rol:</label>
+          <select id="filtro-rol" class="form-select">
+            <option value="">Todos los roles</option>
+            <option value="Investigador">Investigador</option>
+            <option value="Jefe_departamento">Jefe de Departamento</option>
+          </select>
+        </div>
+        
+        <div class="filtro-grupo">
+          <label for="filtro-perfil">Estado del Perfil:</label>
+          <select id="filtro-perfil" class="form-select">
+            <option value="">Todos</option>
+            <option value="Completo">Completo</option>
+            <option value="Incompleto">Incompleto</option>
+          </select>
+        </div>
+        
+        <div class="filtros-acciones">
+          <button id="btn-filtrar" class="btn-filtrar">Filtrar</button>
+          <button id="btn-limpiar-filtros" class="btn-limpiar">Limpiar filtros</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card-body">
+      <table id="Investigadores" class="display table table-striped table-hover table-primary" style="width:100%">
+        <thead class="encabezado">
+          <tr>
+            <th scope="col" style="color: white; text-align: center;">No</th>
+            <th scope="col" style="color: white; text-align: center;">Usuario</th>
+            <th scope="col" style="color: white; text-align: center;">Nombre Completo</th>
+            <th scope="col" style="color: white; text-align: center;">Email</th>
+            <th scope="col" style="color: white; text-align: center;">Departamento</th>
+            <th scope="col" style="color: white; text-align: center;">Rol</th>
+            <th scope="col" style="color: white; text-align: center;">Perfil</th>
+            <th scope="col" style="color: white; text-align: center;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for i in investigadores %}
+            <tr>
+              <td style="text-align: center;">{{ forloop.counter }}</td>
+              <td style="text-align: center;">{{ i.username }}</td>
+              <td style="text-align: center;">
+                {% if i.tiene_perfil %}
+                  {{ i.nombre }} {{ i.apellidos }}
+                {% else %}
+                  {{ i.nombre }} {{ i.apellidos }}
+                  <span class="no-profile">(Sin perfil)</span>
+                {% endif %}
+              </td>
+              <td style="text-align: center;">{{ i.email }}</td>
+              <td style="text-align: center;">{{ i.departamento|default:"-" }}</td>
+              <td style="text-align: center;">
+                {% if i.rol == 'Investigador' %}
+                  <span class="badge badge-role badge-investigador">Investigador</span>
+                {% elif i.rol == 'Jefe_departamento' %}
+                  <span class="badge badge-role badge-jefe">Jefe de Departamento</span>
+                {% else %}
+                  <span class="badge badge-role" style="background-color: #607d8b; color: white;">{{ i.rol }}</span>
+                {% endif %}
+              </td>
+              <td style="text-align: center;">
+                {% if i.tiene_perfil %}
+                  <span class="badge bg-success">Completo</span>
+                {% else %}
+                  <span class="badge bg-warning text-dark">Incompleto</span>
+                {% endif %}
+              </td>
+              <td style="text-align: center;">
+                <a href="{% url 'CambiarRolJefeArea' i.id %}" class="btn btn-sm btn-primary">
+                  <i class="fas fa-user-edit"></i> Cambiar Rol
+                </a>
+                {% if i.tiene_perfil %}
+                
+                <!-- Modificar esta parte para que siempre use el ID del usuario -->
+                <a href="{% url 'Informacion_Detail_Investigador_Area' i.id %}" class="btn btn-sm btn-info">
+                  <i class="fas fa-eye"></i> Ver Perfil
+                </a>
+                <a href="{% url 'Curriculo_Investigador_JefeArea' i.id %}" class="btn btn-sm btn-secondary">
+                  <i class="fas fa-file-alt"></i> Currículo
+                </a>
+              {% endif %}
+            </td>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="8" class="text-center">No hay usuarios disponibles en esta área.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}
+   
+{% block js %}
+<script src="{% static 'libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.js' %}"></script>  
+<script src="{% static 'libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>  
+<script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>  
+<script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>  
+<script src="{% static 'libs/Datatable/JS/pdfmake.min.js' %}"></script>  
+<script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>  
+<script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>  
+<script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>  
+<script src="{% static 'libs/Datatable/JS/buttons.colVis.min.js' %}"></script>  
+<script src="{% static 'libs/Datatable/JS/dataTables.responsive.js' %}"></script>  
+<script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>
+  
+<script>
+$(document).ready(function() {
+  // Inicializar DataTable
+  var table = $('#Investigadores').DataTable({
+    responsive: true,
+    dom: '<"top"Bfrtip<"clear">>',
+    buttons: [
+      {
+        extend: 'copy',
+        text: 'Copiar',
+        className: 'btn btn-sm btn-secondary'
+      },
+      {
+        extend: 'excel',
+        text: 'Excel',
+        className: 'btn btn-sm btn-success'
+      },
+      {
+        extend: 'pdf',
+        text: 'PDF',
+        className: 'btn btn-sm btn-danger'
+      },
+      {
+        extend: 'print',
+        text: 'Imprimir',
+        className: 'btn btn-sm btn-info'
+      },
+      {
+        extend: 'colvis',
+        text: 'Columnas',
+        className: 'btn btn-sm btn-warning'
+      }
+    ],
+    language: {
+      url: "{% static 'libs/Datatable/dataTableLenguage.json' %}"
+    },
+    columnDefs: [
+      { targets: [0], orderable: true, searchable: false }, // Columna No
+      { targets: [7], orderable: false, searchable: false } // Columna Acciones
+    ]
+  });
+
+  // Función para aplicar filtros a la tabla
+  function aplicarFiltros() {
+    // Obtener valores de los filtros
+    var departamentoSeleccionado = $('#filtro-departamento').val();
+    var rolSeleccionado = $('#filtro-rol').val();
+    var perfilSeleccionado = $('#filtro-perfil').val();
+    
+    // Limpiar todos los filtros primero
+    table.columns().search('').draw();
+    
+    // Aplicar filtros de forma secuencial con expresiones regulares exactas
+    if (departamentoSeleccionado) {
+      // Usar expresión regular exacta para el departamento
+      table.column(4).search('^' + departamentoSeleccionado + '$', true, false).draw();
+    }
+    
+    if (rolSeleccionado) {
+      // Usar expresión regular exacta para el rol
+      table.column(5).search(rolSeleccionado).draw();
+    }
+    
+    if (perfilSeleccionado) {
+      // Usar expresión regular exacta para el estado del perfil
+      table.column(6).search(perfilSeleccionado).draw();
+    }
+    
+    // Debug
+    console.log("Filtros aplicados - Departamento:", departamentoSeleccionado, 
+                "Rol:", rolSeleccionado, 
+                "Perfil:", perfilSeleccionado);
+  }
+
+  // Evento para el botón de filtrar
+  $('#btn-filtrar').on('click', aplicarFiltros);
+
+  // Evento para el botón de limpiar filtros
+  $('#btn-limpiar-filtros').on('click', function() {
+    // Limpiar los selects/inputs
+    $('#filtro-departamento').val('');
+    $('#filtro-rol').val('');
+    $('#filtro-perfil').val('');
+    
+    // Limpiar los filtros en la tabla
+    table.columns().search('').draw();
+    table.search('').draw(); // Limpiar búsqueda global
+    
+    // Debug
+    console.log("Filtros limpiados");
+  });
+
+  // Evento para aplicar filtros al cambiar los selects
+  $('#filtro-departamento, #filtro-rol, #filtro-perfil').on('change', function() {
+    // No aplicamos los filtros automáticamente al cambiar para dar más control al usuario
+    // El usuario debe hacer clic en el botón "Filtrar" para aplicar los filtros
+    console.log("Filtro cambiado:", $(this).attr('id'), "Valor:", $(this).val());
+  });
+  
+  // Debug: Verificar estructura de la tabla
+  console.log("Estructura de columnas:");
+  $('#Investigadores thead th').each(function(index) {
+    console.log(index + ": " + $(this).text().trim());
+  });
+});
+</script>
+{% endblock %}

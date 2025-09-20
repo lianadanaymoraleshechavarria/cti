@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Container CSS -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/Dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'css/datatableSD.css' %}">
+{% endblock %}
+<!-- End Container CSS -->
+
+{% block content %}
+<main class="content-inside px-3 py-2">
+    <section id="tablaColaboradores">
+        <div class="card">
+            <div class="card-header Colaboradores">
+                <h5 class="card-title">
+                    Lista de Colaboradores
+                </h5>
+                <a href="{% url 'Colaboradores_Create' %}" class="btn btn-primary btn-sm">Nuevo Colaborador</a>
+            </div>
+            <div class="p-2">
+                <table id="Colaboradores" class="display table table-striped table-hover table-primary"
+                    style="width:100%; height: 100%;">
+                    <thead class="encabezado">
+                        <tr>
+                            <th scope="col" style="color: white; text-align: start;">#</th>
+                            <th scope="col" style="color: white; text-align: start;">Nombre</th>
+                            <th scope="col" style="color: white; text-align: start;">Apellidos</th>
+                            <th scope="col" style="color: white; text-align: center;">ORCID</th>
+                            <th scope="col" style="color: white; text-align: center;">Opciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for colaborador in object_list %}
+                        <tr>
+                            <td style="text-align: start;">{{ forloop.counter }}</td>
+                            <td style="text-align: start;">{{ colaborador.nombre }}</td>
+                            <td style="text-align: start;">{{ colaborador.apellidos }}</td>
+                            <td style="text-align: center;">{{ colaborador.orci|default:"-" }}</td>
+                            <td style="text-align: center; font-size: 1.2rem;">
+                                <a class="iconos p-2" href="{% url 'Colaboradores_Update' colaborador.id %}" title="Editar">
+                                    <i class="fas fa-solid fa-pen-to-square"></i>
+                                </a>
+                                <a class="iconos p-2" data-bs-toggle="modal" data-bs-target="#Colaborador{{ colaborador.id }}" title="Eliminar">
+                                    <i class="fas fa-solid fa-trash-can"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <!-- Modal de Confirmación -->
+                        <div class="modal fade" id="Colaborador{{ colaborador.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel" style="color:black">
+                                            <i class="bi bi-exclamation-triangle" style="color:black"></i> Advertencia
+                                        </h5>
+                                        <button type="button" class="btn-close cerrar" data-bs-dismiss="modal" aria-label="Close" style="box-shadow: none"></button>
+                                    </div>
+                                    <div class="modal-body" style="color:black">
+                                        ¿Desea eliminar al colaborador "{{ colaborador.apellidos }}, {{ colaborador.nombre }}"?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancelar</button>
+                                        <a href="{% url 'Colaboradores_Delete' colaborador.id %}" class="btn btn-primary">Confirmar</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" style="text-align: center;">No hay colaboradores registrados</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
+<!-- Container JS -->
+{% block js %}
+<script src="{% static 'libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/pdfmake.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>
+<script>
+$(document).ready(function() {
+    $('#Colaboradores').DataTable({
+        responsive: true,
+        dom: 'Bfrtip',
+        buttons: [
+            'copy', 'csv', 'excel', 'pdf', 'print'
+        ],
+        language: {
+            url: "{% static 'libs/Datatable/dataTableLenguage.json' %}"
+        },
+        columnDefs: [
+            { orderable: false, targets: [4] }
+        ]
+    });
+});
+</script>
+{% endblock %}
+<!-- End Container JS -->

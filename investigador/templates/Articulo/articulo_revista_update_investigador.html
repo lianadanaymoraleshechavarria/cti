@@ -1,0 +1,740 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+  <link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}">
+  <style>
+    /* Estilos para el componente de selección */
+    .select-container {
+      position: relative;
+      width: 100%;
+    }
+    
+    .select-input {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ced4da;
+      border-radius: 0.25rem;
+      font-size: 1rem;
+      line-height: 1.5;
+      color: #495057;
+      background-color: #fff;
+    }
+    
+    .select-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      z-index: 1000;
+      width: 100%;
+      max-height: 200px;
+      overflow-y: auto;
+      background-color: #fff;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      border-radius: 0.25rem;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175);
+    }
+    
+    .select-item {
+      padding: 0.5rem;
+      cursor: pointer;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .select-item:hover {
+      background-color: #f8f9fa;
+    }
+    
+    .select-item .item-title {
+      font-weight: 500;
+    }
+    
+    .select-item .item-info {
+      font-size: 0.85rem;
+      color: #6c757d;
+    }
+    
+    .select-selected {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    
+    .item-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      line-height: 1;
+      color: #fff;
+      background-color: #007bff;
+      border-radius: 0.25rem;
+    }
+    
+    .item-badge button {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.25rem;
+      line-height: 1;
+      padding: 0 0 0 0.25rem;
+      cursor: pointer;
+      opacity: 0.7;
+    }
+    
+    .item-badge button:hover {
+      opacity: 1;
+    }
+
+    /* Estilos para secciones organizadas */
+    .dashed-rounded-border {
+      border: 1px dashed #64748b;
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+      position: relative;
+    }
+    
+    .section-label {
+      position: absolute;
+      top: -12px;
+      left: 20px;
+      background-color: #f97316;
+      color: white;
+      padding: 4px 16px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+    
+    .form-control {
+      border: 2px solid #3b82f6;
+      border-radius: 0.375rem;
+    }
+    
+    .required-field::after {
+      content: "*";
+      color: #ef4444;
+      margin-left: 4px;
+    }
+
+    /* Estilos para el switch de proyecto */
+    .switch-container {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+      margin-right: 10px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #2196F3;
+    }
+    input:focus + .slider {
+      box-shadow: 0 0 1px #2196F3;
+    }
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+    .proyecto-select-container {
+      display: none;
+      transition: all 0.3s ease;
+    }
+    .proyecto-select-container.visible {
+      display: block;
+    }
+
+    /* Estilos para secciones con borde discontinuo */
+    .dashed-section {
+      border: 1px dashed #6b7280;
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      position: relative;
+      margin-bottom: 2rem;
+    }
+
+    /* Estilo para el campo de archivo */
+    .custom-file-input {
+      opacity: 0;
+      position: absolute;
+      z-index: -1;
+    }
+    .file-label {
+      display: block;
+      width: 100%;
+      padding: 0.375rem 0.75rem;
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.5;
+      color: #212529;
+      background-color: #fff;
+      background-clip: padding-box;
+      border: 1px solid #ced4da;
+      border-radius: 0.25rem;
+      transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="content">
+    <div class="col">
+      <div class="container-form">
+        <div class="form">
+          <div class="container-fluid py-4">
+            <div class="row">
+              <div id="error-container"></div>
+              <div class="col-md-12">
+                <div class="card">
+                  {% if messages %}
+                  {% for message in messages %}
+                    {% if message.tags == 'success' %}
+                      <div style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem; z-index: 2000;"
+                          class="alert alert-success alert-dismissible fade show" role="alert">
+                    {% elif message.tags == 'error' %}
+                      <div style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem; z-index: 2000;"
+                          class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {% endif %}
+                      {{ message }}
+                        <button style="font-size: 10px; border-bottom: none; position: relative; box-shadow: none;" type="button"
+                          class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                  {% endfor %}
+                  {% endif %}
+                  
+                  <div class="card-header pb-0">
+                    <div class="title">
+                      <h3 class="title-text p-3">Solicitud de Artículo de Revista</h3>
+                      <p class="text">
+                        Por favor, complete todos los campos requeridos para enviar su solicitud.
+                        Su información es vital para procesar su solicitud de manera adecuada.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <form id="formu" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="card-body">
+                      <div class="row">
+                        <div class="col-md-12">
+                          <div class="form-header">REGISTRAR ARTÍCULO DE REVISTA</div>
+                          
+                          <!-- Información básica del artículo -->
+                          <div class="dashed-rounded-border">
+                            <div class="section-label">Información básica del artículo</div>
+                            
+                            <div class="row">
+                              <div class="col-md-12">
+                                <div class="form-group">
+                                  <label class="form-control-label required-field">Título</label>
+                                  {{ form.titulo }}
+                                </div>
+                              </div>
+                              
+                              <div class="col-md-6">
+                                <div class="form-group select">
+                                  <label class="form-control-label required-field">Colaboradores</label>
+                                  <div id="user-select-container" class="select-container">
+                                    <input type="text" id="user-search" class="form-control" placeholder="Buscar autores...">
+                                    <div id="user-dropdown" class="select-dropdown" style="display: none;"></div>
+                                    <div id="selected-users" class="select-selected mt-2"></div>
+                                  </div>
+                                  <div style="display: none;">{{ form.autores }}</div>
+                                </div>
+                              </div>
+                              
+                              <div class="col-md-6">
+                                <div class="form-group">
+                                  <label class="form-control-label required-field">Fecha de Creación</label>
+                                  {{ form.fecha_creacion }}
+                                </div>
+                              </div>
+                              
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                  <label class="form-control-label required-field">ISSN</label>
+                                  {{ form.issn }}
+                                </div>
+                              </div>
+                              
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                  <label class="form-control-label">DOI</label>
+                                  {{ form.doi }}
+                                </div>
+                              </div>
+                              
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                  <label class="form-control-label">Idioma</label>
+                                  {{ form.idioma }}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Datos de la Revista o Medio de Publicación -->
+                          <div class="dashed-rounded-border mt-4">
+                            <div class="section-label" style="background-color: #8b5cf6;">Datos de la Revista o Medio de Publicación</div>
+                            
+                            <div class="row">
+                              <div class="col-md-6">
+                                <div class="form-group">
+                                  <label class="form-control-label required-field">Buscar Revista</label>
+                                  <div class="select-container">
+                                    <input type="text" id="revista-search" class="form-control" placeholder="Buscar por título o editorial...">
+                                    <div id="revista-dropdown" class="select-dropdown" style="display: none;"></div>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <div class="col-md-6">
+                                <div class="form-group">
+                                  <label class="form-control-label">Editorial</label>
+                                  {{ form.editorial }}
+                                </div>
+                              </div>
+                              
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                  <label class="form-control-label">Páginas (Formato: inicio-fin)</label>
+                                  {{ form.pag }}
+                                  <small class="form-text text-muted">Ejemplo: 12-34</small>
+                                </div>
+                              </div>
+                              
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                  <label class="form-control-label required-field">Volumen</label>
+                                  {{ form.volumen }}
+                                </div>
+                              </div>
+                              
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                  <label class="form-control-label required-field">Número</label>
+                                  {{ form.numero }}
+                                </div>
+                              </div>
+                              
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                  <label class="form-control-label required-field">Index</label>
+                                  {{ form.index }}
+                                </div>
+                              </div>
+                              
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                  <label class="form-control-label required-field">URL de publicación</label>
+                                  {{ form.url }}
+                                </div>
+                              </div>
+                              
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                  <label class="form-control-label">País</label>
+                                  {{ form.pais }}
+                                </div>
+                              </div>
+                              
+                              <div class="col-md-12">
+                                <div class="form-group">
+                                  <label class="form-control-label">Forma de citar</label>
+                                  {{ form.cita }}
+                                </div>
+                              </div>
+                              
+                              <div class="col-md-12">
+                                <div class="form-group">
+                                  <label class="form-control-label">Archivo Adjunto</label>
+                                  <div class="custom-file">
+                                    {{ form.archivo }}
+                                    <label class="file-label" for="id_archivo">
+                                      <span id="file-name">Seleccionar archivo...</span>
+                                    </label>
+                                  </div>
+                                  <small class="form-text text-muted">Formatos aceptados: PDF, DOC, DOCX</small>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Asociación a proyecto -->
+                          <div class="dashed-section">
+                            <div class="switch-container">
+                              <label class="switch">
+                                <input type="checkbox" id="proyecto-switch" {% if form.proyecto.value %}checked{% endif %}>
+                                <span class="slider"></span>
+                              </label>
+                              <label for="proyecto-switch" class="form-control-label">Artículo asociado a un resultado de proyecto: 
+                                <strong id="proyecto-status">{% if form.proyecto.value %}Sí{% else %}No{% endif %}</strong>
+                              </label>
+                            </div>
+                            <div id="proyecto-select-container" class="proyecto-select-container {% if form.proyecto.value %}visible{% endif %}">
+                              <label class="form-control-label">¿Cuál proyecto?</label>
+                              <select name="proyecto" id="id_proyecto" class="form-control">
+                                <option value="">Seleccione un proyecto</option>
+                                {% for proyecto in proyectos %}
+                                  <option value="{{ proyecto.id }}" {% if form.proyecto.value == proyecto.id %}selected{% endif %}>
+                                    {{ proyecto.nombre_proyecto }}
+                                  </option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                          </div>
+
+                          <!-- Botones -->
+                          <div class="row mt-4">
+                            <div class="col-md-12 text-center">
+                              <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save me-2"></i>Guardar
+                              </button>
+                              <a href="{% url 'Articulo_List_Investigador' %}" class="btn btn-primary ml-3">
+                                <i class="fas fa-arrow-left me-2"></i>Cancelar
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+<script src="{% static 'js/jquery-ui.min.js' %}"></script>
+<script src="{% static 'js/validations.js' %}"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Script para mostrar el nombre del archivo seleccionado
+  document.getElementById('id_archivo').addEventListener('change', function(e) {
+    var fileName = e.target.files[0] ? e.target.files[0].name : 'Seleccionar archivo...';
+    document.getElementById('file-name').textContent = fileName;
+  });
+  
+  // Script para manejar el switch de proyecto
+  const proyectoSwitch = document.getElementById('proyecto-switch');
+  const proyectoContainer = document.getElementById('proyecto-select-container');
+  const proyectoSelect = document.getElementById('id_proyecto');
+  const proyectoStatus = document.getElementById('proyecto-status');
+  
+  // Inicializar el estado del switch basado en si hay un proyecto seleccionado
+  if (proyectoSelect.value) {
+    proyectoSwitch.checked = true;
+    proyectoContainer.classList.add('visible');
+  }
+  
+  // Manejar cambios en el switch
+  proyectoSwitch.addEventListener('change', function() {
+    if (this.checked) {
+      proyectoContainer.classList.add('visible');
+      proyectoStatus.textContent = 'Sí';
+    } else {
+      proyectoContainer.classList.remove('visible');
+      proyectoStatus.textContent = 'No';
+      proyectoSelect.value = ''; // Limpiar la selección cuando se desmarca
+    }
+  });
+
+  // Autocompletado de revistas
+  const revistaSearchInput = document.getElementById('revista-search');
+  const revistaDropdown = document.getElementById('revista-dropdown');
+  
+  // Campos a rellenar
+  const tituloInput = document.getElementById('id_titulo');
+  const editorialInput = document.getElementById('id_editorial');
+  const issnInput = document.getElementById('id_issn');
+  const paisSelect = document.getElementById('id_pais');
+  
+  async function searchRevistas(query) {
+    try {
+      revistaDropdown.innerHTML = '<div class="p-2 text-center">Buscando revistas...</div>';
+      revistaDropdown.style.display = 'block';
+      
+      const response = await fetch(`/Plataforma/api_revistas/?search=${encodeURIComponent(query)}`);
+      if (!response.ok) {
+        throw new Error('Error en la respuesta del servidor: ' + response.status);
+      }
+      
+      const revistas = await response.json();
+      revistaDropdown.innerHTML = '';
+      
+      if (revistas.length === 0) {
+        const noResults = document.createElement('div');
+        noResults.className = 'p-2 text-center';
+        noResults.textContent = 'No se encontraron revistas';
+        revistaDropdown.appendChild(noResults);
+        return;
+      }
+      
+      revistas.forEach(revista => {
+        const item = document.createElement('div');
+        item.className = 'select-item';
+        
+        const tituloDiv = document.createElement('div');
+        tituloDiv.className = 'item-title';
+        tituloDiv.textContent = revista.titulo;
+        
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'item-info';
+        
+        const infoTexts = [];
+        if (revista.editorial) infoTexts.push(`Editorial: ${revista.editorial}`);
+        if (revista.issn) infoTexts.push(`ISSN: ${revista.issn}`);
+        if (revista.isbn) infoTexts.push(`ISBN: ${revista.isbn}`);
+        
+        infoDiv.textContent = infoTexts.join(' | ');
+        
+        item.appendChild(tituloDiv);
+        if (infoTexts.length > 0) {
+          item.appendChild(infoDiv);
+        }
+        
+        item.onclick = () => {
+          tituloInput.value = revista.titulo;
+          editorialInput.value = revista.editorial;
+          if (revista.issn) {
+            issnInput.value = revista.issn;
+          }
+          if (revista.pais) {
+            const paisOption = Array.from(paisSelect.options).find(
+              option => option.value === revista.pais
+            );
+            if (paisOption) {
+              paisSelect.value = revista.pais;
+            }
+          }
+          revistaDropdown.style.display = 'none';
+          revistaSearchInput.value = revista.titulo;
+        };
+        
+        revistaDropdown.appendChild(item);
+      });
+    } catch (error) {
+      console.error('Error al buscar revistas:', error);
+      revistaDropdown.innerHTML = `<div class="p-2 text-center text-danger">Error al buscar revistas: ${error.message}</div>`;
+    }
+  }
+  
+  revistaSearchInput.addEventListener('focus', () => {
+    if (revistaSearchInput.value.trim() === '') {
+      searchRevistas('');
+    } else {
+      revistaDropdown.style.display = 'block';
+    }
+  });
+  
+  revistaDropdown.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+  });
+  
+  revistaSearchInput.addEventListener('blur', () => {
+    setTimeout(() => {
+      revistaDropdown.style.display = 'none';
+    }, 200);
+  });
+  
+  revistaSearchInput.addEventListener('input', () => {
+    const query = revistaSearchInput.value.trim();
+    searchRevistas(query);
+  });
+  
+  // Selección de usuarios
+  const searchInput = document.getElementById('user-search');
+  const dropdown = document.getElementById('user-dropdown');
+  const selectedUsersContainer = document.getElementById('selected-users');
+  const hiddenSelect = document.querySelector('select[name="autores"]');
+  
+  const selectedUsers = new Map();
+  
+  Array.from(hiddenSelect.selectedOptions).forEach(option => {
+    selectedUsers.set(option.value, {
+      id: option.value,
+      name: option.textContent
+    });
+  });
+  
+  function updateSelectedUsers() {
+    selectedUsersContainer.innerHTML = '';
+    selectedUsers.forEach(user => {
+      const badge = document.createElement('span');
+      badge.className = 'item-badge';
+      badge.textContent = user.name;
+      
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.textContent = '×';
+      removeBtn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        selectedUsers.delete(user.id);
+        updateSelectedUsers();
+        updateHiddenSelect();
+      };
+      
+      badge.appendChild(removeBtn);
+      selectedUsersContainer.appendChild(badge);
+    });
+  }
+  
+  function updateHiddenSelect() {
+    Array.from(hiddenSelect.options).forEach(option => {
+      option.selected = false;
+    });
+    selectedUsers.forEach(user => {
+      const option = hiddenSelect.querySelector(`option[value="${user.id}"]`);
+      if (option) {
+        option.selected = true;
+      } else {
+        const newOption = new Option(user.name, user.id, true, true);
+        hiddenSelect.appendChild(newOption);
+      }
+    });
+    const event = new Event('change', { bubbles: true });
+    hiddenSelect.dispatchEvent(event);
+  }
+  
+  async function searchUsers(query) {
+    try {
+      dropdown.innerHTML = '<div class="p-2 text-center">Buscando usuarios...</div>';
+      dropdown.style.display = 'block';
+      const response = await fetch(`/Investigador/api_usuarios/?search=${encodeURIComponent(query)}`);
+      if (!response.ok) {
+        throw new Error('Error en la respuesta del servidor');
+      }
+      const users = await response.json();
+      dropdown.innerHTML = '';
+      if (users.length === 0) {
+        const noResults = document.createElement('div');
+        noResults.className = 'p-2 text-center';
+        noResults.textContent = 'No se encontraron usuarios';
+        dropdown.appendChild(noResults);
+        return;
+      }
+      users.forEach(user => {
+        const item = document.createElement('div');
+        item.className = 'select-item';
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'item-title';
+        nameDiv.textContent = user.name;
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'item-info';
+        const infoTexts = [];
+        if (user.carnet) infoTexts.push(`Carnet: ${user.carnet}`);
+        if (user.area) infoTexts.push(`Área: ${user.area}`);
+        if (user.departamento) infoTexts.push(`Depto: ${user.departamento}`);
+        infoDiv.textContent = infoTexts.join(' | ');
+        item.appendChild(nameDiv);
+        if (infoTexts.length > 0) {
+          item.appendChild(infoDiv);
+        }
+        if (selectedUsers.has(user.id.toString())) {
+          item.classList.add('selected');
+          item.style.backgroundColor = '#e9ecef';
+        }
+        item.onclick = () => {
+          if (selectedUsers.has(user.id.toString())) {
+            selectedUsers.delete(user.id.toString());
+          } else {
+            selectedUsers.set(user.id.toString(), {
+              id: user.id.toString(),
+              name: user.full_name || user.name
+            });
+          }
+          updateSelectedUsers();
+          updateHiddenSelect();
+          item.classList.toggle('selected');
+          item.style.backgroundColor = item.classList.contains('selected') ? '#e9ecef' : '';
+        };
+        dropdown.appendChild(item);
+      });
+    } catch (error) {
+      console.error('Error al buscar usuarios:', error);
+      dropdown.innerHTML = '<div class="p-2 text-center text-danger">Error al buscar usuarios</div>';
+    }
+  }
+  
+  searchInput.addEventListener('focus', () => {
+    if (searchInput.value.trim() === '') {
+      searchUsers('');
+    } else {
+      dropdown.style.display = 'block';
+    }
+  });
+  
+  dropdown.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+  });
+  
+  searchInput.addEventListener('blur', () => {
+    setTimeout(() => {
+      dropdown.style.display = 'none';
+    }, 200);
+  });
+  
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value.trim();
+    searchUsers(query);
+  });
+  
+  updateSelectedUsers();
+  
+  const currentUserId = '{{ request.user.id }}';
+  const currentUserName = '{{ request.user.get_full_name|default:request.user.username }}';
+  
+  if (currentUserId && !selectedUsers.has(currentUserId)) {
+    selectedUsers.set(currentUserId, {
+      id: currentUserId,
+      name: currentUserName
+    });
+    updateSelectedUsers();
+    updateHiddenSelect();
+    console.log('Usuario actual añadido automáticamente:', currentUserName);
+  }
+});
+</script>
+{% endblock %}

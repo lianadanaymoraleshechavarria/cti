@@ -1,0 +1,120 @@
+  {% extends "base.html" %}
+  {% load static %}
+  
+    {% block css %}
+      <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+    {% endblock %}
+  
+  
+    {% block content %}
+      <div class="content" >
+        <div class="col">
+          <div class="container-form">
+            <div class="form">
+              <div class="container-fluid py-4">
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="card">
+                      <div class="card-header pb-0">
+                        <div class="title">
+                          <h3 class="title-text p-3">Detalles del Evento</h3>
+                        </div>
+                      </div>
+                      <form  id="formu" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="card-body">
+                          <div class="row">
+                            <div class="col-md-12">
+                              <div class="form-group">
+                                <label for="text-input" class="form-control-label">Participantes</label>
+                                <input type="text" name="autores" id="autores" class="form-control" required value="{{ evento.autores }}" required disabled>
+                              </div>
+                            </div>
+                            
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group">
+                                <label for="example-text-input" class="form-control-label">Título</label>
+                                <input type="text" name="titulo" id="titulo" class="form-control" required value="{{ evento.titulo }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group">
+                                <label for="example-text-input" class="form-control-label">Fecha</label>
+                                <input type="fecha" name="autores" id="fecha" class="form-control" required value="{{ evento.fecha }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Caracter</label>
+                                <input type="text" name="caracter" id="caracter" class="form-control" required value="{{ evento.caracter }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group">
+                                <label for="example-text-input" class="form-control-label">ISBN</label>
+                                <input type="text" name="isbn" id="isbn" class="form-control" required value="{{ evento.isbn }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Tipo</label>
+                                <input type="text" name="tipo" id="tipo" class="form-control" required value="{{ evento.tipo }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Area</label>
+                                <input type="text" name="area" id="area" class="form-control" required value="{{ evento.area }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group">
+                                <label for="example-text-input" class="form-control-label">Certificado</label>
+                                {% if evento.certificado %}
+                                <a href="{{ evento.certificado.url }}" download > Descargar Archivo</a>
+                                {% else %}
+                                <input type="text" name="certificado" id="certificado" class="form-control" placeholder="No hay certificado disponible." required disabled>
+                                  
+                                {% endif %} 
+                                
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Presencialidad</label>
+                                <input type="text" name="presencialidad" id="presencialidad" class="form-control" required value="{{ evento.presencialidad }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Publicación</label>
+                                <input type="text" name="publicacion" id="publicacion" class="form-control" required value="{{ evento.publicacion }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Estado del Evento</label>
+                                <input type="text" name="publicacion" id="publicacion" class="form-control" required value="{{ evento.aprobacion }}" required disabled>
+                              </div>
+                            </div>
+                          </div>   
+                        </div>
+                        <div class="boot d-flex flex-wrap justify-content-center align-items-center">
+                          <a href="{% url 'Evento_List_Vicerrector' %}" class="btn1 m-2 btn btn-primary btn-sm text-decoration-none">Atr&aacute;s</a>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>    
+        </div>
+      </div>
+    {% endblock %}
+    
+    {% block js %}
+      <script src = "{% static 'js/validations.js' %}"></script>
+    {% endblock %}
+  
+ 

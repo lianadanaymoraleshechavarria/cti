@@ -1,0 +1,1210 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.min.css">
+{% endblock %}
+
+{% block content %}
+  <div class="content">
+    <div class="col">
+      <div class="container-form">
+        <div class="form">
+          <div class="container-fluid py-4">
+            <div class="card">
+              <div class="col-md-12">
+                <div class="title">
+                  <h3 class="title-text p-3">Solicitud de Artículo</h3>
+                </div>
+                <form id="formu" method="POST" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="seccion-formulario">
+                          <h5>Datos del artículo</h5>
+                          <div class="row">
+                            <div class="col-md-12">
+                              <div class="form-group">
+                                <label class="form-control-label required-field">Título</label>
+                                {{ form.titulo }}
+                              </div>
+                            </div>
+                            <div class="col-md-12">
+                              <div class="form-group select">
+                                <label class="form-control-label required-field">Autor(es)</label>
+                                <div class="form-group d-flex align-items-end">
+                                  <div id="user-select-container" class="user-select-container">
+                                  <input type="text" id="user-search" class="form-control" placeholder="Buscar usuarios...">
+                                  <div id="user-dropdown" class="select-dropdown" style="display: none;"></div>
+                                  <div id="selected-users" class="select-selected mt-2"></div>
+                                </div>
+                                <button type="button" class="btn boton-add" id="add-user-btn" data-bs-toggle="modal"
+                                  data-bs-target="#nuevoUsuarioModal">
+                                  <i class="fa fa-plus"></i>
+                                </button>
+                                </div>
+                                <!-- Campo original oculto -->
+                                <div style="display: none;">{{ form.autores }}</div>
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label">DOI</label>
+                                {{ form.doi }}
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                  <label class="form-control-label required-field">ISSN o ISBN</label>
+                                  <input type="text" class="form-control" id="revista-issn" name="issn" required maxlength="9" pattern="[a-zA-Z0-9]{0,9}" title="Máximo 9 caracteres alfanuméricos" placeholder="Introduzca el ISSN">
+                                  <div class="invalid-feedback">Máximo 9 caracteres alfanuméricos</div>
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label">Fecha de publicación</label>
+                                {{ form.fecha_create }}
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label">Idioma</label>
+                                {{ form.idioma }}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="seccion-formulario">
+                          <h5>Datos de la Revista o Medio de Publicación</h5>
+                          <div class="row">
+                            <div class="col-md-12">
+                              <div class="form-group select">
+                                <label class="form-control-label required-field">Revista/Libro/Conferencia</label>
+                                <div id="revista-select-container" class="select-container">
+                                  <div class="form-group d-flex align-items-end icon-input">
+                                    <input type="text" id="revista-search" class="form-control" placeholder="Buscar revistas...">
+                                    <button type="button" class="btn boton-add" id="add-revista-btn">
+                                      <i class="fas fa-plus"></i>
+                                    </button>
+                                  </div>
+                                  <div id="revista-dropdown" class="select-dropdown" style="display: none;"></div>
+                                  <div id="selected-revista" class="select-selected mt-2"></div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                  <label class="form-control-label required-field">Editorial</label>
+                                  <input type="text" class="form-control" id="revista-editorial" name="editorial" required maxlength="200" placeholder="Introduzca la editorial">
+                                  <div class="invalid-feedback">La editorial es requerida (3-200 caracteres)</div>
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label required-field">Volumen</label>
+                                {{ form.volumen }}
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label required-field">Número</label>
+                                {{ form.numero }}
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label">Páginas (inicio-fin)</label>
+                                {{ form.pag }}
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label">Indexación</label>
+                                {{ form.indexacion }}
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label">URL</label>
+                                {{ form.url }}
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label">País</label>
+                                {{ form.pais }}
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label">Archivo Adjunto</label>
+                                {{ form.archivo }}
+                              </div>
+                            </div>
+                            <div class="col-md-12">
+                              <div class="form-group">
+                                <label class="form-control-label">Forma de citar</label>
+                                {{ form.forma_citar }}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="seccion-formulario">
+                          <h5>Información Adicional</h5>
+                          <div class="row">
+                            <div class="switch-container">
+                              <label class="switch">
+                                <input type="checkbox" id="proyecto-switch" {% if form.proyecto.value %}checked{% endif %}>
+                                <span class="slider"></span>
+                              </label>
+                              <label for="proyecto-switch" class="form-control-label">Artículo asociado a un resultado de proyecto: 
+                                <strong id="proyecto-status">{% if form.proyecto.value %}Sí{% else %}No{% endif %}</strong>
+                              </label>
+                            </div>
+                            <div id="proyecto-select-container" class="proyecto-select-container {% if form.proyecto.value %}visible{% endif %}">
+                              <label class="form-control-label">¿Cuál proyecto?</label>
+                              <select name="proyecto" id="id_proyecto" class="form-control">
+                                <option value="">Seleccione un proyecto</option>
+                                {% for proyecto in proyectos %}
+                                  <option value="{{ proyecto.id }}" {% if form.proyecto.value == proyecto.id %}selected{% endif %}>
+                                    {{ proyecto.nombre_proyecto }}
+                                  </option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row mt-4">
+                      <div class="col-md-12 text-center">
+                        <a href="{% url 'Articulo_List_Investigador' %}" class="btn btn-cancelar ml-3">Cancelar</a>
+                        <button type="submit" class="btn boton-form"><i class="fas fa-check"></i> Guardar</button>
+                      </div>
+                    </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+  <!-- Modal para crear nueva revista/libro -->
+  <div class="modal fade" id="modal-revista" tabindex="-1" aria-labelledby="modalRevistaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalRevistaLabel">Crear Nueva Revista/Libro</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="revista-form">
+            <div class="mb-3">
+              <label for="revista-titulo" class="form-label required-field">Nombre</label>
+              <input type="text" class="form-control" id="revista-titulo" required>
+            </div>
+            
+            <div class="mb-3">
+              <label for="revista-editorial" class="form-label required-field">Editorial</label>
+              <input type="text" class="form-control" id="revista-editorial" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="revista-issn" class="form-label">ISSN</label>
+              <input type="text" class="form-control" id="revista-issn">
+            </div>
+            
+            <div class="mb-3">
+              <label for="revista-url" class="form-label">URL</label>
+              <input type="url" class="form-control" id="revista-url">
+            </div>
+
+            <div class="mb-3">
+              <label for="revista-pais" class="form-label">País</label>
+              <input type="text" class="form-control" id="revista-pais">
+            </div>
+
+            <div class="mb-3">
+              <label for="revista-indexacion" class="form-label">Indexación</label>
+              <select class="form-select" id="revista-indexacion" name="indexacion">
+                {% for value, text in form.fields.indexacion.choices %}
+                <option value="{{ value }}">{{ text }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-cancelar" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn boton-form"><i class="fas fa-check"></i> Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para crear nuevo colaborador -->
+<div class="modal fade" id="nuevoUsuarioModal" tabindex="-1" aria-labelledby="nuevoUsuarioModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalColaboradorLabel">Crear Nuevo Colaborador</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="nuevo-usuario-form">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="colaborador-nombre" class="form-label required-field">Nombre</label>
+            <input type="text" class="form-control" id="colaborador-nombre" name="nombre" required maxlength="50">
+          </div>
+          <div class="mb-3">
+            <label for="colaborador-apellidos" class="form-label required-field">Apellidos</label>
+            <input type="text" class="form-control" id="colaborador-apellidos" name="apellidos" required maxlength="50">
+          </div>
+          <div class="mb-3">
+            <label for="colaborador-orci" class="form-label">ORCID</label>
+            <input type="text" class="form-control" id="colaborador-orci" name="orcid" placeholder="1234567890" maxlength="10">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-cancelar" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn boton-form"><i class="fas fa-check"></i> Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block js %}
+<!-- Colaboradores -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const addUserBtn = document.getElementById('add-user-btn');
+  const modalEl = document.getElementById('nuevoUsuarioModal');
+  const nuevoUsuarioForm = document.getElementById('nuevo-usuario-form');
+
+  // Inicializar modal con Bootstrap 5
+  const modal = new bootstrap.Modal(modalEl);
+
+  // Mostrar modal
+  addUserBtn.addEventListener('click', () => {
+    modal.show();
+  });
+
+  // Enviar formulario
+  nuevoUsuarioForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(nuevoUsuarioForm);
+
+    try {
+      const response = await fetch('{% url "crear_colaborador_ajax" %}', {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+      });
+
+      const data = await response.json();
+      console.log("Respuesta del backend:", data); // <-- debug
+
+      if (data.success) {
+        modal.hide();
+
+        // Agregar al select oculto
+        const hiddenSelect = document.querySelector('select[name="premiados"]');
+        const colaboradorId = `colaborador-${data.id}`;
+        const newOption = new Option(data.nombre, colaboradorId, true, true);
+        newOption.dataset.tipo = 'colaborador';
+        hiddenSelect.appendChild(newOption);
+        newOption.selected = true;
+
+        // Actualizar userSelectHelpers si existe
+        const helpers = window.userSelectHelpers;
+        if (helpers) {
+          helpers.selectedUsers.set(colaboradorId, {
+            id: colaboradorId,
+            name: data.nombre,
+            isCurrentUser: false
+          });
+          helpers.updateSelectedUsers();
+          helpers.updateHiddenSelect();
+        }
+
+      } else {
+        let msg = 'Error al guardar colaborador.';
+        if (data.errors) {
+          msg += '\n' + Object.entries(data.errors)
+            .map(([campo, mensajes]) => `${campo}: ${mensajes.join(', ')}`)
+            .join('\n');
+        } else if (data.error) {
+          msg += '\n' + data.error;
+        }
+        alert(msg);
+      }
+
+    } catch (err) {
+      console.error("Error en fetch:", err);
+      alert("Error al comunicarse con el servidor.");
+    }
+  });
+});
+</script>
+
+<script src="{% static 'js/validations.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  
+  // =============================================
+  // FUNCIONES DE DEBUG Y LOGGING (igual que eventos)
+  // =============================================
+  function debugLog(message, data = null) {
+    console.log(`[ARTICULO FORM DEBUG] ${message}`, data);
+  }
+
+  // =============================================
+  // 1. SELECTOR DE REVISTAS (igual que eventos)
+  // =============================================
+  const revistaSearchInput = document.getElementById('revista-search');
+  const revistaDropdown = document.getElementById('revista-dropdown');
+  const selectedRevistaContainer = document.getElementById('selected-revista');
+  let selectedRevista = null;
+
+  // Campos de display para mostrar información de la revista seleccionada
+  const revistaTituloDisplay = document.getElementById('revista-titulo-display');
+  const revistaEditorialDisplay = document.getElementById('revista-editorial-display');
+  const revistaIssnDisplay = document.getElementById('revista-issn-display');
+
+  // Verificar que los elementos existen
+  debugLog('Elementos del selector de revistas:', {
+    revistaSearchInput: !!revistaSearchInput,
+    revistaDropdown: !!revistaDropdown,
+    selectedRevistaContainer: !!selectedRevistaContainer,
+    revistaTituloDisplay: !!revistaTituloDisplay,
+    revistaEditorialDisplay: !!revistaEditorialDisplay,
+    revistaIssnDisplay: !!revistaIssnDisplay
+  });
+
+  function updateSelectedRevista() {
+    if (!selectedRevistaContainer) return;
+    
+    selectedRevistaContainer.innerHTML = '';
+    if (selectedRevista) {
+      const badge = document.createElement('span');
+      badge.className = 'item-badge';
+      badge.textContent = selectedRevista.titulo;
+
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.textContent = '×';
+      removeBtn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        selectedRevista = null;
+        updateSelectedRevista();
+        clearRevistaFields();
+      };
+
+      badge.appendChild(removeBtn);
+      selectedRevistaContainer.appendChild(badge);
+      debugLog('Revista seleccionada actualizada en UI:', selectedRevista.titulo);
+    }
+  }
+
+  function clearRevistaFields() {
+    // Limpiar campos de display readonly
+    if (revistaTituloDisplay) revistaTituloDisplay.value = '';
+    if (revistaEditorialDisplay) revistaEditorialDisplay.value = '';
+    if (revistaIssnDisplay) revistaIssnDisplay.value = '';
+    if (revistaUrlDisplay) revistaUrlDisplay.value = '';
+    
+    // Limpiar campos del formulario principal
+    const fieldsToClean = [
+      'id_editorial', 'id_issn', 'id_isbn', 'id_pais', 
+      'id_idioma', 'id_url', 'id_cita', 'id_index'
+    ];
+    
+    fieldsToClean.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        if (field.tagName.toLowerCase() === 'select') {
+          field.selectedIndex = 0; // Seleccionar primera opción (vacía)
+        } else {
+          field.value = '';
+        }
+        field.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+    
+    debugLog('Todos los campos de revista limpiados');
+  }
+
+  function autocompleteRevistaFields(revista) {
+    debugLog('Autocompletando campos de revista:', revista);
+    
+    // Campos de display readonly
+    if (revistaTituloDisplay) revistaTituloDisplay.value = revista.titulo || '';
+    if (revistaEditorialDisplay) revistaEditorialDisplay.value = revista.editorial || '';
+    if (revistaIssnDisplay) revistaIssnDisplay.value = revista.issn || '';
+    if (revistaUrlDisplay) revistaUrlDisplay.value = revista.url || '';
+    
+    // Campos del formulario principal que se pueden autocompletar
+    const formFields = {
+      // Editorial - campo común
+      'id_editorial': revista.editorial,
+      
+      // ISSN - campo común  
+      'id_issn': revista.issn,
+      
+      // ISBN - campo común
+      'id_isbn': revista.isbn,
+      
+      // País - campo común (select)
+      'id_pais': revista.pais,
+      
+      // Idioma - campo común (select)
+      'id_idioma': revista.idioma,
+      
+      // URL - campo común
+      'id_url': revista.url,
+      
+      // Cita - campo común
+      'id_cita': revista.cita
+    };
+    
+    // Autocompletar campos de texto e inputs
+    Object.entries(formFields).forEach(([fieldId, value]) => {
+      const field = document.getElementById(fieldId);
+      if (field && value) {
+        if (field.tagName.toLowerCase() === 'select') {
+          // Para campos select, buscar la opción que coincida
+          const option = Array.from(field.options).find(opt => 
+            opt.value === value || opt.textContent.toLowerCase() === value.toLowerCase()
+          );
+          if (option) {
+            field.value = option.value;
+            field.dispatchEvent(new Event('change', { bubbles: true }));
+            debugLog(`Campo select ${fieldId} actualizado:`, option.textContent);
+          } else {
+            debugLog(`ADVERTENCIA: Opción no encontrada para ${fieldId}:`, value);
+          }
+        } else {
+          // Para campos de texto normales
+          field.value = value;
+          field.dispatchEvent(new Event('input', { bubbles: true }));
+          debugLog(`Campo ${fieldId} actualizado:`, value);
+        }
+      }
+    });
+    
+    // Autocompletar campo Index si existe (ForeignKey)
+    if (revista.index && revista.index.id) {
+      const indexField = document.getElementById('id_index');
+      if (indexField) {
+        const indexOption = Array.from(indexField.options).find(opt => 
+          opt.value === revista.index.id.toString()
+        );
+        if (indexOption) {
+          indexField.value = indexOption.value;
+          indexField.dispatchEvent(new Event('change', { bubbles: true }));
+          debugLog('Campo index actualizado:', indexOption.textContent);
+        }
+      }
+    }
+  }
+
+  async function searchRevistas(query) {
+    try {
+      debugLog('Buscando revistas con query:', query);
+      
+      if (!revistaDropdown) {
+        debugLog('ERROR: revistaDropdown no existe');
+        return;
+      }
+
+      revistaDropdown.innerHTML = '<div class="p-2 text-center">Buscando revistas...</div>';
+      revistaDropdown.style.display = 'block';
+
+      const url = `/Plataforma/api_revistas/?search=${encodeURIComponent(query)}`;
+      debugLog('URL de búsqueda:', url);
+
+      const response = await fetch(url, {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      });
+
+      debugLog('Respuesta recibida:', { status: response.status, ok: response.ok });
+
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      debugLog('Datos de revistas recibidos:', data);
+      
+      revistaDropdown.innerHTML = '';
+
+      if (!data || data.length === 0) {
+        const noResults = document.createElement('div');
+        noResults.className = 'p-2 text-center';
+        noResults.textContent = 'No se encontraron revistas';
+        revistaDropdown.appendChild(noResults);
+        debugLog('No se encontraron revistas');
+        return;
+      }
+
+      debugLog(`Procesando ${data.length} revistas`);
+
+      data.forEach((revista, index) => {
+        debugLog(`Procesando revista ${index + 1}:`, revista);
+        
+        const item = document.createElement('div');
+        item.className = 'select-item';
+
+        const titleDiv = document.createElement('div');
+        titleDiv.className = 'item-title';
+        titleDiv.textContent = revista.titulo || 'Sin título';
+        
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'item-info';
+
+        const infoTexts = [];
+        if (revista.editorial) infoTexts.push(`Editorial: ${revista.editorial}`);
+        if (revista.issn) infoTexts.push(`ISSN: ${revista.issn}`);
+        if (revista.isbn) infoTexts.push(`ISBN: ${revista.isbn}`);
+        if (revista.pais) infoTexts.push(`País: ${revista.pais}`);
+
+        infoDiv.textContent = infoTexts.join(' | ');
+
+        item.appendChild(titleDiv);
+        if (infoTexts.length > 0) item.appendChild(infoDiv);
+
+        item.onclick = () => {
+          debugLog('Revista clickeada:', revista);
+          
+          selectedRevista = {
+            id: revista.id,
+            titulo: revista.titulo || 'Sin título',
+            editorial: revista.editorial,
+            issn: revista.issn,
+            isbn: revista.isbn,
+            pais: revista.pais,
+            idioma: revista.idioma,
+            url: revista.url,
+            index: revista.index,
+            cita: revista.cita
+          };
+
+          debugLog('selectedRevista establecida:', selectedRevista);
+          
+          updateSelectedRevista();
+          autocompleteRevistaFields(selectedRevista);
+          revistaDropdown.style.display = 'none';
+        };
+
+        revistaDropdown.appendChild(item);
+      });
+    } catch (error) {
+      debugLog('ERROR en searchRevistas:', error);
+      console.error('Error al buscar revistas:', error);
+      if (revistaDropdown) {
+        revistaDropdown.innerHTML = '<div class="p-2 text-center text-danger">Error al buscar revistas</div>';
+      }
+    }
+  }
+
+  // Event listeners para revistas (igual que eventos)
+  if (revistaSearchInput) {
+    revistaSearchInput.addEventListener('focus', () => {
+      debugLog('Focus en campo de búsqueda de revistas');
+      if (revistaSearchInput.value.trim() === '') searchRevistas('');
+      else if (revistaDropdown) revistaDropdown.style.display = 'block';
+    });
+
+    revistaSearchInput.addEventListener('input', () => {
+      const query = revistaSearchInput.value.trim();
+      debugLog('Input en campo de búsqueda:', query);
+      searchRevistas(query);
+    });
+
+    revistaSearchInput.addEventListener('blur', () => {
+      setTimeout(() => {
+        if (revistaDropdown) revistaDropdown.style.display = 'none';
+      }, 200);
+    });
+
+    if (revistaDropdown) {
+      revistaDropdown.addEventListener('mousedown', (e) => e.preventDefault());
+    }
+  }
+
+  // =============================================
+  // 2. MANEJO DEL MODAL PARA REVISTA (igual que eventos)
+  // =============================================
+  const addRevistaBtn = document.getElementById('add-revista-btn');
+  const guardarRevistaBtn = document.getElementById('guardar-revista');
+  const modalRevista = document.getElementById('modal-revista');
+
+  if (addRevistaBtn) {
+    addRevistaBtn.addEventListener('click', () => {
+      debugLog('Botón añadir revista clickeado');
+      
+      if (modalRevista) {
+        try {
+          if (typeof $ !== 'undefined' && typeof $.fn.modal === 'function') {
+            $('#modal-revista').modal('show');
+            debugLog('Modal mostrado con jQuery');
+          } else if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function') {
+            const modal = new bootstrap.Modal(modalRevista);
+            modal.show();
+            debugLog('Modal mostrado con Bootstrap 5');
+          } else {
+            modalRevista.style.display = 'block';
+            modalRevista.classList.add('show');
+            document.body.classList.add('modal-open');
+            
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show';
+            backdrop.id = 'manual-backdrop-revista';
+            document.body.appendChild(backdrop);
+            
+            debugLog('Modal mostrado manualmente');
+          }
+        } catch (error) {
+          debugLog('Error al mostrar modal:', error);
+        }
+      } else {
+        debugLog('ERROR: Modal no encontrado');
+      }
+    });
+  }
+
+  if (guardarRevistaBtn) {
+    guardarRevistaBtn.addEventListener('click', () => {
+      debugLog('Botón guardar revista clickeado');
+      
+      const formData = {
+        titulo: document.getElementById('revista-titulo')?.value || '',
+        editorial: document.getElementById('revista-editorial')?.value || '',
+        pais: document.getElementById('revista-pais')?.value || '',
+        issn: document.getElementById('revista-issn')?.value || '',
+        isbn: document.getElementById('revista-isbn')?.value || '',
+        idioma: document.getElementById('revista-idioma')?.value || '',
+        url: document.getElementById('revista-url')?.value || '',
+        cita: document.getElementById('revista-cita')?.value || ''
+      };
+
+      debugLog('Datos del formulario modal revista:', formData);
+
+      // Validaciones
+      const requiredFields = ['titulo', 'editorial'];
+      const missingFields = requiredFields.filter(field => !formData[field]);
+      
+      if (missingFields.length > 0) {
+        const message = `Faltan los siguientes campos requeridos: ${missingFields.join(', ')}`;
+        debugLog('ERROR de validación:', message);
+        alert(message);
+        return;
+      }
+
+      // Preparar datos para envío (igual que eventos)
+      const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]')?.value;
+      if (!csrfToken) {
+        debugLog('ERROR: Token CSRF no encontrado');
+        alert('Error: Token de seguridad no encontrado');
+        return;
+      }
+
+      const postData = new URLSearchParams({
+        csrfmiddlewaretoken: csrfToken,
+        ...formData
+      });
+
+      debugLog('Enviando datos al servidor:', Object.fromEntries(postData));
+
+      // Enviar al servidor (igual que eventos)
+      fetch('/Plataforma/api_crear_revista_libro/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': csrfToken,
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: postData
+      })
+      .then(response => {
+        debugLog('Respuesta del servidor:', { status: response.status, ok: response.ok });
+        
+        if (!response.ok) {
+          return response.text().then(text => {
+            debugLog('Respuesta de error del servidor:', text);
+            throw new Error(`Error HTTP ${response.status}: ${text}`);
+          });
+        }
+        
+        return response.json();
+      })
+      .then(data => {
+        debugLog('Datos recibidos del servidor:', data);
+        
+        if (data.success) {
+          // Cerrar modal (igual que eventos)
+          try {
+            if (typeof $ !== 'undefined' && typeof $.fn.modal === 'function') {
+              $('#modal-revista').modal('hide');
+            } else if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function') {
+              const modalInstance = bootstrap.Modal.getInstance(modalRevista);
+              if (modalInstance) modalInstance.hide();
+            } else {
+              modalRevista.style.display = 'none';
+              modalRevista.classList.remove('show');
+              document.body.classList.remove('modal-open');
+              const backdrop = document.getElementById('manual-backdrop-revista');
+              if (backdrop) backdrop.remove();
+            }
+          } catch (error) {
+            debugLog('Error al cerrar modal:', error);
+          }
+          
+          // Actualizar revista seleccionada
+          selectedRevista = {
+            id: data.revista_libro.id,
+            titulo: data.revista_libro.titulo,
+            editorial: data.revista_libro.editorial,
+            issn: data.revista_libro.issn,
+            isbn: data.revista_libro.isbn,
+            pais: data.revista_libro.pais,
+            idioma: data.revista_libro.idioma,
+            url: data.revista_libro.url,
+            index: data.revista_libro.index,
+            cita: data.revista_libro.cita
+          };
+          
+          debugLog('Nueva revista creada:', selectedRevista);
+          
+          updateSelectedRevista();
+          autocompleteRevistaFields(selectedRevista);
+          
+          // Limpiar formulario
+          document.getElementById('revista-form')?.reset();
+          
+          alert('Revista creada correctamente.');
+        } else {
+          let errorMsg = 'Error al crear la revista:';
+          if (data.errors) {
+            Object.entries(data.errors).forEach(([field, errors]) => {
+              errorMsg += `\n${field}: ${Array.isArray(errors) ? errors.join(' ') : errors}`;
+            });
+          } else if (data.message) {
+            errorMsg += `\n${data.message}`;
+          }
+          debugLog('Error del servidor:', data);
+          alert(errorMsg);
+        }
+      })
+      .catch(error => {
+        debugLog('ERROR en la petición:', error);
+        alert(`Error al comunicarse con el servidor: ${error.message}`);
+      });
+    });
+  }
+
+   // =============================================
+  // 3. SELECTOR DE COLABORADORES CON MODALES
+  // =============================================
+  const searchInput = document.getElementById('user-search');
+  const dropdown = document.getElementById('user-dropdown');
+  const selectedUsersContainer = document.getElementById('selected-users');
+  const hiddenSelect = document.querySelector('select[name="autores"]');
+  const selectedUsers = new Map();
+  const currentUserId = '{{ user.id }}';
+  const currentUserName = '{{ user.get_full_name|default:user.username }}';
+
+  // Cargar usuarios seleccionados inicialmente
+  if (hiddenSelect) {
+    Array.from(hiddenSelect.selectedOptions).forEach(option => {
+      selectedUsers.set(option.value, {
+        id: option.value,
+        name: option.textContent
+      });
+    });
+  }
+
+  // Añadir usuario actual si no está seleccionado
+  if (currentUserId && !selectedUsers.has(currentUserId)) {
+    selectedUsers.set(currentUserId, {
+      id: currentUserId,
+      name: currentUserName
+    });
+  }
+
+  // Actualizar usuarios seleccionados
+  function updateSelectedUsers() {
+    selectedUsersContainer.innerHTML = '';
+    selectedUsers.forEach(user => {
+      const badge = document.createElement('span');
+      badge.className = 'item-badge';
+      badge.textContent = user.name;
+      
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.textContent = '×';
+      removeBtn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (user.id === currentUserId) {
+          alert('No puedes eliminarte a ti mismo como autor.');
+          return;
+        }
+        selectedUsers.delete(user.id);
+        updateSelectedUsers();
+        updateHiddenSelect();
+      };
+      
+      badge.appendChild(removeBtn);
+      selectedUsersContainer.appendChild(badge);
+    });
+  }
+
+  // Actualizar select oculto
+  function updateHiddenSelect() {
+    if (!hiddenSelect) return;
+    
+    Array.from(hiddenSelect.options).forEach(option => option.selected = false);
+    
+    selectedUsers.forEach(user => {
+      const option = hiddenSelect.querySelector(`option[value="${user.id}"]`);
+      if (option) option.selected = true;
+      else hiddenSelect.appendChild(new Option(user.name, user.id, true, true));
+    });
+    
+    hiddenSelect.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+
+  // Buscar usuarios
+  async function searchUsers(query) {
+    try {
+      dropdown.innerHTML = '<div class="p-2 text-center">Buscando usuarios...</div>';
+      dropdown.style.display = 'block';
+      
+      const response = await fetch(`/Investigador/api_usuarios/?search=${encodeURIComponent(query)}`, {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      });
+      
+      if (!response.ok) throw new Error('Error en la respuesta del servidor');
+      
+      const users = await response.json();
+      dropdown.innerHTML = '';
+      
+      if (users.length === 0) {
+        const noResults = document.createElement('div');
+        noResults.className = 'p-2 text-center';
+        noResults.textContent = 'No se encontraron usuarios';
+        dropdown.appendChild(noResults);
+        return;
+      }
+      
+      users.forEach(user => {
+        const item = document.createElement('div');
+        item.className = 'select-item';
+        
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'item-title';
+        nameDiv.textContent = user.name;
+        
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'item-info';
+        
+        const infoTexts = [];
+        if (user.carnet) infoTexts.push(`Carnet: ${user.carnet}`);
+        if (user.area) infoTexts.push(`Área: ${user.area}`);
+        if (user.departamento) infoTexts.push(`Depto: ${user.departamento}`);
+        
+        infoDiv.textContent = infoTexts.join(' | ');
+        item.appendChild(nameDiv);
+        if (infoTexts.length > 0) item.appendChild(infoDiv);
+
+        if (selectedUsers.has(user.id.toString())) {
+          item.classList.add('selected');
+          item.style.backgroundColor = '#e9ecef';
+        }
+
+        const isCurrentUser = user.id.toString() === currentUserId;
+        if (isCurrentUser) {
+          item.classList.add('disabled');
+          item.style.opacity = '0.7';
+          item.style.cursor = 'not-allowed';
+        }
+
+        item.onclick = () => {
+          if (isCurrentUser) {
+            alert('No puedes eliminarte a ti mismo como autor.');
+            return;
+          }
+          
+          if (selectedUsers.has(user.id.toString())) {
+            selectedUsers.delete(user.id.toString());
+          } else {
+            selectedUsers.set(user.id.toString(), {
+              id: user.id.toString(),
+              name: user.full_name || user.name
+            });
+          }
+          updateSelectedUsers();
+          updateHiddenSelect();
+        };
+
+        dropdown.appendChild(item);
+      });
+    } catch (error) {
+      console.error('Error al buscar usuarios:', error);
+      dropdown.innerHTML = '<div class="p-2 text-center text-danger">Error al buscar usuarios</div>';
+    }
+  }
+
+  // Event listeners para selector de colaboradores
+  if (searchInput) {
+    searchInput.addEventListener('focus', () => {
+      if (searchInput.value.trim() === '') searchUsers('');
+      else dropdown.style.display = 'block';
+    });
+
+    searchInput.addEventListener('input', () => {
+      const query = searchInput.value.trim();
+      searchUsers(query);
+    });
+
+    searchInput.addEventListener('blur', () => {
+      setTimeout(() => { dropdown.style.display = 'none'; }, 200);
+    });
+
+    dropdown.addEventListener('mousedown', (e) => e.preventDefault());
+  }
+
+  // Inicializar
+  updateSelectedUsers();
+  updateHiddenSelect();
+
+  // =============================================
+  // 4. MANEJO DEL MODAL PARA COLABORADOR
+  // =============================================
+  const addColaboradorBtn = document.getElementById('add-colaborador-btn');
+  const guardarColaboradorBtn = document.getElementById('guardar-colaborador');
+  const modalColaborador = document.getElementById('modal-colaborador');
+
+  if (addColaboradorBtn) {
+    addColaboradorBtn.addEventListener('click', () => {
+      debugLog('Botón añadir colaborador clickeado');
+      
+      if (modalColaborador) {
+        try {
+          if (typeof $ !== 'undefined' && typeof $.fn.modal === 'function') {
+            $('#modal-colaborador').modal('show');
+            debugLog('Modal mostrado con jQuery');
+          } else if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function') {
+            const modal = new bootstrap.Modal(modalColaborador);
+            modal.show();
+            debugLog('Modal mostrado con Bootstrap 5');
+          } else {
+            modalColaborador.style.display = 'block';
+            modalColaborador.classList.add('show');
+            document.body.classList.add('modal-open');
+            
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show';
+            backdrop.id = 'manual-backdrop-colaborador';
+            document.body.appendChild(backdrop);
+            
+            debugLog('Modal mostrado manualmente');
+          }
+        } catch (error) {
+          debugLog('Error al mostrar modal:', error);
+        }
+      } else {
+        debugLog('ERROR: Modal no encontrado');
+      }
+    });
+  }
+
+  if (guardarColaboradorBtn) {
+    guardarColaboradorBtn.addEventListener('click', () => {
+      debugLog('Botón guardar colaborador clickeado');
+      
+      const formData = {
+        nombre: document.getElementById('colaborador-nombre')?.value || '',
+        apellidos: document.getElementById('colaborador-apellidos')?.value || '',
+        orci: document.getElementById('colaborador-orci')?.value || '',
+        google_academico: document.getElementById('colaborador-google')?.value || '',
+        rgate: document.getElementById('colaborador-rgate')?.value || ''
+      };
+
+      debugLog('Datos del formulario modal colaborador:', formData);
+
+      // Validaciones
+      const requiredFields = ['nombre', 'apellidos'];
+      const missingFields = requiredFields.filter(field => !formData[field]);
+      
+      if (missingFields.length > 0) {
+        const message = `Faltan los siguientes campos requeridos: ${missingFields.join(', ')}`;
+        debugLog('ERROR de validación:', message);
+        alert(message);
+        return;
+      }
+
+      // Preparar datos para envío
+      const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]')?.value;
+      if (!csrfToken) {
+        debugLog('ERROR: Token CSRF no encontrado');
+        alert('Error: Token de seguridad no encontrado');
+        return;
+      }
+
+      const postData = new URLSearchParams({
+        csrfmiddlewaretoken: csrfToken,
+        ...formData
+      });
+
+      debugLog('Enviando datos al servidor:', Object.fromEntries(postData));
+
+      // Enviar al servidor
+      fetch('/Investigador/api_crear_colaborador/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': csrfToken,
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: postData
+      })
+      .then(response => {
+        debugLog('Respuesta del servidor:', { status: response.status, ok: response.ok });
+        
+        if (!response.ok) {
+          return response.text().then(text => {
+            debugLog('Respuesta de error del servidor:', text);
+            throw new Error(`Error HTTP ${response.status}: ${text}`);
+          });
+        }
+        
+        return response.json();
+      })
+      .then(data => {
+        debugLog('Datos recibidos del servidor:', data);
+        
+        if (data.success) {
+          // Cerrar modal
+          try {
+            if (typeof $ !== 'undefined' && typeof $.fn.modal === 'function') {
+              $('#modal-colaborador').modal('hide');
+            } else if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function') {
+              const modalInstance = bootstrap.Modal.getInstance(modalColaborador);
+              if (modalInstance) modalInstance.hide();
+            } else {
+              modalColaborador.style.display = 'none';
+              modalColaborador.classList.remove('show');
+              document.body.classList.remove('modal-open');
+              const backdrop = document.getElementById('manual-backdrop-colaborador');
+              if (backdrop) backdrop.remove();
+            }
+          } catch (error) {
+            debugLog('Error al cerrar modal:', error);
+          }
+          
+          // Añadir el nuevo colaborador a la lista de seleccionados
+          const colaborador = data.colaborador;
+          const nombreCompleto = `${colaborador.nombre} ${colaborador.apellidos}`;
+          
+          selectedUsers.set(colaborador.id.toString(), {
+            id: colaborador.id.toString(),
+            name: nombreCompleto
+          });
+          
+          updateSelectedUsers();
+          updateHiddenSelect();
+          
+          // Limpiar formulario
+          document.getElementById('colaborador-form')?.reset();
+          
+          alert('Colaborador creado correctamente: ' + nombreCompleto);
+        } else {
+          let errorMsg = 'Error al crear el colaborador:';
+          if (data.errors) {
+            Object.entries(data.errors).forEach(([field, errors]) => {
+              errorMsg += `\n${field}: ${Array.isArray(errors) ? errors.join(' ') : errors}`;
+            });
+          } else if (data.message) {
+            errorMsg += `\n${data.message}`;
+          }
+          debugLog('Error del servidor:', data);
+          alert(errorMsg);
+        }
+      })
+      .catch(error => {
+        debugLog('ERROR en la petición:', error);
+        alert(`Error al comunicarse con el servidor: ${error.message}`);
+      });
+    });
+  }
+
+  // =============================================
+  // 5. OTROS SCRIPTS EXISTENTES
+  // =============================================
+  
+  // Script para mostrar el nombre del archivo seleccionado
+  document.getElementById('id_archivo')?.addEventListener('change', function(e) {
+    var fileName = e.target.files[0] ? e.target.files[0].name : 'Seleccionar archivo...';
+    const fileNameElement = document.getElementById('file-name');
+    if (fileNameElement) {
+      fileNameElement.textContent = fileName;
+    }
+  });
+
+  // =============================================
+  // 6. MANEJO DEL SWITCH DE PROYECTO
+  // =============================================
+  const proyectoSwitch = document.getElementById('proyecto-switch');
+  const proyectoContainer = document.getElementById('proyecto-select-container');
+  const proyectoStatus = document.getElementById('proyecto-status');
+  const proyectoSelect = document.getElementById('id_proyecto');
+
+  if (proyectoSwitch) {
+    // Inicializar el estado del switch basado en si hay un proyecto seleccionado
+    if (proyectoSelect && proyectoSelect.value) {
+      proyectoSwitch.checked = true;
+      proyectoContainer.classList.add('visible');
+    }
+
+    proyectoSwitch.addEventListener('change', function() {
+      if (this.checked) {
+        proyectoContainer.classList.add('visible');
+        proyectoStatus.textContent = 'Sí';
+        setTimeout(() => proyectoSelect.focus(), 300);
+      } else {
+        proyectoContainer.classList.remove('visible');
+        proyectoStatus.textContent = 'No';
+        proyectoSelect.value = '';
+      }
+    });
+
+    // Validación en el envío del formulario
+    document.getElementById('formu')?.addEventListener('submit', function(e) {
+      if (proyectoSwitch.checked && !proyectoSelect.value) {
+        e.preventDefault();
+        alert('Por favor seleccione un proyecto o desactive la opción "¿Pertenece a un proyecto?"');
+        proyectoSelect.focus();
+      }
+    });
+  }
+
+  debugLog('Inicialización completada');
+});
+</script>
+{% endblock %}

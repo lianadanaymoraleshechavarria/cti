@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Conatiner CSS -->
+{% block css %}
+<link rel="stylesheet" href=" {% static 'css/Dashboard.css' %}">
+<link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'css/datatableSD.css' %}">
+{% endblock %}
+<!-- End Conatiner CSS -->
+
+{% block content %}
+<div class="main" style="padding-top:60px;">
+  <main class="content-inside px-3 py-2">
+    <div class="container-fluid">
+      <div class="container-fluid">
+          <!--Table Element-->
+        <section id="tablaTramites">
+          <div class="card card-a p-3 h-100">
+            <div class="card-header">
+              <h5 class="card-title title-t" style=" text-align: start;">
+                Programas
+              </h5>
+            </div>
+            <div class="boot d-flex flex-wrap justify-content-start align-items-center">
+              <a href="{% url 'Programa_Create' %}" class="btn1 m-2 btn btn-primary btn-sm text-decoration-none">Añadir</a>
+            </div>
+            </div>
+            <table id="Programas" class="display table table-striped table-hover table-primary" style="width:100%; height: 100%;">
+                <thead class="encabezado">
+                  <tr>
+                    <th scope="col" style="color: white; text-align: center;">No</th>
+                    <th scope="col" style="color: white; text-align: center;">Nombre</th>
+                    <th scope="col" style="color: white; text-align: center;">Jefe</th>
+                    <th scope="col" style="color: white; text-align: center;">Área</th>
+                    <th scope="col" style="color: white; text-align: center;">Proyectos</th>
+                    <th scope="col" style="color: white; text-align: center;">Código</th>
+                    <th scope="col" style="color: white; text-align: center;">Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for p in programa %}
+                    <tr>
+                      <td style=" text-align: center;">{{forloop.counter}}</td>
+                      <td style="text-align: center;"><a class="details" style="color:blue " href="{% url "Programa_Detail_JefeArea" p.id %}"> {{p.nombre_programa}} </a></td>
+                      <td style=" text-align: center;">{{p.jefe_programa}}</td>
+                      <td style=" text-align: center;">{{p.area}}</td>
+                      <td style=" text-align: center;">{{p.cantidad_proyectos_programa}}</td>
+                      <td style="text-align: center;">{{p.codigo_programa }}</td>
+                      <td style="text-align: center;">{{ p.aprobacion }}</td>
+                    </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section class="mb-2 row row-gap-1">
+        
+          <section class="col-md-6 col-sm-12" id="graficaBarMarcadores">
+            <div class="card">
+               <div class="p-2">
+                <div id="grafDepartamentosProyectos">
+                </div>
+              </div>
+            </div>
+          </section>
+          
+          <section class="col-md-6 col-sm-12" id="graficaBarMarcadores">
+            <div class="card">
+               <div class="p-2">
+                <div id="grafSectorEstrategico">
+                </div>
+              </div>
+            </div>
+          </section>
+        </section>
+      </div>
+  </main>
+</div>
+ 
+  {% endblock %}
+
+  <!-- Conatiner JS -->
+  {% block js%}
+  <script src="{% static 'libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/dataTables.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+  
+  <script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/pdfmake.min.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/bottons.colVis.min.js' %}"></script>
+  
+  <script src="{% static 'libs/Datatable/JS/dataTables.responsive.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>
+  
+  <script src="{% static 'libs/Datatable/JS/Programas.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/highcharts.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/modules/accessibility.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/modules/exporting.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/modules/offline-exporting.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/modules/export-data.js' %}"></script>
+
+
+  <script>
+    $(document).ready(function() {
+        
+        // Datos para la gráfica de proyectos por Programas
+    var departamentosProgramas = {{ departamentos_programa_json|safe }};
+    var dataDepartamentosProgramas = departamentosProgramas.map(function(item) {
+        return { name: item.departamento, y: item.count };
+    });
+
+    // Inicializar la gráfica de proyectos por Programas
+    Highcharts.chart('grafDepartamentosProyectos', {
+        chart: { type: 'bar' },
+        title: { text: 'Proyectos por Programas' },
+        xAxis: {
+            categories: departamentosProgramas.map(function(item) { return item.departamento; })
+        },
+        yAxis: {
+            title: { text: 'Cantidad de Programas' }
+        },
+        series: [{
+            name: 'Proyectos',
+            data: dataDepartamentosProgramas
+        }],
+        legend: {
+            enabled: false
+        },
+        credits: {
+            enabled: false
+        }
+    });
+
+    // Datos para la gráfica de sectores estratégicos
+    var sectoresEstrategicos = {{ sector_estrategico|safe }};
+    var dataSectoresEstrategicos = sectoresEstrategicos.map(function(item) {
+        return { name: item.sector_estrategico, y: item.count };
+    });
+
+    // Inicializar la gráfica de sectores estratégicos como una gráfica de barras
+    Highcharts.chart('grafSectorEstrategico', {
+        chart: {
+            type: 'bar'
+        },
+        title: {
+            text: 'Sectores Estratégicos'
+        },
+        xAxis: {
+            categories: sectoresEstrategicos.map(function(item) { return item.sector_estrategico; }),
+            title: {
+                text: null
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Cantidad de Programas',
+                align: 'high'
+            },
+            labels: {
+                overflow: 'justify'
+            }
+        },
+        tooltip: {
+            valueSuffix: ' proyectos'
+        },
+        plotOptions: {
+            bar: {
+                dataLabels: {
+                    enabled: true
+                }
+              }
+        },
+        legend: {
+            enabled: false
+        },
+        series: [{
+            name: 'Proyectos',
+            data: dataSectoresEstrategicos
+        }]
+    });
+    
+     
+  });
+</script>
+
+  {% endblock %}
+  <!-- End Conatiner JS -->

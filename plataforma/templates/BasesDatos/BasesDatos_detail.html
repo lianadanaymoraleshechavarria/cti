@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Container CSS -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'Plataforma/css/estilobeta.css' %}">
+<style>
+    .detail-card {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        margin: 20px auto;
+        max-width: 800px;
+    }
+    .detail-header {
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+    }
+    .detail-title {
+        font-size: 24px;
+        color: #2c3e50;
+        margin-bottom: 5px;
+    }
+    .detail-group {
+        color: #6c757d;
+        font-size: 16px;
+    }
+    .detail-content {
+        margin-bottom: 20px;
+    }
+    .detail-label {
+        font-weight: bold;
+        color: #495057;
+        margin-bottom: 5px;
+    }
+    .detail-value {
+        color: #212529;
+        margin-bottom: 15px;
+    }
+    .detail-url {
+        word-break: break-all;
+    }
+    .detail-url a {
+        color: #007bff;
+        text-decoration: none;
+    }
+    .detail-url a:hover {
+        text-decoration: underline;
+    }
+    .detail-actions {
+        margin-top: 30px;
+        display: flex;
+        gap: 10px;
+    }
+    .btn-back {
+        background-color: #6c757d;
+        color: white;
+    }
+    .btn-edit {
+        background-color: #007bff;
+        color: white;
+    }
+    .btn-delete {
+        background-color: #dc3545;
+        color: white;
+    }
+</style>
+{% endblock %}
+<!-- End Container CSS -->
+
+{% block content %}
+<div class="detail-card">
+    <div class="detail-header">
+        <h1 class="detail-title">{{ base_datos.nombre_base_datos }}</h1>
+        <div class="detail-group">{{ base_datos.get_grupo_display }}</div>
+    </div>
+    
+    <div class="detail-content">
+        <div class="detail-label">Nombre:</div>
+        <div class="detail-value">{{ base_datos.nombre_base_datos }}</div>
+        
+        <div class="detail-label">Grupo:</div>
+        <div class="detail-value">{{ base_datos.get_grupo_display }}</div>
+        
+        <div class="detail-label">URL:</div>
+        <div class="detail-value detail-url">
+            <a href="{{ base_datos.url }}" target="_blank">{{ base_datos.url }}</a>
+        </div>
+    </div>
+    
+    <div class="detail-actions">
+        <a href="{% url 'BasesDatosList' %}" class="btn btn-back">Volver</a>
+        <a href="{% url 'BasesDatos_Update' base_datos.id %}" class="btn btn-edit">Editar</a>
+        <button type="button" class="btn btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal">
+            Eliminar
+        </button>
+    </div>
+</div>
+
+<!-- Modal de Confirmación para Eliminar -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirmar eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ¿Está seguro que desea eliminar la base de datos "{{ base_datos.nombre_base_datos }}"?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form method="post" action="{% url 'BasesDatos_Delete' base_datos.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- Container JS -->
+{% block js %}
+<script>
+    // Si necesitas algún JavaScript específico para esta página
+</script>
+{% endblock %}
+<!-- End Container JS -->

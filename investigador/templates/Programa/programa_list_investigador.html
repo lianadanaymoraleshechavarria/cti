@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+  <link rel="stylesheet" href="{% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+  <link rel="stylesheet" href="{% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+  <link rel="stylesheet" href="{% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+  <link rel="stylesheet" href="{% static 'css/datatableSD.css' %}">
+  
+  <style>
+    /* Custom badge styles */
+    .badge-aprobado {
+      background-color: #28a745;
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+    }
+    
+    .badge-rechazado {
+      background-color: #dc3545;
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+    }
+    
+    .badge-pendiente {
+      background-color: #ffc107;
+      color: #212529;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+<section class="tabla" id="programas">
+  <div class="card card-a p-3 h-100">
+    <div class="card-header text-center">
+      <h5 class="card-title">Lista de Programas</h5>
+    </div>
+    <div class="boot d-flex flex-wrap justify-content-start align-items-center mb-3">
+      <form id="filter-form" class="w-100">
+        <div class="row">
+          <div class="col-md-3">
+            <label for="tipo_programa">Tipo de Programa:</label>
+            <select class="form-control" id="tipo_programa" name="tipo_programa">
+              <option value="">Todos</option>
+              {% for tipo in tipos_programa %}
+                <option value="{{ tipo.id }}">{{ tipo.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="estado_aprobacion">Estado de Aprobación:</label>
+            <select class="form-control" id="estado_aprobacion" name="estado_aprobacion">
+              <option value="">Todos</option>
+              <option value="Pendiente">Pendiente</option>
+              <option value="Aprobado">Aprobado</option>
+              <option value="Rechazado">Rechazado</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="anio_inicio">Año de Inicio:</label>
+            <select class="form-control" id="anio_inicio" name="anio_inicio">
+              <option value="">Todos</option>
+              {% for anio in anios_inicio %}
+                <option value="{{ anio }}">{{ anio }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-3 d-flex align-items-end">
+            <button type="button" class="btn btn-primary form-control" id="filter-button">Filtrar</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    
+    <table id="programa-table" class="display table table-striped table-hover" style="width:100%">
+      <thead>
+        <tr>
+          <th>Título</th>
+          <th>Tipo de Programa</th>
+          <th>Organismo</th>
+          <th>Fecha Inicio</th>
+          <th>Fecha Fin</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Data will be loaded by DataTables -->
+      </tbody>
+    </table>
+
+    <a href="{% url 'programas:programa_create' %}" class="btn btn-success">Crear Programa</a>
+  </div>
+</section>
+
+{% block js %}
+  <script src="{% static 'libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/dataTables.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/pdfmake.min.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/dataTables.responsive.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>  
+
+  <script>
+    $(document).ready(function() {
+        var table = $('#programa-table').DataTable({
+            "ajax": {
+                "url": "{% url 'programas:programa_list_data_investigador' %}",
+                "data": function (d) {
+                    d.tipo_programa = $('#tipo_programa').val();
+                    d.estado_aprobacion = $('#estado_aprobacion').val();
+                    d.anio_inicio = $('#anio_inicio').val();
+                }
+            },
+            "columns": [
+                { "data": "titulo" },
+                { "data": "tipo_programa" },
+                { "data": "organismo" },
+                { "data": "fecha_inicio" },
+                { "data": "fecha_fin" },
+                { "data": "estado",
+                  "render": function(data) {
+                      return `<span class="badge badge-${data === 'Aprobado' ? 'aprobado' : data === 'Rechazado' ? 'rechazado' : 'pendiente'}">${data}</span>`;
+                  }
+                },
+                {
+                    "data": null,
+                    "defaultContent": "<button class='btn btn-sm btn-info edit-button'>Editar</button> <button class='btn btn-sm btn-danger delete-button'>Eliminar</button>",
+                    "orderable": false
+                }
+            ],
+            dom: 'Bfrtip',
+            buttons: ['excelHtml5'],
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json"
+            }
+        });
+
+        $('#filter-button').on('click', function() {
+            table.ajax.reload();
+        });
+
+        $('#programa-table tbody').on('click', '.edit-button', function () {
+            var data = table.row($(this).parents('tr')).data();
+            window.location.href = '/programas/programa/update/' + data.id;
+        });
+
+        $('#programa-table tbody').on('click', '.delete-button', function () {
+            var data = table.row($(this).parents('tr')).data();
+            if (confirm('¿Estás seguro de que quieres eliminar este programa?')) {
+                window.location.href = '/programas/programa/delete/' + data.id;
+            }
+        });
+    });
+  </script>
+{% endblock %}

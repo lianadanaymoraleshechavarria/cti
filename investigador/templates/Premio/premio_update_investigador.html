@@ -1,0 +1,935 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="content">
+  <div class="col">
+    <div class="container-form">
+      <div class="form">
+        <div class="container-fluid py-4">
+          <div class="row">
+            <div class="card">
+              <div class="title">
+                <h3 class="title-text p-3">Editar Solicitud de Premio</h3>
+              </div>
+              <form id="formu" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <!-- Datos del Premio -->
+                      <div class="seccion-formulario">
+                        <h5>Datos del premio</h5>
+                        <div class="row">
+                          <div class="col-md-6">
+                            <div class="form-group d-flex align-items-end icon-input">
+                              <div class="w-100">
+                                <label class="form-control-label required-field">Tipo de Premio</label>
+                                <div class="input-wrapper">
+                                  <i class="fas fa-trophy" style="margin-right: 5px;"></i>
+                                  {{ form.tipo }}
+                                  {% for error in form.tipo.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                  {% endfor %}
+                                </div>
+                              </div>
+                              <button type="button" class="btn boton-add" id="add-tipo-premio-btn">
+                                <i class="fa fa-plus"></i>
+                              </button>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="form-group d-flex align-items-end">
+                              <div class="w-100">
+                                <label class="form-control-label required-field">Carácter de Premio</label>
+                                {{ form.caracter }}
+                                {% for error in form.tipo.errors %}
+                                  <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                              </div>
+                              <button type="button" class="btn boton-add" id="add-caracter-premio-btn">
+                                <i class="fa fa-plus"></i>
+                              </button>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label class="form-control-label">Título</label>
+                                {{ form.titulo }}
+                                {% for error in form.titulo.errors %}
+                                  <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="form-group icon-input ">
+                              <label class="form-control-label required-field">Institución</label>
+                              <div class="input-wrapper">
+                                <i class="fas fa-building" style="margin-right: 5px;"></i>
+                                <select name="institucion" id="form_institucion" class="form-control">
+                                  <option value="">Seleccione una institución</option>
+                                  {% for institucion in instituciones %}
+                                  <label>hola</label>
+                                  <p>Valor actual del campo institución: {{ form.institucion.value }}</p>
+                                    <option value="{{ institucion.id }}"
+                                      {% if form.institucion.value|stringformat:"s" == institucion.id|stringformat:"s" %}selected{% endif %}>
+                                      {{ institucion.nombre }}
+                                    </option>
+                                  {% endfor %}
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label class="form-control-label required-field">Fecha</label>
+                              <div class="form-group">
+                                {{ form.fecha_create }}
+                                {% for error in form.fecha_create.errors %}
+                                  <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div class="col-md-6" >
+                            <div class="form-group icon-input">
+                              <label class="form-control-label">Diploma del premio</label>
+                                 {% if form.instance.diploma %}
+                                 <div class="current-file-info">
+                                  <strong>Archivo actual:</strong>
+                                  <a href="{{ form.instance.diploma.url }}" target="_blank" class="current-file-link">
+                                    <i class="fas fa-paperclip me-1"></i>
+                                      Ver diploma
+                                  </a>
+                                </div>
+                                {% else %}
+                                <div class="form-group">
+                                    <input type="text" class="form-control readonly-input" value="No existe diploma del premio" readonly>
+                                </div>
+                                {% endif %}
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="form-group icon-input">
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="form-group icon-input">
+                              <label class="form-control-label">Nuevo archivo</label>
+                              {{form.diploma}}
+                            </div>
+                          </div>
+                          <div class="col-md-12">
+                            <div class="form-group d-flex align-items-end">
+                              <div class="w-100">
+                                <label for="text-input" class="form-control-label required-field">Premiados</label>
+                                <div id="user-select-container" class="user-select-container"></div>
+                                <div style="display: none;">{{ form.premiados }}</div>
+                              </div>
+                              <button type="button" class="btn boton-add" id="add-user-btn" data-bs-toggle="modal"
+                                data-bs-target="#nuevoUsuarioModal">
+                                <i class="fa fa-plus"></i>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="seccion-formulario">
+                      <h5>Información adicional</h5>
+                      <div class="col-md-12">
+                        <div class="mt-3">
+                          <div class="switch-container">
+                            <label class="switch">
+                              <input type="checkbox" id="proyecto-switch"
+                                    {% if form.proyecto.value %}checked{% endif %}>
+                              <span class="slider"></span>
+                            </label>
+                            <label for="proyecto-switch" class="form-control-label">
+                              Premio asociado a un proyecto:
+                              <strong id="proyecto-status">
+                                {% if form.proyecto.value %}Sí{% else %}No{% endif %}
+                              </strong>
+                            </label>
+                          </div>
+                          <div id="proyecto-select-container"
+                              class="proyecto-select-container {% if form.proyecto.value %}visible{% endif %}">
+                            <label class="form-control-label">¿Cuál proyecto?</label>
+                            <select name="proyecto" id="id_proyecto" class="form-control">
+                              <option value="">Seleccione un proyecto</option>
+                              {% for proyecto in proyectos %}
+                                <option value="{{ proyecto.id }}"
+                                        {% if form.proyecto.value|stringformat:"s" == proyecto.id|stringformat:"s" %}
+                                            selected
+                                        {% endif %}>
+                                  {{ proyecto.nombre_proyecto }}
+                                </option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                      <!-- Botones -->
+                      <div class="row mt-4">
+                        <div class="col-md-12 text-center">
+                          <a href="{% url 'Premio_List_Investigador' %}" class="btn btn-cancelar ml-3">Cancelar</a>
+                          <button type="submit" class="btn boton-form"><i class="fas fa-check"></i> Guardar</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal para agregar Tipo de Premio -->
+<div class="modal fade" id="tipoPremioModal" tabindex="-1" role="dialog" aria-labelledby="tipoPremioModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form id="tipo-premio-form" method="post" action="{% url 'TipoPremio_Create' %}">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="tipoPremioModalLabel">Agregar Tipo de Premio</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            {{ tipo_premio_form.nombre.label_tag }}
+            {{ tipo_premio_form.nombre }}
+          </div>
+          <div class="mb-3">
+            {{ tipo_premio_form.institucion.label_tag }}
+            <div class="form-group d-flex align-items-end icon-input">
+              {{ tipo_premio_form.institucion }}
+              <button type="button" id="add-institucion-btn" class="btn boton-add"><i class="fa fa-plus"></i></button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn  btn-cancelar" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn boton-form"><i class="fas fa-check"></i> Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- Modal para agregar Caracter de Premio -->
+<div class="modal fade" id="caracterPremioModal" tabindex="-1" role="dialog" aria-labelledby="caracterPremioModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form id="caracter-premio-form" method="POST" action="{% url 'CaracterPremio_Create' %}">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="tipoPremioModalLabel">Agregar Carácter de Premio</h5>
+          <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          {{ caracter_premio_form.as_p }}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-cancelar" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn boton-form"><i class="fas fa-check"></i> Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- Modal para agregar Institución -->
+<div class="modal fade" id="institucionModal" tabindex="-1" aria-labelledby="institucionModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="institucion-form" method="post" action="{% url 'crear_institucion_ajax' %}">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title">Nueva Institución</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="id_nombre" class="form-label required-field">Nombre</label>
+            <input type="text" name="nombre" id="id_nombre" class="form-control">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-cancelar" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn boton-form"><i class="fas fa-check"></i> Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- Modal para agregar colaborador personalizado -->
+<div class="modal fade" id="nuevoUsuarioModal" tabindex="-1" aria-labelledby="nuevoUsuarioModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="nuevo-usuario-form">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title">Agregar nuevo premiado</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Nombre *</label>
+            <input type="text" class="form-control" name="nombre" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Apellidos *</label>
+            <input type="text" class="form-control" name="apellidos" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">ORCID</label>
+            <input type="text" class="form-control" name="orci">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-cancelar" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn boton-form"><i class="fas fa-check"></i> Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'js/validations.js' %}"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Premiados -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const container = document.getElementById('user-select-container');
+    const hiddenSelect = document.querySelector('select[name="premiados"]');
+
+    if (container && hiddenSelect) {
+      createUserSelect(container, hiddenSelect);
+    }
+  });
+
+  const proyectoSwitch = document.getElementById('proyecto-switch');
+  const proyectoContainer = document.getElementById('proyecto-select-container');
+  const proyectoStatus = document.getElementById('proyecto-status');
+
+  if (proyectoSwitch) {
+    proyectoSwitch.addEventListener('change', function () {
+      if (this.checked) {
+        proyectoContainer.classList.add('visible');
+        proyectoStatus.textContent = 'Sí';
+      } else {
+        proyectoContainer.classList.remove('visible');
+        proyectoStatus.textContent = 'No';
+        document.getElementById('id_proyecto').value = '';
+      }
+    });
+  }
+
+  async function createUserSelect(container, hiddenSelect) {
+  const currentUserId = "{{ request.user.id }}";
+  const selectedUsers = new Map();
+
+  const options = Array.from(hiddenSelect.options);
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'user-select-wrapper';
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.placeholder = 'Buscar usuarios...';
+  input.className = 'user-select-input form-control';
+
+  const dropdown = document.createElement('div');
+  dropdown.className = 'user-select-dropdown';
+  dropdown.style.display = 'none';
+
+  const selectedList = document.createElement('div');
+  selectedList.className = 'user-select-selected';
+
+  wrapper.appendChild(input);
+  wrapper.appendChild(dropdown);
+  container.appendChild(wrapper);
+  container.appendChild(selectedList);
+
+  // Procesar opciones precargadas
+  for (const option of options) {
+    if (/^\d+$/.test(option.value)) {
+      const isColab = option.dataset && option.dataset.tipo === 'colaborador';
+      option.value = (isColab ? 'colaborador-' : 'usuario-') + option.value;
+    }
+
+    if (option.selected) {
+      const value = option.value;
+
+      if (value.startsWith('usuario-')) {
+        const userId = value.split('-')[1];
+        try {
+          const response = await fetch(`/Investigador/api_usuarios/?id=${userId}`);
+          const users = await response.json();
+          const user = users.find(u => String(u.id) === String(userId));
+          const name = user?.name || 'Nombre no disponible';
+          selectedUsers.set(value, {
+            id: value,
+            name: String(userId) === String(currentUserId) ? `${name} (Tú)` : name,
+            isCurrentUser: String(userId) === String(currentUserId)
+          });
+        } catch (err) {
+          console.error('Error al obtener usuario:', err);
+        }
+      } else {
+        // colaborador
+        const name = option.textContent || 'Nombre no disponible';
+        selectedUsers.set(value, {
+          id: value,
+          name: name,
+          isCurrentUser: false
+        });
+      }
+    }
+  }
+
+  console.log('Selected Users:', selectedUsers);
+
+  function updateSelectedUsers() {
+    selectedList.innerHTML = '';
+    selectedUsers.forEach(user => {
+      const badge = document.createElement('span');
+      badge.className = 'autor-badge';
+      badge.textContent = user.name;
+
+      if (!user.isCurrentUser) {
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.textContent = '×';
+        removeBtn.onclick = () => {
+          selectedUsers.delete(user.id);
+          updateSelectedUsers();
+          updateHiddenSelect();
+        };
+        badge.appendChild(removeBtn);
+      }
+
+      selectedList.appendChild(badge);
+    });
+  }
+
+  function updateHiddenSelect() {
+    Array.from(hiddenSelect.options).forEach(option => option.selected = false);
+
+    selectedUsers.forEach(user => {
+      let opt = hiddenSelect.querySelector(`option[value="${user.id}"]`);
+      if (!opt) {
+        opt = new Option(user.name, user.id, true, true);
+        if (String(user.id).startsWith('colaborador-')) opt.dataset.tipo = 'colaborador';
+        hiddenSelect.appendChild(opt);
+      }
+      opt.selected = true;
+    });
+  }
+
+  async function searchUsers(query) {
+    try {
+      const response = await fetch(`/Investigador/api_usuarios/?search=${encodeURIComponent(query)}`);
+      const users = await response.json();
+
+      dropdown.innerHTML = '';
+      if (!users.length) {
+        const noResults = document.createElement('div');
+        noResults.className = 'p-2 text-center';
+        noResults.textContent = 'No se encontraron usuarios';
+        dropdown.appendChild(noResults);
+        return;
+      }
+
+      users.forEach(user => {
+        const tipo = user.tipo || 'usuario';
+        const userKey = `${tipo}-${user.id}`;
+
+        if (String(user.id) === String(currentUserId) && tipo === 'usuario') return;
+
+        const name = user.name || user.username || 'Nombre no disponible';
+
+        const item = document.createElement('div');
+        item.className = 'user-select-item';
+        item.textContent = name;
+
+        const isSelected = selectedUsers.has(userKey);
+        if (isSelected) {
+          item.classList.add('selected');
+          item.style.backgroundColor = '#e9ecef';
+        }
+
+        item.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+
+          if (selectedUsers.has(userKey)) {
+            selectedUsers.delete(userKey);
+          } else {
+            selectedUsers.set(userKey, {
+              id: userKey,
+              name: name,
+              isCurrentUser: tipo === 'usuario' && String(user.id) === String(currentUserId)
+            });
+          }
+
+          updateSelectedUsers();
+          updateHiddenSelect();
+          input.value = '';
+          searchUsers('');
+        });
+
+        dropdown.appendChild(item);
+      });
+
+    } catch (err) {
+      console.error('Error al buscar usuarios:', err);
+      dropdown.innerHTML = '<div class="p-2 text-center text-danger">Error al buscar usuarios</div>';
+    }
+  }
+
+  input.addEventListener('focus', () => {
+    dropdown.style.display = 'block';
+    if (input.value.trim() === '') searchUsers('');
+  });
+
+  input.addEventListener('input', () => {
+    dropdown.style.display = 'block';
+    searchUsers(input.value.trim());
+  });
+
+  input.addEventListener('blur', () => {
+    setTimeout(() => {
+      if (!dropdown.matches(':hover')) dropdown.style.display = 'none';
+    }, 200);
+  });
+
+  updateSelectedUsers();
+}
+
+</script>
+<!-- Colaboradores -->
+<script>
+  document.getElementById('add-user-btn').addEventListener('click', function () {
+    $('#nuevoUsuarioModal').modal('show');
+  });
+
+  document.getElementById('nuevo-usuario-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const response = await fetch('{% url "crear_colaborador_ajax" %}', {
+      method: 'POST',
+      body: formData,
+      headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+    });
+    const data = await response.json();
+
+    if (data.success) {
+      $('#nuevoUsuarioModal').modal('hide');
+
+      const hiddenSelect = document.querySelector('select[name="premiados"]');
+      const colaboradorId = `colaborador-${data.id}`;
+      const newOption = new Option(data.nombre, colaboradorId, true, true);
+      newOption.dataset.tipo = 'colaborador';
+      hiddenSelect.appendChild(newOption);
+      newOption.selected = true;
+
+      const helpers = window.userSelectHelpers;
+
+      if (helpers) {
+        helpers.selectedUsers.set(colaboradorId, {
+          id: colaboradorId,
+          name: data.nombre,
+          isCurrentUser: false
+      });
+        helpers.updateSelectedUsers();
+        helpers.updateHiddenSelect();
+      }
+
+    } else {
+      if (data.errors) {
+        let errores = Object.entries(data.errors)
+          .map(([campo, mensajes]) => `${campo}: ${mensajes.join(', ')}`)
+          .join('\n');
+        alert('Error al guardar colaborador:\n' + errores);
+      } else if (data.error) {
+        alert('Error al guardar colaborador:\n' + data.error);
+      } else {
+        alert('Error al guardar colaborador (respuesta desconocida).');
+      }
+    }
+  });
+
+</script>
+<!-- Tipo de Premio -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+  const form = document.getElementById('tipo-premio-form');
+  const tipoSelect = document.getElementById('id_tipo');
+  const modalEl = document.getElementById('tipoPremioModal');
+
+  let modal = null;
+
+  document.getElementById('add-tipo-premio-btn')?.addEventListener('click', () => {
+    modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modal.show();
+  });
+
+  form?.addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  const formData = new FormData(form);
+  const nombre = formData.get('nombre')?.trim().toLowerCase();
+
+  const duplicado = Array.from(tipoSelect.options).some(opt =>
+    opt.text.trim().toLowerCase() === nombre
+  );
+
+  if (duplicado) {
+    alert('Ya existe un tipo de premio con ese nombre.');
+    return;
+  }
+
+  fetch(form.action, {
+    method: 'POST',
+    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+    body: formData
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+      const institucionModalSelect = document.getElementById('modal_institucion');
+        if (data.institucion_id && data.institucion_nombre && institucionModalSelect) {
+          console.log("Institución que viene del backend:", data.institucion_id, data.institucion_nombre);
+          const yaExiste = Array.from(institucionModalSelect.options).some(opt =>
+            opt.value === String(data.institucion_id)
+          );
+
+          if (!yaExiste) {
+            const nueva = new Option(data.institucion_nombre, data.institucion_id, true, true);
+            institucionModalSelect.appendChild(nueva);
+          }
+
+          institucionModalSelect.value = data.institucion_id;
+          institucionModalSelect.dispatchEvent(new Event('change'));
+        }
+
+        fetch('/Investigador/api/tipos-premio/')
+          .then(res => res.json())
+          .then(tipos => {
+            tipoSelect.innerHTML = '';
+            const placeholder = new Option("Seleccione un tipo", "", true, false);
+            placeholder.disabled = true;
+            tipoSelect.appendChild(placeholder);
+
+            tipos.forEach(tipo => {
+              const option = new Option(tipo.nombre, tipo.id);
+              tipoSelect.appendChild(option);
+            });
+
+            tipoSelect.value = data.id;
+          });
+
+        // 2. Insertar institución al <select> si viene en la respuesta
+        const institucionSelect = document.getElementById('form_institucion');
+        if (data.institucion_id && data.institucion_nombre && institucionSelect) {
+          const yaExiste = Array.from(institucionSelect.options).some(opt =>
+            opt.value === String(data.institucion_id)
+          );
+
+          if (!yaExiste) {
+            const nueva = new Option(data.institucion_nombre, data.institucion_id, true, true);
+            institucionSelect.appendChild(nueva);
+          }
+
+          institucionSelect.value = data.institucion_id;
+          institucionSelect.dispatchEvent(new Event('change'));
+        }
+
+        if (modal) modal.hide();
+        form.reset();
+      } else {
+        alert("Ocurrió un error al guardar el Tipo de Premio.");
+        console.error(data.errors);
+      }
+    })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  });
+});
+</script>
+<!-- Caracter del Premio -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const addTipoPremioBtn = document.getElementById('add-caracter-premio-btn');
+    const modalCaracterPremio = document.getElementById('caracterPremioModal');
+
+    if (addTipoPremioBtn) {
+      addTipoPremioBtn.addEventListener('click', function () {
+        // Usar jQuery si está disponible
+        if (typeof $ !== 'undefined' && typeof $.fn.modal === 'function') {
+          $('#caracterPremioModal').modal('show');
+        } else if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function') {
+          const modal = new bootstrap.Modal(modalCaracterPremio);
+          modal.show();
+        } else {
+          // Fallback simple
+          modalCaracterPremio.style.display = 'block';
+          modalCaracterPremio.classList.add('show');
+          document.body.classList.add('modal-open');
+
+          const backdrop = document.createElement('div');
+          backdrop.className = 'modal-backdrop fade show';
+          backdrop.id = 'manual-backdrop';
+          document.body.appendChild(backdrop);
+        }
+      });
+    }
+  });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('caracter-premio-form');
+    const caracterSelect = document.getElementById('id_caracter');  // asegúrate de que este ID esté bien
+    const modalEl = document.getElementById('caracterPremioModal');
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+
+    if (!form || !caracterSelect) return;
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+      const nuevoNombre = formData.get('nombre')?.trim().toLowerCase();
+
+      const existe = Array.from(caracterSelect.options).some(opt =>
+        opt.text.trim().toLowerCase() === nuevoNombre
+      );
+
+      if (existe) {
+        alert('Ya existe un carácter de premio con ese nombre.');
+        return;
+      }
+
+      fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            const nuevaOpcion = new Option(data.nombre, data.id, true, true);
+            caracterSelect.add(nuevaOpcion);
+
+            caracterSelect.value = data.id;
+            caracterSelect.dispatchEvent(new Event('change'));
+
+            modal.hide();
+            form.reset();
+          } else {
+            alert("Error al crear el carácter del premio");
+            console.error(data.errors);
+          }
+        })
+        .catch(error => {
+          console.error("Error en el fetch:", error);
+        });
+    });
+  });
+</script>
+<!-- Institución -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const tipoSelect = document.getElementById("id_tipo");
+    const institucionSelect = document.getElementById("form_institucion");
+    const institucionForm = document.getElementById("institucion-form");
+    const institucionModalEl = document.getElementById("institucionModal");
+    const institucionBtn = document.getElementById("add-institucion-btn");
+
+    const institucionModal = bootstrap.Modal.getOrCreateInstance(institucionModalEl);
+
+    if (tipoSelect && institucionSelect) {
+      tipoSelect.addEventListener("change", function () {
+        const tipoId = this.value;
+
+        if (tipoId) {
+          fetch(`/Investigador/api/tipo-premio/${tipoId}/`)
+            .then(response => response.json())
+            .then(data => {
+              const institucionId = data.institucion_id;
+              const institucionNombre = data.institucion_nombre;
+
+              if (institucionSelect.value !== String(institucionId)) {
+                if (institucionId && institucionNombre && institucionNombre.trim() !== "") {
+                  let option = institucionSelect.querySelector(`option[value="${institucionId}"]`);
+                  if (!option) {
+                    option = new Option(institucionNombre, institucionId, true, true);
+                    institucionSelect.appendChild(option);
+                  }
+
+                  institucionSelect.value = institucionId;
+                  institucionSelect.dispatchEvent(new Event('change'));
+                }
+              }
+            })
+            .catch(error => {
+              console.error('Error al cargar institución:', error);
+              institucionSelect.value = '';
+            });
+        } else {
+          institucionSelect.value = '';
+        }
+      });
+    }
+    if (institucionBtn) {
+      institucionBtn.addEventListener('click', () => institucionModal.show());
+    }
+
+    if (institucionForm) {
+      institucionForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(institucionForm);
+
+        fetch(institucionForm.action, {
+          method: 'POST',
+          headers: { 'X-Requested-With': 'XMLHttpRequest' },
+          body: formData
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success && data.id && data.nombre) {
+              const exists = Array.from(institucionSelect.options).some(opt =>
+                opt.value === String(data.id) ||
+                opt.text.trim().toLowerCase() === data.nombre.trim().toLowerCase()
+              );
+
+              if (!exists) {
+                const newOption = new Option(data.nombre, data.id, true, true);
+                institucionSelect.appendChild(newOption);
+              }
+
+              institucionSelect.value = data.id;
+              institucionSelect.dispatchEvent(new Event('change'));
+
+              const modalInstitucionSelect = document.getElementById("modal_institucion");
+              if (modalInstitucionSelect) {
+                const yaExisteModal = Array.from(modalInstitucionSelect.options).some(opt =>
+                  opt.value === String(data.id)
+                );
+
+                if (!yaExisteModal) {
+                  const nuevaModal = new Option(data.nombre, data.id, true, true);
+                  modalInstitucionSelect.appendChild(nuevaModal);
+                }
+
+                modalInstitucionSelect.value = data.id;
+                modalInstitucionSelect.dispatchEvent(new Event('change'));
+              }
+
+              institucionModal.hide();
+              institucionForm.reset();
+            } else {
+              const mensajes = [];
+              for (const campo in data.errors) {
+                mensajes.push(`${data.errors[campo].join(', ')}`);
+              }
+              alert("Error al crear la institución:\n" + mensajes.join('\n'));
+              console.log(data.errors);
+            }
+          })
+          .catch(error => {
+            console.error('Error al guardar la institución:', error);
+          });
+      });
+    }
+  });
+</script>
+<!-- Actualizar Institucion desde tipo de premio -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const tipoSelect = document.getElementById("id_tipo");
+  const institucionSelect = document.getElementById("form_institucion");
+
+  if (tipoSelect && institucionSelect) {
+    tipoSelect.addEventListener("change", function () {
+      const tipoId = this.value;
+
+      if (!tipoId) return;
+
+      fetch(`/Investigador/api/tipo-premio/${tipoId}/`)
+        .then(res => res.json())
+        .then(data => {
+          const { institucion_id, institucion_nombre } = data;
+
+          if (institucion_id && institucion_nombre) {
+            // Eliminar opciones vacías o duplicadas
+            Array.from(institucionSelect.options).forEach(opt => {
+              if (!opt.value || !opt.text.trim()) {
+                opt.remove();
+              }
+            });
+
+            // Verifica si ya existe la opción
+            let option = institucionSelect.querySelector(`option[value="${institucion_id}"]`);
+            if (!option) {
+              option = new Option(institucion_nombre, institucion_id, true, true);
+              institucionSelect.appendChild(option);
+            }
+
+            // Actualiza el valor y dispara el evento change
+            institucionSelect.value = institucion_id;
+            institucionSelect.dispatchEvent(new Event('change'));
+          }
+        })
+        .catch(err => {
+          console.error('Error al actualizar institución desde tipo de premio:', err);
+        });
+    });
+  }
+});
+</script>
+<script>
+  $('#form_institucion').val('{{ form.institucion.value }}').trigger('change');
+</script>
+<!-- Proyecto -->
+ <script>
+document.addEventListener('DOMContentLoaded', function () {
+  const proyectoSwitch = document.getElementById('proyecto-switch');
+  const proyectoStatus = document.getElementById('proyecto-status');
+  const proyectoSelectContainer = document.getElementById('proyecto-select-container');
+
+  function actualizarProyectoStatus() {
+    if (proyectoSwitch.checked) {
+      proyectoStatus.textContent = 'Sí';
+      proyectoSelectContainer.classList.add('visible'); // o usa display:block si no tienes CSS
+    } else {
+      proyectoStatus.textContent = 'No';
+      proyectoSelectContainer.classList.remove('visible'); // o display:none
+    }
+  }
+
+  // Inicializa el estado al cargar la página
+  actualizarProyectoStatus();
+
+  // Escucha cambios del switch
+  proyectoSwitch.addEventListener('change', actualizarProyectoStatus);
+});
+</script>
+
+{% endblock %}

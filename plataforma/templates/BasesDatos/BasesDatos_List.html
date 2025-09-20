@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Container CSS -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'Plataforma/css/Dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'Plataforma/libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'Plataforma/libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'Plataforma/libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'Plataforma/css/datatableSD.css' %}">
+<style>
+    .card-header.BasesDatos {
+        background-color:rgb(255, 255, 255);
+        color: white;
+    }
+    .table-primary {
+        --bs-table-bg: #f8f9fa;
+    }
+    .url-link {
+        color: #007bff;
+        text-decoration: none;
+    }
+    .url-link:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+<!-- End Container CSS -->
+
+{% block content %}
+<main class="content-inside px-3 py-2">
+    <section id="tablaBasesDatos">
+        <div class="card">
+            <div class="card-header BasesDatos">
+                <h5 class="card-title">
+                    Bases de Datos
+                </h5>
+                <a href="{% url 'BasesDatos_create' %}" class="btn btn-primary btn-sm">Crear Base de Datos</a>
+            </div>
+            <div class="p-2">
+                <table id="BasesDatos" class="display table table-striped table-hover table-primary" style="width:100%">
+                    <thead class="encabezado">
+                        <tr>
+                            <th scope="col" style="color: white; text-align: start;">#</th>
+                            <th scope="col" style="color: white; text-align: start;">Nombre</th>
+                            <th scope="col" style="color: white; text-align: start;">Grupo</th>
+                            <th scope="col" style="color: white; text-align: start;">URL</th>
+                            <th scope="col" style="color: white; text-align: center;">Opciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for base in bases_datos %}
+                        <tr>
+                            <td style="text-align: start;">{{ forloop.counter }}</td>
+                            <td style="text-align: start;">{{ base.nombre_base_datos }}</td>
+                            <td style="text-align: start;">{{ base.get_grupo_display }}</td>
+                            <td style="text-align: start;">
+                                <a href="{{ base.url }}" target="_blank" class="url-link">{{ base.url }}</a>
+                            </td>
+                            <td style="text-align: center; font-size: 1.2rem;">
+                                <a class="iconos p-2" href="{% url 'BasesDatos_detail' base.id %}" title="Ver detalles">
+                                    <i class="fas fa-solid fa-eye"></i>
+                                </a>
+                                <a class="iconos p-2" href="{% url 'BasesDatos_Update' base.id %}" title="Editar">
+                                    <i class="fas fa-solid fa-pen-to-square"></i>
+                                </a>
+                                <a class="iconos p-2" data-bs-toggle="modal" data-bs-target="#BasesDatos{{ base.id }}" title="Eliminar">
+                                    <i class="fas fa-solid fa-trash-can"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <!-- Modal de Confirmación -->
+                        <div class="modal fade" id="BasesDatos{{ base.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel" style="color:black">
+                                            <i class="bi bi-exclamation-triangle" style="color:black"></i> Confirmación
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="box-shadow: none"></button>
+                                    </div>
+                                    <div class="modal-body" style="color:black">
+                                        ¿Está seguro que desea eliminar la base de datos "{{ base.nombre_base_datos }}"?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <form method="post" action="{% url 'BasesDatos_Delete' base.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" style="text-align: center;">No hay bases de datos registradas</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
+<!-- Container JS -->
+{% block js %}
+<script src="{% static 'Plataforma/libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.buttons.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/jszip.min.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/pdfmake.min.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/vfs_fonts.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/buttons.html5.min.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/buttons.print.min.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.responsive.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>
+<script>
+$(document).ready(function() {
+    $('#BasesDatos').DataTable({
+        responsive: true,
+        language: {
+            url: "{% static 'Plataforma/libs/Datatable/dataTableLenguage.json' %}"
+        },
+        dom: 'Bfrtip',
+        buttons: [
+            'copy', 'csv', 'excel', 'pdf', 'print'
+        ],
+        columnDefs: [
+            { orderable: false, targets: [4] } // Deshabilitar ordenamiento para columna de opciones
+        ]
+    });
+});
+</script>
+{% endblock %}
+<!-- End Container JS -->

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+  <link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+  <link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+  <link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+  <link rel="stylesheet" href="{% static 'css/datatableSD.css' %}">
+  <link rel="stylesheet" href="{% static 'css/styless.css' %}">
+{% endblock %}
+
+{% block content %}
+  <section class="tabla" id="Investigador">
+      <div class="card-header">
+        <h5 class="card-title" style=" text-align: center;">
+          Investigadores
+        </h5>
+      </div>
+      <div class="boot d-flex flex-wrap justify-content-start align-items-center" style="margin-bottom: 20px;">
+        <a href="{% url 'Evento_Create' %}" class="btn boton-form">
+          <i class="fas fa-plus"></i> Nuevo</a>
+      </div>
+      <div class="table-responsive">
+        <p><strong>Total:</strong> {{ investigador|length }} investigadores</p>
+      <table id="Investigadores" class="display table table-striped table-hover table-primary" style="width:100%; height: 100%;">
+        <thead class="encabezado">
+          <tr>
+            <th scope="col">No</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Correo</th>
+            <th scope="col">Cargo</th>
+            <th scope="col">Categoría Docente</th>
+            <th scope="col">Categoría Científica</th>
+            <th scope="col">Currículo</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for i in investigadores %}
+          <tr>
+              <td style="text-align: center;">{{ forloop.counter }}</td>
+              <td style="text-align: center;">
+                  {% if i.id %}
+                      <a class="info personal" style="text-decoration: none;" href="{% url 'Informacion_Detail_Investigador_Departamento' i.id %}">
+                          {{ i.nombre }} {{ i.apellidos }}
+                      </a>
+                  {% else %}
+                      {{ i.nombre }} {{ i.apellidos }} (Sin ID)
+                  {% endif %}
+              <td style="text-align: center;">{{ i.email }}</td>
+              <td style="text-align: center;">{{ i.cargo }}</td>
+              <td style="text-align: center;">{{ i.categoria_docente  }}</td>
+              <td style="text-align: center;">{{ i.categoria_cientifica}}</td>
+              <td style="text-align: center;">
+                {% if i.id %}
+                    <a class="info personal" style="text-decoration: none;" href="{% url 'Curriculo_Investigador_Departamento' i.id %}">
+                        Ver Currículo
+                    </a>
+                {% else %}
+                    Ver Currículo (Sin ID)
+                {% endif %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="option bgs">
+      <div class="bg-active" id="bg-active"></div>
+    </div>
+  </section>
+{% endblock %}
+   
+{% block js %}
+  <script src="{% static 'libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/dataTables.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+  <!--Botones DataTables-->  
+  <script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/pdfmake.min.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/bottons.colVis.min.js' %}"></script>  
+  <!--DataTables responsivo-->
+  <script src="{% static 'libs/Datatable/JS/dataTables.responsive.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>  
+  <!--Inicializar DataTables-->
+  <script src="{% static 'libs/Datatable/JS/Investigadores.js' %}"></script>
+{% endblock %}

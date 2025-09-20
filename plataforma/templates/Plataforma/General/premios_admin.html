@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Conatiner CSS -->
+{% block css %}
+<link rel="stylesheet" href=" {% static 'css/Dashboard.css' %}">
+<link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'css/datatableSD.css' %}">
+{% endblock %}
+<!-- End Conatiner CSS -->
+
+{% block content %}
+<div class="main" style="padding-top:60px;">
+  <main class="content-inside px-3 py-2">
+    <div class="container-fluid">
+      <div class="container-fluid">
+        <section id="tablaTramites">
+          <div class="card card-a p-3 h-100">
+            <div class="card-header">
+              <h5 class="card-title title-t" style=" text-align: start;">
+                  Premios
+              </h5>
+            </h5>
+          </div>
+          <div class="boot d-flex flex-wrap justify-content-start align-items-center">
+            <a href="{% url 'Premio_Create' %}" class="btn1 m-2 btn btn-primary btn-sm text-decoration-none">Añadir</a>
+          </div>
+            </div>
+            <table id="Premios" class="display table table-striped table-hover table-primary" style="width:100%; height: 100%;">
+              <thead class="encabezado">
+                <tr>
+                  <th scope="col" style="color: white; text-align: center;">No</th>
+                  <th scope="col" style="color: white; text-align: center;">Título</th>
+                  <th scope="col" style="color: white; text-align: center;">Fecha</th>
+                  <th scope="col" style="color: white; text-align: center;">Premiados</th>
+                  <th scope="col" style="color: white; text-align: center;">Area</th>
+                  <th scope="col" style="color: white; text-align: center;">Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for p in premio %}
+                  <tr>
+                    <td style=" text-align: center;">{{forloop.counter}}</td>
+                    <td style="text-align: center;"><a class="details" style="color:blue " href="{% url "Premio_Detail_Admin" p.id %}"> {{p.titulo}} </a></td>
+                    <td style=" text-align: start;">{{p.fecha}}</td>
+                    <td style=" text-align: start;">{{p.premiados}}</td>
+                    <td style=" text-align: start;">{{p.area}}</td>
+                    <td style="text-align: start;">{{p.aprobacion }}</td>
+                  </tr>    
+                {% endfor %}
+              </tbody>
+            </table>
+          <pre>{{ premios_por_estado_json|safe }}</pre>
+          </div>
+        </section>
+        <section class="mb-2 row row-gap-1">
+          <section class="col-md-6 col-sm-12" id="graficaPremios">
+            <div class="card">
+              <div class="p-2">
+                <div id="grafAreasPendientes">
+                </div>
+              </div>
+            </div>
+          </section>
+          <section class="col-md-6 col-sm-12" id="graficaBarMarcadores">
+            <div class="card">
+               <div class="p-2">
+                <div id="grafTiposPremios">
+                </div>
+              </div>
+            </div>
+          </section>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+ 
+  {% endblock %}
+
+  <!-- Conatiner JS -->
+  {% block js%}
+  <script src="{% static 'Plataforma/libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+  <script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.js' %}"></script>
+  <script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+  
+  <script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/pdfmake.min.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/bottons.colVis.min.js' %}"></script>
+  
+  <script src="{% static 'libs/Datatable/JS/dataTables.responsive.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>
+  
+  
+  <script src="{% static 'libs/Highcharts/code/highcharts.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/modules/accessibility.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/modules/exporting.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/modules/offline-exporting.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/modules/export-data.js' %}"></script>
+  
+<script>
+  $(document).ready(function() {
+      // Inicializar DataTable con configuración personalizada
+      var table = $('#Premios').DataTable({
+          responsive: true,
+          dom: 'Bfrtip',
+          buttons: [
+              'copy', 'csv', 'excel', 'pdf', 'print'
+          ],
+          language: {
+            url: "{% static 'Plataforma/libs/Datatable/dataTableLenguage.json' %}"
+        },
+      });
+      
+      
+      // Función para actualizar los departamentos según el área seleccionada
+      function actualizarDepartamentos() {
+        var areaSeleccionada = $('#filtro-area').val();
+        var departamentoSelect = $('#filtro-departamento');
+        
+        // Guardar el valor actual del departamento
+        var valorActual = departamentoSelect.val();
+        
+        // Limpiar el select de departamentos
+        departamentoSelect.empty();
+        departamentoSelect.append('<option value="">Todos los departamentos</option>');
+        
+        // Si no hay área seleccionada, mostrar todos los departamentos
+        if (!areaSeleccionada) {
+            $('#filtro-departamento-hidden option').each(function() {
+                departamentoSelect.append($(this).clone());
+            });
+        } else {
+            // Filtrar departamentos por área
+            $('option', '#filtro-departamento-hidden').each(function() {
+                if ($(this).data('area') === areaSeleccionada) {
+                    departamentoSelect.append($(this).clone());
+                }
+            });
+        }
+        
+        // Intentar restaurar el valor anterior si existe en las nuevas opciones
+        if (valorActual && departamentoSelect.find('option[value="' + valorActual + '"]').length > 0) {
+            departamentoSelect.val(valorActual);
+        }
+    }
+    
+    // Crear un select oculto con todos los departamentos para referencia
+    var departamentosHidden = $('<select id="filtro-departamento-hidden" style="display:none;"></select>');
+    $('#filtro-departamento option').each(function() {
+        departamentosHidden.append($(this).clone());
+    });
+    $('body').append(departamentosHidden);
+    
+    // Evento de cambio en el filtro de área
+    $('#filtro-area').on('change', function() {
+        var areaSeleccionada = $(this).val();
+        
+        // Actualizar departamentos disponibles
+        actualizarDepartamentos();
+        
+        // Aplicar filtro a la tabla
+        table.column(4).search(areaSeleccionada).draw();
+    });
+    
+    // Evento de cambio en el filtro de departamento
+    $('#filtro-departamento').on('change', function() {
+        var departamentoSeleccionado = $(this).val();
+        table.column(5).search(departamentoSeleccionado).draw();
+    });
+    
+    // Botón para limpiar filtros
+    $('#btn-limpiar-filtros').on('click', function() {
+        // Limpiar selecciones
+        $('#filtro-area').val('');
+        $('#filtro-departamento').val('');
+        
+        // Restaurar todos los departamentos
+        actualizarDepartamentos();
+        
+        // Limpiar filtros de la tabla
+        table.columns().search('').draw();
+    });
+  
+      // Evento de cambio en el filtro de área
+      $('#filtro-area').on('change', function() {
+          var areaSeleccionada = $(this).val();
+          table.column(4).search(areaSeleccionada).draw();
+      });
+      
+      // Botón para limpiar filtros
+      $('#btn-limpiar-filtros').on('click', function() {
+          $('#filtro-area').val('');
+          table.columns().search('').draw();
+      });
+      
+      // Gráfica de áreas con premios pendientes
+      var areasPendientes = {{ areas_pendientes_json|safe }};
+      var dataAreasPendientes = areasPendientes.map(function(item) {
+          return { name: item.area__nombre_area, y: item.count };
+      });
+  
+      Highcharts.chart('grafAreasPendientes', {
+          chart: {
+              plotBackgroundColor: null,
+              plotBorderWidth: null,
+              plotShadow: false,
+              type: 'pie'
+          },
+          title: {
+              text: 'Áreas con Premios Pendientes'
+          },
+          tooltip: {
+              pointFormat: '{series.name}: <b>{point.y}</b> ({point.percentage:.1f}%)'
+          },
+          accessibility: {
+              point: {
+                  valueSuffix: '%'
+              }
+          },
+          plotOptions: {
+              pie: {
+                  allowPointSelect: true,
+                  cursor: 'pointer',
+                  dataLabels: {
+                      enabled: true,
+                      format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                  },
+                  showInLegend: true
+              }
+          },
+          series: [{
+              name: 'Premios Pendientes',
+              colorByPoint: true,
+              data: dataAreasPendientes
+          }]
+      });
+  
+      // Gráfica de tipos de premios
+      var tiposPremios = {{ tipos_premios_json|safe }};
+      var dataTiposPremios = tiposPremios.map(function(item) {
+          return { name: item.tipo, y: item.count };
+      });
+  
+      Highcharts.chart('grafTiposPremios', {
+          chart: {
+              plotBackgroundColor: null,
+              plotBorderWidth: null,
+              plotShadow: false,
+              type: 'pie'
+          },
+          title: {
+              text: 'Distribución por Tipo de Premio'
+          },
+          tooltip: {
+              pointFormat: '{series.name}: <b>{point.y}</b> ({point.percentage:.1f}%)'
+          },
+          accessibility: {
+              point: {
+                  valueSuffix: '%'
+              }
+          },
+          plotOptions: {
+              pie: {
+                  innerSize: '50%',
+                  allowPointSelect: true,
+                  cursor: 'pointer',
+                  dataLabels: {
+                      enabled: true,
+                      format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                  },
+                  showInLegend: true
+              }
+          },
+          series: [{
+              name: 'Premios',
+              colorByPoint: true,
+              data: dataTiposPremios
+          }]
+      });
+  });
+  
+  </script>
+  {% endblock %}

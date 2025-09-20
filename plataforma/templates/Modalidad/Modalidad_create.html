@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Container CSS -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'Plataforma/css/estilobeta.css' %}">
+<style>
+    .error-message {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    #error-container {
+        margin: 0 auto;
+        max-width: 600px;
+    }
+
+    .alert {
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+<!-- End Container CSS -->
+
+{% block content %}
+<div id="error-container">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    {% if form.errors %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Por favor corrige los siguientes errores:</strong>
+        <ul class="mb-0">
+            {% for field in form %}
+            {% for error in field.errors %}
+            <li>{{ field.label }}: {{ error }}</li>
+            {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+</div>
+
+<div class="container-form">
+    <div class="form">
+        <div class="contact-form">
+            <span class="circle one"></span>
+            <span class="circle two"></span>
+            <form action="." method="POST" id="modalidad-form">
+                {% csrf_token %}
+                <h3 class="title">Crear Nueva Modalidad</h3>
+
+                <!-- Nombre -->
+                <div class="input-container">
+                    <input type="text" name="{{ form.nombre.name }}" id="{{ form.nombre.id_for_label }}" class="input"
+                        value="{{ form.nombre.value|default_if_none:'' }}" required>
+                    <label for="{{ form.nombre.id_for_label }}">Nombre</label>
+                    <span>Nombre</span>
+                    <div id="nombre-error" class="error-message"></div>
+                </div>
+
+                <!-- Descripción -->
+                <div class="input-container textarea">
+                    <textarea name="{{ form.descripcion.name }}" id="{{ form.descripcion.id_for_label }}"
+                        class="input">{{ form.descripcion.value|default_if_none:'' }}</textarea>
+                    <label for="{{ form.descripcion.id_for_label }}">Descripción (opcional)</label>
+                    <span>Descripción</span>
+                    <div id="descripcion-error" class="error-message"></div>
+                </div>
+                <div class="btn">
+                    <input type="submit" value="Crear" class="btn1" id="boton">
+                    <a href="{% url 'Modalidad_List' %}" class="btn2">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- Container JS -->
+{% block js %}
+<script src="{% static 'Plataforma/js/FormularioSelect.js' %}"></script>
+<script>
+    $(document).ready(function () {
+        // Form validation
+        $('#modalidad-form').on('submit', function (e) {
+            let isValid = true;
+            const nombre = $('#id_nombre').val().trim();
+
+            // Clear previous errors
+            $('.error-message').text('');
+
+            // Validate nombre
+            if (nombre === '') {
+                $('#nombre-error').text('Este campo es obligatorio');
+                isValid = false;
+            } else if (nombre.length > 100) {
+                $('#nombre-error').text('El nombre no puede exceder los 100 caracteres');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+
+        // Input animation
+        const inputs = document.querySelectorAll(".input");
+
+        function focusFunc() {
+            let parent = this.parentNode;
+            parent.classList.add("focus");
+        }
+
+        function blurFunc() {
+            let parent = this.parentNode;
+            if (this.value == "") {
+                parent.classList.remove("focus");
+            }
+        }
+
+        inputs.forEach((input) => {
+            input.addEventListener("focus", focusFunc);
+            input.addEventListener("blur", blurFunc);
+
+            // Initialize floating labels if field has value
+            if (input.value !== '') {
+                input.parentNode.classList.add('focus');
+            }
+        });
+
+        // Cerrar automáticamente los mensajes después de 5 segundos
+        setTimeout(function () {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function (alert) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    });
+</script>
+{% endblock %}

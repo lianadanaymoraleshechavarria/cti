@@ -1,0 +1,590 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+<link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}">
+<style>
+  /* Estilos para el componente de selección */
+  .select-container {
+    position: relative;
+    width: 100%;
+  }
+
+  .select-input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #E0DFE2;
+    border-radius: 4px;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #424045;
+    background-color: #fff;
+  }
+
+  .select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: #fff;
+    border: 1px solid #E0DFE2;
+    border-radius: 4px;
+    box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.3);
+  }
+
+  .select-item {
+    padding: 0.5rem;
+    cursor: pointer;
+    border-bottom: 1px solid #E0DFE2;
+  }
+
+  .select-item:hover {
+    background-color: #f8f9fa;
+  }
+
+  .select-item .item-title {
+    font-weight: 500;
+  }
+
+  .select-item .item-info {
+    font-size: 0.85rem;
+    color: #6c757d;
+  }
+
+  .select-selected {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .item-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1;
+    color: #fff;
+    background-color: #007bff;
+    border-radius: 0.25rem;
+  }
+
+  .item-badge button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.25rem;
+    line-height: 1;
+    padding: 0 0 0 0.25rem;
+    cursor: pointer;
+    opacity: 0.7;
+  }
+
+  .item-badge button:hover {
+    opacity: 1;
+  }
+
+  /* Estilos para el modal */
+  .required-field::after {
+    content: "*";
+    color: red;
+    margin-left: 4px;
+  }
+
+  .dashed-rounded-border {
+    border: 1px dashed #64748b;
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    position: relative;
+  }
+
+
+
+  .readonly-input {
+    background-color: #3b82f6;
+  }
+
+  .required-field::after {
+    content: "*";
+    color: #ef4444;
+    margin-left: 4px;
+  }
+
+  /* Estilos para el switch de proyecto */
+  .switch-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+    margin-right: 10px;
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+  }
+
+  input:checked+.slider {
+    background-color: #2196F3;
+  }
+
+  input:focus+.slider {
+    box-shadow: 0 0 1px #2196F3;
+  }
+
+  input:checked+.slider:before {
+    transform: translateX(26px);
+  }
+
+  .proyecto-select-container {
+    display: none;
+    transition: all 0.3s ease;
+  }
+
+  .proyecto-select-container.visible {
+    display: block;
+  }
+
+  /* Estilos para secciones con borde discontinuo */
+  .dashed-section {
+    border: 1px dashed #6b7280;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    position: relative;
+    margin-bottom: 2rem;
+  }
+
+  /* Estilos para user select */
+  .user-select-wrapper {
+    position: relative;
+  }
+
+  .user-select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 0.25rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175);
+  }
+
+  .user-select-item {
+    padding: 0.5rem;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .user-select-item:hover {
+    background-color: #f8f9fa;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content">
+  <div class="col">
+    <div class="container-form">
+      <div class="form">
+        <div class="container-fluid py-4">
+          <div class="row">
+            <div id="error-container"></div>
+            <div class="col-md-12">
+              <div class="card">
+                <!-- Messages display -->
+                {% if messages %}
+                {% for message in messages %}
+                {% if message.tags == 'success' %}
+                <div
+                  style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem; z-index: 2000;"
+                  class="alert alert-success alert-dismissible fade show" role="alert">
+                  {% elif message.tags == 'error' %}
+                  <div
+                    style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem; z-index: 2000; "
+                    class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {% endif %}
+                    {{ message }}
+                    <button style="font-size: 10px; border-bottom: none; position: relative; box-shadow: none;"
+                      type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+                  {% endfor %}
+                  {% endif %}
+
+                  <div class="card-header pb-0">
+                    <div class="title">
+                      <h3 class="title-text p-3">Solicitud de Programa</h3>
+                    </div>
+                  </div>
+
+                  <form id="formu" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="card-body">
+                      <div class="row">
+                        <div class="col-md-12">
+                          <!-- Datos del Programa -->
+                          <div class="dashed-rounded-border">
+                            <div class="section-label">Datos del Programa</div>
+
+                            <div class="row">
+                              <!-- Nombre del Programa -->
+                              <div class="col-md-6">
+                                <div class="form-group">
+                                  <label class="form-control-label required-field">Nombre del Programa</label>
+                                  {{form.nombre_programa}}
+                                </div>
+                              </div>
+
+                              <!-- Código del Programa -->
+                              <div class="col-md-6">
+                                <div class="form-group">
+                                  <label class="form-control-label required-field">Código del Programa</label>
+                                  {{form.codigo_programa}}
+                                  <small class="form-text text-muted">Solo letras mayúsculas, números y guiones</small>
+                                </div>
+                              </div>
+
+                              <!-- Tipo de Programa -->
+                              <div class="col-md-6">
+                                <div class="form-group">
+                                  <label class="form-control-label required-field">Tipo de Programa</label>
+                                  {{form.tipo_programa}}
+                                </div>
+                              </div>
+
+                              <!-- Organismo -->
+                              <div class="col-md-6">
+                                <div class="form-group">
+                                  <label class="form-control-label required-field">Organismo</label>
+                                  {{form.organismo}}
+                                </div>
+                              </div>
+
+                              <!-- Entidad Ejecutora -->
+                              <div class="col-md-6">
+                                <div class="form-group">
+                                  <label class="form-control-label required-field">Entidad Ejecutora</label>
+                                  {{form.entidad_ejecutora}}
+                                </div>
+                              </div>
+
+                              <!-- Jefe del Programa -->
+                              <div class="col-md-6">
+                                <div class="form-group">
+                                  <label class="form-control-label required-field">Jefe del Programa</label>
+                                  {{form.jefe_programa}}
+                                </div>
+                              </div>
+
+                              <!-- Fechas -->
+                              <div class="col-md-6">
+                                <div class="form-group">
+                                  <label class="form-control-label required-field">Fecha de Inicio</label>
+                                  {{form.fecha_inicio}}
+                                </div>
+                              </div>
+
+                              <div class="col-md-6">
+                                <div class="form-group">
+                                  <label class="form-control-label required-field">Fecha de Finalización</label>
+                                  {{form.fecha_fin}}
+                                </div>
+                              </div>
+
+                              <!-- Sector Estratégico -->
+                              <div class="col-md-6">
+                                <div class="form-group">
+                                  <label class="form-control-label required-field">Sector Estratégico</label>
+                                  {{form.sector_estrategico}}
+                                </div>
+                              </div>
+
+                              <!-- Línea de Investigación -->
+                              <div class="col-md-6">
+                                <div class="form-group">
+                                  <label class="form-control-label required-field">Línea de Investigación</label>
+                                  {{form.linea_investigacion}}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Entidades Participantes -->
+                          <div class="dashed-rounded-border mt-4">
+                            <div class="section-label">Entidades Participantes</div>
+                            <div class="row">
+                              <div class="col-md-12">
+                                <div class="form-group">
+                                  <label class="form-control-label">Entidades Participantes</label>
+                                  {{form.entidades_participantes}}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Botones -->
+                          <div class="row mt-4">
+                            <div class="col-md-12 text-center">
+                              <button type="submit" class="btn btn-success">Guardar</button>
+                              <a href="{% url 'Programa_List_Investigador' %}" class="btn btn-primary ml-3">Cancelar</a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endblock %}
+
+  {% block js %}
+  <script src="{% static 'js/validations.js' %}"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const container = document.getElementById('user-select-container');
+      const hiddenSelect = document.querySelector('select[name="participantes_uho"]');
+
+      if (container && hiddenSelect) {
+        // Crear el componente de selección de usuarios
+        createUserSelect(container, hiddenSelect);
+      }
+    });
+
+    // Configuración del switch de proyecto
+    const proyectoSwitch = document.getElementById('proyecto-switch');
+    const proyectoContainer = document.getElementById('proyecto-select-container');
+    const proyectoStatus = document.getElementById('proyecto-status');
+
+    if (proyectoSwitch) {
+      proyectoSwitch.addEventListener('change', function () {
+        if (this.checked) {
+          proyectoContainer.classList.add('visible');
+          proyectoStatus.textContent = 'Sí';
+        } else {
+          proyectoContainer.classList.remove('visible');
+          proyectoStatus.textContent = 'No';
+          document.getElementById('id_proyecto_asociado').value = '';
+        }
+      });
+    }
+
+    function createUserSelect(container, hiddenSelect) {
+      // Crear elementos del componente
+      const wrapper = document.createElement('div');
+      wrapper.className = 'user-select-wrapper';
+
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.placeholder = 'Buscar participantes...';
+      input.className = 'user-select-input form-control';
+
+      const dropdown = document.createElement('div');
+      dropdown.className = 'user-select-dropdown';
+      dropdown.style.display = 'none';
+
+      const selectedList = document.createElement('div');
+      selectedList.className = 'user-select-selected';
+
+      // Construir el componente
+      wrapper.appendChild(input);
+      wrapper.appendChild(dropdown);
+      container.appendChild(wrapper);
+      container.appendChild(selectedList);
+
+      // Almacenar usuarios seleccionados
+      const selectedUsers = new Set();
+
+      // Cargar usuarios seleccionados inicialmente
+      Array.from(hiddenSelect.selectedOptions).forEach(option => {
+        selectedUsers.add({
+          id: option.value,
+          name: option.textContent
+        });
+      });
+
+      // Actualizar la lista de usuarios seleccionados
+      function updateSelectedUsers() {
+        selectedList.innerHTML = '';
+        selectedUsers.forEach(user => {
+          const badge = document.createElement('span');
+          badge.className = 'user-badge';
+          badge.textContent = user.name;
+
+          const removeBtn = document.createElement('button');
+          removeBtn.type = 'button';
+          removeBtn.textContent = '×';
+          removeBtn.onclick = () => {
+            selectedUsers.delete(user);
+            updateSelectedUsers();
+            updateHiddenSelect();
+          };
+
+          badge.appendChild(removeBtn);
+          selectedList.appendChild(badge);
+        });
+      }
+
+      // Actualizar el select oculto
+      function updateHiddenSelect() {
+        // Deseleccionar todas las opciones
+        Array.from(hiddenSelect.options).forEach(option => {
+          option.selected = false;
+        });
+
+        // Seleccionar las opciones correspondientes
+        selectedUsers.forEach(user => {
+          const option = hiddenSelect.querySelector(`option[value="${user.id}"]`);
+          if (option) {
+            option.selected = true;
+          }
+        });
+      }
+
+      // Buscar usuarios
+      async function searchUsers(query) {
+        try {
+          const response = await fetch(`/Investigador/api_usuarios/?search=${encodeURIComponent(query)}`, {
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            }
+          });
+
+          if (!response.ok) throw new Error('Error en la respuesta del servidor');
+
+          const users = await response.json();
+
+          // Limpiar el dropdown
+          dropdown.innerHTML = '';
+
+          if (users.length === 0) {
+            const noResults = document.createElement('div');
+            noResults.className = 'p-2 text-center';
+            noResults.textContent = 'No se encontraron usuarios';
+            dropdown.appendChild(noResults);
+            return;
+          }
+
+          // Añadir los usuarios al dropdown
+          users.forEach(user => {
+            const item = document.createElement('div');
+            item.className = 'user-select-item';
+
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'item-title';
+            nameDiv.textContent = user.name;
+
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'item-info';
+
+            const infoTexts = [];
+            if (user.carnet) infoTexts.push(`Carnet: ${user.carnet}`);
+            if (user.area) infoTexts.push(`Área: ${user.area}`);
+            if (user.departamento) infoTexts.push(`Depto: ${user.departamento}`);
+
+            infoDiv.textContent = infoTexts.join(' | ');
+            item.appendChild(nameDiv);
+            if (infoTexts.length > 0) item.appendChild(infoDiv);
+
+            // Verificar si el usuario ya está seleccionado
+            const isSelected = Array.from(selectedUsers).some(u => u.id === user.id.toString());
+            if (isSelected) {
+              item.classList.add('selected');
+              item.style.backgroundColor = '#e9ecef';
+            }
+
+            item.onclick = () => {
+              const existingUser = Array.from(selectedUsers).find(u => u.id === user.id.toString());
+              if (existingUser) {
+                selectedUsers.delete(existingUser);
+              } else {
+                selectedUsers.add({
+                  id: user.id.toString(),
+                  name: user.full_name || user.name
+                });
+              }
+              updateSelectedUsers();
+              updateHiddenSelect();
+            };
+
+            dropdown.appendChild(item);
+          });
+        } catch (error) {
+          console.error('Error al buscar usuarios:', error);
+          dropdown.innerHTML = '<div class="p-2 text-center text-danger">Error al buscar usuarios</div>';
+        }
+      }
+
+      // Eventos
+      input.addEventListener('focus', () => {
+        dropdown.style.display = 'block';
+        if (input.value.trim() === '') {
+          // Cargar usuarios iniciales
+          searchUsers('');
+        }
+      });
+
+      input.addEventListener('blur', () => {
+        // Pequeño retraso para permitir clics en el dropdown
+        setTimeout(() => {
+          dropdown.style.display = 'none';
+        }, 200);
+      });
+
+      input.addEventListener('input', () => {
+        const query = input.value.trim();
+        searchUsers(query);
+      });
+
+      // Inicializar con los usuarios seleccionados
+      updateSelectedUsers();
+    }
+  </script>
+  {% endblock %}

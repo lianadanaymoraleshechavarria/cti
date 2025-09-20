@@ -1,0 +1,108 @@
+  {% extends "base.html" %}
+  {% load static %}
+  
+    {% block css %}
+      <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+    {% endblock %}
+  
+  
+    {% block content %}
+      <div class="content" >
+        <div class="col">
+          <div class="container-form">
+            <div class="form">
+              <div class="container-fluid py-4">
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="card">
+                      <div class="card-header pb-0">
+                        <div class="title">
+                          <h3 class="title-text p-3">Perfil del Investigador</h3>
+                        </div>
+                      </div>
+                      <form  id="formu" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="card-body">
+                          <div class="row">
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group">
+                                <label for="text-input" class="form-control-label">Nombre</label>
+                                <input type="text" name="nombre" id="nombre" class="form-control" required value="{{ perfil.nombre}}" required disabled>
+                              </div>
+                            </div>
+                            
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group">
+                                <label for="example-text-input" class="form-control-label">Apellidos</label>
+                                <input type="text" name="apellidos" id="apellidos" class="form-control" required value="{{ perfil.apellidos }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group">
+                                <label for="example-text-input" class="form-control-label">Carnet de IdentidadFecha</label>
+                                <input type="fecha" name="ci" id="ci" class="form-control" required value="{{ perfil.ci }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Correo Electrónico</label>
+                                <input type="text" name="email" id="email" class="form-control" required value="{{ perfil.email }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group">
+                                <label for="example-text-input" class="form-control-label">Número de Móvil</label>
+                                <input type="text" name="telefono" id="telefono" class="form-control" required value="{{perfil.telefono }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Cargo que ocupa</label>
+                                <input type="text" name="cargo" id="cargo" class="form-control" required value="{{ perfil.cargo }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Categoría Docente</label>
+                                <input type="text" name="categoria_docente" id="categoria_docente" class="form-control" required value="{{ perfil.categoria_docente }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Categoría Científica</label>
+                                <input type="text" name="categoria_cientifica" id="categoria_cientifica" class="form-control" required value="{{ perfil.categoria_cientifica}}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Área</label>
+                                <input type="text" name="area" id="area" class="form-control" required value="{{ perfil.area }}" required disabled>
+                              </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                              <div class="form-group select">
+                                <label for="text-input" class="form-control-label">Departamento</label>
+                                <input type="text" name="departamento" id="departamento" class="form-control" required value="{{ perfil.departamento }}" required disabled>
+                              </div>
+                            </div>
+                          </div>   
+                        </div>
+                        <div class="boot d-flex flex-wrap justify-content-center align-items-center">
+                          <a href="{% url 'List_Investigador_Vicerrector'%}" class="btn1 m-2 btn btn-primary btn-sm text-decoration-none">Volver</a>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>    
+        </div>
+      </div>
+    {% endblock %}
+    
+    {% block js %}
+      <script src = "{% static 'js/validations.js' %}"></script>
+    {% endblock %}
+  
+ 

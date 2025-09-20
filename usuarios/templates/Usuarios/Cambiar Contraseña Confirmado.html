@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Conatiner CSS -->
+    <link rel="stylesheet" href="{% static 'Usuarios/css/Login.css' %}">
+    <link rel="stylesheet" href="{% static 'Usuarios/libs/boxicons-2.1.4/css/boxicons.min.css' %}">
+    <link rel="stylesheet" href="{% static 'Usuarios/libs/Bootstrap/css/bootstrap.min.css' %}">
+    <link rel="icon" type="image/png" sizes="50x50" href="{% static 'Usuarios/img/Id UHo-03.png' %}">
+    <link rel="stylesheet" href="{% static 'libs/Bootstrap/icon/bootstrap-icons.min.css' %}">
+    <!-- End Conatiner CSS -->
+    <title>Sistema de gestión de resultados e indicadores de Ciencia, Tecnología e 
+        Innovación de la Universidad de Holguín</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="login-container">
+            <form action="." method="POST">
+                {% csrf_token %}
+                <img class="logo" style="margin-left:50px;" src="{% static 'Usuarios/img/Id UHo-01.png' %}" alt="">
+                <h2 style="color:#222e58">Confirmación</h2>
+                <div class="text">
+                    <p>Su contraseña a sido establecida. Ahora puede continuar e iniciar sesión</p>
+                </div>
+                <a class="a" href="{% url 'Login' %}"><i class="bi bi-arrow-left-circle-fill" style="font-size: 0.9rem;padding-right: 2px;font-weight:900;"></i>Iniciar sesión</a>
+            </form>
+        </div>
+    </div>
+
+    <!-- Conatiner Js -->
+    <script src="{% static 'Usuarios/js/jquery-3.7.1.js' %}"></script>
+    <script src="{% static 'Usuarios/js/popper.min.js' %}"></script>
+    <script src="{% static 'Usuarios/js/Trim registrar.js' %}"></script>
+    <script src="{% static 'Usuarios/js/Registrar.js' %}"></script>
+    <script src="{% static 'Usuarios/libs/Bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <!-- End Conatiner JS -->
+
+</body>
+
+</html>

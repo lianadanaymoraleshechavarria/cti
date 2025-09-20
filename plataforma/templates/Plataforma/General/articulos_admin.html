@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Container CSS -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/Dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'css/datatableSD.css' %}">
+{% endblock %}
+<!-- End Container CSS -->
+
+{% block content %}
+<div class="main" style="padding-top:60px;">
+  <main class="content-inside px-3 py-2">
+    <div class="container-fluid">
+      <div class="container-fluid">
+        <!-- Table Element -->
+        <section id="tablaTramites">
+          <div class="card card-a p-3 h-100">
+            <div class="card-header">
+              <h5 class="card-title title-t" style="text-align: start;">
+                  Artículos
+              </h5>
+            </div>
+            <div class="boot d-flex flex-wrap justify-content-start align-items-center">
+              <a href="{% url 'Articulo_Publicacion_Create' %}" class="btn1 m-2 btn btn-primary btn-sm text-decoration-none">Añadir Publicaciones</a>
+              <a href="{% url 'Articulo_Revista_Create' %}" class="btn1 m-2 btn btn-primary btn-sm text-decoration-none">Añadir Artículos</a>
+            </div>
+            <table id="Articulos" class="display table table-striped table-hover table-primary" style="width:100%; height: 100%;">
+              <thead class="encabezado">
+                <tr>
+                  <th scope="col" style="color: white; text-align: center;">No</th>
+                  <th scope="col" style="color: white; text-align: center;">Título</th>
+                  <th scope="col" style="color: white; text-align: center;">Fecha</th>
+                  <th scope="col" style="color: white; text-align: center;">Autores</th>
+                  <th scope="col" style="color: white; text-align: center;">Área</th>
+                  <th scope="col" style="color: white; text-align: center;">Departamento</th>
+                  <th scope="col" style="color: white; text-align: center;">Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for a in articulo %}
+                  <tr>
+                    <td style="text-align: center;">{{ forloop.counter }}</td>
+                    <td style="text-align: center;"><a class="details" style="color:blue" href="{% url 'Articulo_Detail_Admin' a.id %}">{{ a.titulo }}</a></td>
+                    <td style="text-align: start;">{{ a.fecha_creacion }}</td>
+                    <td style="text-align: start;">
+                      {% for autor in a.autores.all|slice:":3" %}
+                        {{ autor.username }}{% if not forloop.last %}, {% endif %}
+                      {% empty %}
+                        Sin autores
+                      {% endfor %}
+                    </td>
+                    <td style="text-align: start;">{{ a.area }}</td>
+                    <td style="text-align: start;">{{ a.departamento }}</td>
+                    <td style="text-align: start;">{{ a.aprobacion }}</td>
+                  </tr>  
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section class="mb-2 row row-gap-1">
+          <section class="col-md-6 col-sm-12" id="graficaRevistaPublicacion">
+            <div class="card">
+              <div class="p-2">
+                <div id="grafRevistaPublicacion"></div>
+              </div>
+            </div>
+          </section>
+          <section class="col-md-6 col-sm-12" id="graficaBarMarcadores">
+            <div class="card">
+               <div class="p-2">
+                <div id="container"></div>
+              </div>
+            </div>
+          </section>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+ 
+{% endblock %}
+
+<!-- Container JS -->
+{% block js %}
+<script src="{% static 'Plataforma/libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/pdfmake.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/bottons.colVis.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.responsive.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/Articulos_expo.js' %}"></script>
+<script src="{% static 'libs/Highcharts/code/highcharts.js' %}"></script>
+<script src="{% static 'libs/Highcharts/code/modules/accessibility.js' %}"></script>
+<script src="{% static 'libs/Highcharts/code/modules/exporting.js' %}"></script>
+<script src="{% static 'libs/Highcharts/code/modules/offline-exporting.js' %}"></script>
+<script src="{% static 'libs/Highcharts/code/modules/export-data.js' %}"></script>
+
+<script>
+    $(document).ready(function() {
+        Highcharts.chart('grafRevistaPublicacion', {
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+            title: {
+                text: 'Cantidad de Revistas vs. Publicaciones'
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.y}</b>'
+            },
+            accessibility: {
+                point: {
+                    valueSuffix: '%'
+                }
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: false
+                    },
+                    showInLegend: true
+                }
+            },
+            series: [{
+                name: 'Cantidad',
+                colorByPoint: true,
+                data: [{
+                    name: 'Revistas',
+                    y: {{ revistas }},
+                    sliced: true,
+                    selected: true
+                }, {
+                    name: 'Publicaciones',
+                    y: {{ publicaciones }}
+                }]
+            }]
+        });
+
+        // Gráfico de columnas para Revistas y Publicaciones por área
+        var conteosPorArea = {{ conteos_por_area|safe }};
+        console.log(conteosPorArea);
+        var categorias = conteosPorArea.map(function(item) { return item.area; });
+        var datosRevistas = conteosPorArea.map(function(item) { return item.revistas; });
+        var datosPublicaciones = conteosPorArea.map(function(item) { return item.publicaciones; });
+
+        Highcharts.chart('container', {
+            chart: { type: 'column' },
+            title: { text: 'Revistas y Publicaciones por Área' },
+            xAxis: { categories: categorias },
+            yAxis: { title: { text: 'Cantidad' } },
+            series: [
+                { name: 'Revistas', data: datosRevistas },
+                { name: 'Publicaciones', data: datosPublicaciones }
+            ]
+        });
+    });
+</script>
+{% endblock %}
+<!-- End Container JS -->

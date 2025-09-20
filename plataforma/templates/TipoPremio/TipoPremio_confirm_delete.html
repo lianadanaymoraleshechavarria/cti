@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Container CSS -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/Dashboard.css' %}">
+<style>
+    .delete-card {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .delete-header {
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .delete-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 5px;
+    }
+    
+    .delete-content {
+        margin-bottom: 20px;
+    }
+    
+    .delete-warning {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 15px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+    }
+    
+    .delete-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding-top: 15px;
+        border-top: 1px solid #eee;
+    }
+</style>
+{% endblock %}
+<!-- End Container CSS -->
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="delete-card">
+                <div class="delete-header">
+                    <h1 class="delete-title">Confirmar eliminación</h1>
+                </div>
+                
+                <div class="delete-content">
+                    <div class="delete-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>¡Advertencia!</strong> Esta acción no se puede deshacer.
+                    </div>
+                    
+                    <p>¿Está seguro de que desea eliminar el tipo de evento <strong>"{{ tipo_evento.nombre }}"</strong>?</p>
+                    
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            Detalles del tipo de evento
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Nombre:</strong> {{ tipo_evento.nombre }}</p>
+                            <p><strong>Descripción:</strong> {{ tipo_evento.descripcion|default:"Sin descripción" }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="delete-footer">
+                    <a href="{% url 'TipoEvento_List' %}" class="btn btn-secondary">
+                        <i class="fas fa-times me-1"></i> Cancelar
+                    </a>
+                    <form action="." method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-1"></i> Eliminar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

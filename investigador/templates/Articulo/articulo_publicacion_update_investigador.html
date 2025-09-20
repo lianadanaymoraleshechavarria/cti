@@ -1,0 +1,506 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+  <link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}">
+  <style>
+    /* Estilos para el componente de selección */
+    .select-container {
+      position: relative;
+      width: 100%;
+    }
+    
+    .select-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      z-index: 1000;
+      width: 100%;
+      max-height: 200px;
+      overflow-y: auto;
+      background-color: #fff;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      border-radius: 0.25rem;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175);
+      display: none;
+    }
+    
+    .select-item {
+      padding: 0.5rem;
+      cursor: pointer;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .select-item:hover {
+      background-color: #f8f9fa;
+    }
+    
+    .select-selected {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    
+    .item-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      line-height: 1;
+      color: #fff;
+      background-color: #007bff;
+      border-radius: 0.25rem;
+    }
+    
+    .item-badge button {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.25rem;
+      line-height: 1;
+      padding: 0 0 0 0.25rem;
+      cursor: pointer;
+      opacity: 0.7;
+    }
+
+    /* Estilos para el autocompletado de revistas */
+    .revista-autocomplete-container {
+      position: relative;
+      width: 100%;
+    }
+
+    .revista-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      z-index: 1000;
+      width: 100%;
+      max-height: 200px;
+      overflow-y: auto;
+      background-color: #fff;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      border-radius: 0.25rem;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175);
+      display: none;
+    }
+
+    /* Otros estilos... */
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="content">
+  <div class="col">
+    <div class="container-form">
+      <div class="form">
+        <div class="container-fluid py-4">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header pb-0">
+                  <div class="title">
+                    <h3 class="title-text p-3">Solicitud de Artículo de Publicación</h3>
+                    <p class="text">Por favor, complete todos los campos requeridos para enviar su solicitud. Su información es vital para procesar su solicitud de manera adecuada.</p>
+                  </div>
+                </div>
+
+                <form id="formu" method="POST" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-header">REGISTRAR ARTÍCULO DE PUBLICACIÓN</div>
+                        <div class="dashed-rounded-border">
+                          <div class="section-label">Información básica del artículo</div>
+                          <div class="row">
+                            <div class="col-md-12">
+                              <div class="form-group">
+                                <label class="form-control-label required-field">Nombre del artículo</label>
+                                {{ form.titulo }}
+                              </div>
+                            </div>
+
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label required-field">Autores</label>
+                                <div class="select-container">
+                                  <input type="text" id="user-search" class="form-control" placeholder="Buscar autores...">
+                                  <div id="user-dropdown" class="select-dropdown" style="display: none;"></div>
+                                </div>
+                                <div id="selected-users" class="select-selected mt-2"></div>
+                                <div style="display: none;">{{ form.autores }}</div>
+                              </div>
+                            </div>
+
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label required-field">Fecha de publicación</label>
+                                {{ form.fecha_creacion }}
+                              </div>
+                            </div>
+
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label required-field">ISSN o ISBN</label>
+                                {{ form.isbn }}
+                              </div>
+                            </div>
+
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label">Idioma</label>
+                                {{ form.idioma }}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="dashed-rounded-border mt-4">
+                          <div class="section-label">Datos de la Revista o Medio de Publicación</div>
+                          <div class="row">
+                            <div class="col-md-12">
+                              <div class="form-group">
+                                <label class="form-control-label required-field">Nombre de la revista/libro/conferencia</label>
+                                <div class="revista-autocomplete-container">
+                                  <input type="text" id="revista-search" class="form-control" placeholder="Buscar por título o editorial...">
+                                  <div id="revista-dropdown" class="revista-dropdown" style="display: none;"></div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label">Editorial</label>
+                                {{ form.editorial }}
+                              </div>
+                            </div>
+
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label">Volumen</label>
+                                {{ form.volumen }}
+                              </div>
+                            </div>
+
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label">Número</label>
+                                {{ form.numero }}
+                              </div>
+                            </div>
+
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label">Páginas inicio y fin</label>
+                                {{ form.pag }}
+                                <small class="text-muted">Ejemplo: 12-34</small>
+                              </div>
+                            </div>
+
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label required-field">URL de publicación</label>
+                                {{ form.url }}
+                              </div>
+                            </div>
+
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label">País</label>
+                                {{ form.pais }}
+                              </div>
+                            </div>
+
+                            <div class="col-md-12">
+                              <div class="form-group">
+                                <label class="form-control-label">Subir archivo del artículo</label>
+                                <div class="custom-file">
+                                  {{ form.archivo }}
+                                  <label class="file-label" for="id_archivo">
+                                    <span id="file-name">Seleccionar archivo...</span>
+                                  </label>
+                                </div>
+                                <small class="text-muted">Formatos aceptados: PDF, DOC, DOCX</small>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="dashed-section">
+                          <div class="switch-container">
+                            <label class="switch">
+                              <input type="checkbox" id="proyecto-switch" {% if form.proyecto.value %}checked{% endif %}>
+                              <span class="slider"></span>
+                            </label>
+                            <label for="proyecto-switch" class="form-control-label">Artículo asociado a un resultado de proyecto: 
+                              <strong id="proyecto-status">{% if form.proyecto.value %}Sí{% else %}No{% endif %}</strong>
+                            </label>
+                          </div>
+                          <div id="proyecto-select-container" class="proyecto-select-container {% if form.proyecto.value %}visible{% endif %}">
+                            <label class="form-control-label">¿Cuál proyecto?</label>
+                            <select name="proyecto" id="id_proyecto" class="form-control">
+                              <option value="">Seleccione un proyecto</option>
+                              {% for proyecto in proyectos %}
+                                <option value="{{ proyecto.id }}" {% if form.proyecto.value == proyecto.id %}selected{% endif %}>
+                                  {{ proyecto.nombre_proyecto }}
+                                </option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                        </div>
+
+                        <div class="row mt-4">
+                          <div class="col-md-12 text-center">
+                            <button type="submit" class="btn btn-success">
+                              <i class="fas fa-save me-2"></i>Guardar
+                            </button>
+                            <a href="{% url 'Articulo_List_Investigador' %}" class="btn btn-primary ml-3">
+                              <i class="fas fa-arrow-left me-2"></i>Cancelar
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+<script src="{% static 'js/jquery-ui.min.js' %}"></script>
+<script src="{% static 'js/validations.js' %}"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Mostrar nombre del archivo seleccionado
+  document.getElementById('id_archivo').addEventListener('change', function(e) {
+    var fileName = e.target.files[0] ? e.target.files[0].name : 'Seleccionar archivo...';
+    document.getElementById('file-name').textContent = fileName;
+  });
+
+  // Manejar el switch de proyecto
+  const proyectoSwitch = document.getElementById('proyecto-switch');
+  const proyectoContainer = document.getElementById('proyecto-select-container');
+  const proyectoStatus = document.getElementById('proyecto-status');
+  const proyectoSelect = document.getElementById('id_proyecto');
+
+  if (proyectoSwitch.checked) {
+    proyectoContainer.classList.add('visible');
+  }
+
+  proyectoSwitch.addEventListener('change', function() {
+    if (this.checked) {
+      proyectoContainer.classList.add('visible');
+      proyectoStatus.textContent = 'Sí';
+    } else {
+      proyectoContainer.classList.remove('visible');
+      proyectoStatus.textContent = 'No';
+      proyectoSelect.value = '';
+    }
+  });
+
+  document.getElementById('formu').addEventListener('submit', function(e) {
+    if (proyectoSwitch.checked && !proyectoSelect.value) {
+      e.preventDefault();
+      alert('Por favor seleccione un proyecto o desactive la asociación a proyecto');
+      proyectoSelect.focus();
+    }
+  });
+
+  // Autocompletado de revistas
+  const revistaSearchInput = document.getElementById('revista-search');
+  const revistaDropdown = document.getElementById('revista-dropdown');
+
+  async function searchRevistas(query) {
+    try {
+      revistaDropdown.innerHTML = '<div class="p-2 text-center">Buscando revistas...</div>';
+      revistaDropdown.style.display = 'block';
+
+      const response = await fetch(`/Plataforma/api_revistas/?search=${encodeURIComponent(query)}`);
+      if (!response.ok) throw new Error('Error al buscar revistas');
+      
+      const revistas = await response.json();
+      revistaDropdown.innerHTML = '';
+
+      if (revistas.length === 0) {
+        const noResults = document.createElement('div');
+        noResults.className = 'p-2 text-center';
+        noResults.textContent = 'No se encontraron revistas';
+        revistaDropdown.appendChild(noResults);
+        return;
+      }
+
+      revistas.forEach(revista => {
+        const item = document.createElement('div');
+        item.className = 'select-item';
+
+        const tituloDiv = document.createElement('div');
+        tituloDiv.className = 'item-title';
+        tituloDiv.textContent = revista.titulo;
+
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'item-info';
+        
+        const infoTexts = [];
+        if (revista.editorial) infoTexts.push(`Editorial: ${revista.editorial}`);
+        if (revista.issn) infoTexts.push(`ISSN: ${revista.issn}`);
+        
+        infoDiv.textContent = infoTexts.join(' | ');
+
+        item.appendChild(tituloDiv);
+        if (infoTexts.length > 0) item.appendChild(infoDiv);
+
+        item.onclick = () => {
+          tituloInput.value = revista.titulo;
+          if (revista.editorial) editorialInput.value = revista.editorial;
+          if (revista.issn) issnInput.value = revista.issn;
+          revistaDropdown.style.display = 'none';
+          revistaSearchInput.value = revista.titulo;
+        };
+
+        revistaDropdown.appendChild(item);
+      });
+    } catch (error) {
+      console.error('Error:', error);
+      revistaDropdown.innerHTML = '<div class="p-2 text-center text-danger">Error al buscar revistas</div>';
+    }
+  }
+
+  revistaSearchInput.addEventListener('input', function() {
+    const query = revistaSearchInput.value.trim();
+    searchRevistas(query);
+  });
+
+  // Autocompletado de autores
+  const searchInput = document.getElementById('user-search');
+  const dropdown = document.getElementById('user-dropdown');
+  const selectedUsersContainer = document.getElementById('selected-users');
+  const hiddenSelect = document.querySelector('select[name="autores"]');
+  const selectedUsers = new Map();
+
+  Array.from(hiddenSelect.selectedOptions).forEach(option => {
+    selectedUsers.set(option.value, {
+      id: option.value,
+      name: option.textContent
+    });
+  });
+
+  function updateSelectedUsers() {
+    selectedUsersContainer.innerHTML = '';
+    selectedUsers.forEach(user => {
+      const badge = document.createElement('span');
+      badge.className = 'item-badge';
+      badge.textContent = user.name;
+
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.textContent = '×';
+      removeBtn.onclick = (e) => {
+        e.preventDefault();
+        selectedUsers.delete(user.id);
+        updateSelectedUsers();
+        updateHiddenSelect();
+      };
+
+      badge.appendChild(removeBtn);
+      selectedUsersContainer.appendChild(badge);
+    });
+  }
+
+  function updateHiddenSelect() {
+    Array.from(hiddenSelect.options).forEach(option => option.selected = false);
+    selectedUsers.forEach(user => {
+      const option = hiddenSelect.querySelector(`option[value="${user.id}"]`);
+      if (option) option.selected = true;
+      else hiddenSelect.appendChild(new Option(user.name, user.id, true, true));
+    });
+    const event = new Event('change', { bubbles: true });
+    hiddenSelect.dispatchEvent(event);
+  }
+
+  async function searchUsers(query) {
+    try {
+      dropdown.innerHTML = '<div class="p-2 text-center">Buscando usuarios...</div>';
+      dropdown.style.display = 'block';
+
+      const response = await fetch(`/Investigador/api_usuarios/?search=${encodeURIComponent(query)}`);
+      if (!response.ok) throw new Error('Error al buscar usuarios');
+      
+      const users = await response.json();
+      dropdown.innerHTML = '';
+
+      if (users.length === 0) {
+        const noResults = document.createElement('div');
+        noResults.className = 'p-2 text-center';
+        noResults.textContent = 'No se encontraron usuarios';
+        dropdown.appendChild(noResults);
+        return;
+      }
+
+      users.forEach(user => {
+        const item = document.createElement('div');
+        item.className = 'select-item';
+        item.style.backgroundColor = selectedUsers.has(user.id.toString()) ? '#e9ecef' : '';
+
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'item-title';
+        nameDiv.textContent = user.full_name || user.username;
+
+        item.appendChild(nameDiv);
+
+        item.onclick = () => {
+          if (selectedUsers.has(user.id.toString())) {
+            selectedUsers.delete(user.id.toString());
+          } else {
+            selectedUsers.set(user.id.toString(), {
+              id: user.id.toString(),
+              name: user.full_name || user.username
+            });
+          }
+          updateSelectedUsers();
+          updateHiddenSelect();
+          item.style.backgroundColor = selectedUsers.has(user.id.toString()) ? '#e9ecef' : '';
+        };
+
+        dropdown.appendChild(item);
+      });
+    } catch (error) {
+      console.error('Error:', error);
+      dropdown.innerHTML = '<div class="p-2 text-center text-danger">Error al buscar usuarios</div>';
+    }
+  }
+
+  searchInput.addEventListener('input', function() {
+    const query = searchInput.value.trim();
+    searchUsers(query);
+  });
+
+  // Inicializar con los usuarios seleccionados
+  updateSelectedUsers();
+
+  // Añadir usuario actual automáticamente
+  const currentUserId = '{{ request.user.id }}';
+  const currentUserName = '{{ request.user.get_full_name|default:request.user.username }}';
+
+  if (currentUserId && !selectedUsers.has(currentUserId)) {
+    selectedUsers.set(currentUserId, {
+      id: currentUserId,
+      name: currentUserName
+    });
+    updateSelectedUsers();
+    updateHiddenSelect();
+  }
+});
+</script>
+{% endblock %}

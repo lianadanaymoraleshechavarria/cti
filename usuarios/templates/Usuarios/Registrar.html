@@ -1,0 +1,145 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Conatiner CSS -->
+    <link rel="stylesheet" href="{% static 'Usuarios/css/Login.css' %}">
+    <link rel="stylesheet" href="{% static 'Usuarios/libs/boxicons-2.1.4/css/boxicons.min.css' %}">
+    <link rel="stylesheet" href="{% static 'Usuarios/libs/Bootstrap/css/bootstrap.min.css' %}">
+    <link rel="icon" type="image/png" sizes="50x50" href="{% static 'Usuarios/img/Id UHo-03.png' %}">
+    <!-- End Conatiner CSS -->
+    <title>Sistema de gestión de resultados e indicadores de Ciencia, Tecnología e 
+        Innovación de la Universidad de Holguín</title>
+</head>
+
+{% block content %}
+<!-- Mensajes de error -->
+{% if messages %}
+{% for message in messages  %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert" style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem; z-index: 2000">
+    {{ message }}
+    <button style="font-size: 10px; border-bottom: none; position: relative; box-shadow: none;" type="button"
+          class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+<div class="container">
+    <div class="login-container">
+        <form action="." method="POST">
+            {% csrf_token %}
+            <img class="logo" style="margin-left:50px;" src="{% static 'Usuarios/img/Id UHo-01.png' %}" alt="Logo UHo">
+            <h2 style="color:#222e58;">Registrarse</h2>
+            
+            <!-- Campos básicos -->
+            <div class="input-container {% if form %}focus{% endif %}">
+                <input type="text" name="username" class="input" id="username" value="{{ form.username }}" required>
+                <label for="username">Usuario</label>
+                <span>Usuario</span>
+            </div>
+            
+            <div class="input-container {% if form %}focus{% endif %}">
+                <input type="email" name="email" class="input" value="{{ form.email }}" id="email" required>
+                <label for="email">Email</label>
+                <span>Email</span>
+            </div>
+            
+            <div class="input-container">
+                <input type="password" name="password1" class="input" id="password1" required>
+                <label for="password1">Contraseña</label>
+                <span>Contraseña</span>
+            </div>
+            
+            <div class="input-container">
+                <input type="password" name="password2" class="input" id="password2" required>
+                <label for="password2">Repetir contraseña</label>
+                <span>Repetir contraseña</span>
+            </div>
+
+            <!-- Selector de Área (se cargará dinámicamente) -->
+            <div class="mb-3">
+                <label for="area" class="form-label">Área</label>
+                <select class="form-select" name="area" id="area" required>
+                    <option value="">Primero seleccione un area</option>
+                    {% for area in areas %}
+                    <option value="{{ area.id }}">{{ area.nombre_area}}</option>
+                {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Selector de Departamento -->
+            <div class="mb-3">
+                <label for="departamento" class="form-label">Departamento</label>
+                <select class="form-select" name="departamento" id="departamento" required>
+                    <option value="">Seleccione un departamento</option>
+                    {% for departamento in departamentos %}
+                        <option value="{{ departamento.id }}">{{ departamento.nombre_departamento }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <a class="a" href="{% url 'Login' %}">¿Ya tienes cuenta? Inicia sesión</a>
+            <input type="submit" class="btn1" id="boton" value="Crear cuenta">
+        </form>
+    </div>
+</div>
+
+<!-- Scripts JavaScript -->
+<script src="{% static 'Usuarios/js/jquery-3.7.1.js' %}"></script>
+<script src="{% static 'Usuarios/js/popper.min.js' %}"></script>
+<script src="{% static 'Usuarios/js/FormularioSelect.js' %}"></script>
+<script src="{% static 'Usuarios/js/InputR.js' %}"></script>
+<script src="{% static 'Usuarios/libs/Bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+<!-- Script para cargar áreas según departamento seleccionado -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Selectores
+    const areaSelect = document.getElementById('area');
+    const departamentoSelect = document.getElementById('departamento');
+    
+    // Cuando cambia el área
+    areaSelect.addEventListener('change', function() {
+        const areaId = this.value;
+        
+        if (!areaId) {
+            departamentoSelect.innerHTML = '<option value="">Primero seleccione un área</option>';
+            departamentoSelect.disabled = true;
+            return;
+        }
+        
+        // Obtener departamentos via AJAX
+        fetch(`/get_departamentos/?area_id=${areaId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length > 0) {
+                    let options = '<option value="">Seleccione un departamento</option>';
+                    data.forEach(depto => {
+                        options += `<option value="${depto.id}">${depto.nombre_departamento}</option>`;
+                    });
+                    departamentoSelect.innerHTML = options;
+                    departamentoSelect.disabled = false;
+                } else {
+                    departamentoSelect.innerHTML = '<option value="">No hay departamentos para esta área</option>';
+                    departamentoSelect.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                departamentoSelect.innerHTML = '<option value="">Error al cargar departamentos</option>';
+            });
+    });
+    
+    // Validación del formulario
+    document.querySelector('form').addEventListener('submit', function(e) {
+        if (departamentoSelect.disabled || !departamentoSelect.value) {
+            e.preventDefault();
+            alert('Por favor seleccione un departamento válido');
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,66 @@
+
+.x{
+  overflow: hidden;
+}
+
+
+.content {
+  overflow-y: scroll;
+  padding-left: 10px; /*claudia se lo puse*/
+}
+
+
+
+.header{
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 1% 5%;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    z-index: 100;
+}
+
+.nav-i  {
+    text-decoration: none;
+    font-weight: 500;
+    margin-left:3vw;
+    text-shadow: 0 o 10px rgba(0, 0, 0, .2);
+}
+
+.navbar a {
+    text-decoration: none;
+}
+.nav-ii{
+  color: #15468a;
+}
+
+.x{
+    overflow: hidden;
+}
+
+.dropdown-item {
+  color:  white;
+}
+.dropdown .dropdown-menu {
+  display: none;
+  background: #15468a;
+}
+.dropdown:hover>.dropdown-menu, 
+.dropend:hover>.dropdown-menu {
+  display: block;
+  margin-top: .1em;
+  margin-left: .1em;
+}
+@media screen and (min-width:769px) {
+  .dropend:hover>.dropdown-menu {
+    position: absolute;
+    top: 0;
+    left: 100%;
+  }
+  .dropend .dropdown-toggle {
+    margin-left: .5em;
+  }
+}

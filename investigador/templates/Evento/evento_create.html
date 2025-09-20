@@ -1,0 +1,829 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="content">
+  <div class="col">
+    <div class="container-form">
+      <div class="form">
+        <div class="container-fluid py-4">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="title">
+                  <h3 class="title-text p-3">Solicitud de Evento</h3>
+                </div>
+                <form id="formu" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <!-- Campo oculto para evento_base -->
+                  <input type="hidden" name="evento_base" id="evento_base" value="{{ form.evento_base.value|default:'' }}">
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="seccion-formulario">
+                          <h5>Datos del Evento</h5>
+                          <!-- Datos del Evento -->
+                          <div class="row">
+                            <div class="col-md-12">
+                              <div class="form-group select">
+                                <label for="eventoSearchInput" class="form-control-label required-field">Título</label>
+                                <div id="evento-select-container" class="select-container">
+                                  <div class="form-group d-flex align-items-end icon-input">
+                                    <input type="text" id="eventoSearchInput" class="form-control"
+                                      placeholder="Buscar eventos...">
+                                    <button type="button" class="btn boton-add" id="add-evento-base-btn" data-bs-toggle="modal" data-bs-target="#modal-evento-base">
+                                      <i class="fas fa-plus"></i>
+                                    </button>
+                                  </div>
+                                  <div id="eventoDropdown" class="select-dropdown" style="display:none;"></div>
+                                  <div id="selected-evento" class="select-selected mt-2"></div>
+                                </div>
+                                <!-- Campo oculto "real" que envía el valor al formulario -->
+                                {{ form.titulo }}
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="form-group icon-input">
+                                <label class="form-control-label required-field">Tipo de evento</label>
+                                <div class="input-wrapper">
+                                  {{form.tipo}}
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="form-group icon-input">
+                                <label class="form-control-label required-field">Modalidad</label>
+                                <div class="input-wrapper">
+                                  {{form.modalidad}}
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="form-group icon-input">
+                                <label class="form-control-label required-field">Institución</label>
+                                <div class="input-wrapper">
+                                  <i class="fas fa-building" style="margin-right: 5px;"></i>
+                                  {{form.institucion}}
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="form-group icon-input">
+                                <label for="example-text-input" class="form-control-label">ISBN</label>
+                                <div class="input-wrapper">
+                                  {{form.isbn}}
+                                </div> 
+                              </div>
+                            </div>
+                          </div>
+                          <!-- Fecha y lugar -->
+                          <h5 style="margin-top: 20px;">Fecha y lugar</h5>
+                          <div class="row">
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label required-field">Mes / Año</label>
+                                {{form.fecha_create}}
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label required-field">País</label>
+                                 <div class="input-wrapper">
+                                  {{form.pais}}
+                                 </div>
+                              </div>
+                            </div>
+                            <div class="col-md-6"  id="evento-provincia-container">
+                              <label class="form-control-label">Provincia</label>
+                              <div class="input-wrapper">
+                                {{form.provincia}}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="seccion-formulario">
+                          <!-- Información sobre la participación -->
+                          <h5>Información sobre la participación</h5>
+                          <div class="row">
+                            <div class="col-md-12">
+                              <div class="form-group">
+                                <label class="form-control-label required-field">Nombre de la ponencia/conferencia</label>
+                                {{form.nombre_ponencia}}
+                              </div>
+                            </div>
+                            <div class="col-md-12">
+                              <div class="form-group select">
+                                <label class="form-control-label required-field">Autor(es)</label>
+                                <div class="form-group d-flex align-items-end">
+                                    <div id="user-select-container" class="user-select-container">
+                                  <input type="text" id="user-search" class="form-control" placeholder="Buscar usuarios...">
+                                  <div id="user-dropdown" class="select-dropdown" style="display: none;"></div>
+                                  <div id="selected-users" class="select-selected mt-2"></div>
+                                </div>
+                                <button type="button" class="btn boton-add" id="add-user-btn" data-bs-toggle="modal"
+                                  data-bs-target="#nuevoUsuarioModal">
+                                  <i class="fa fa-plus"></i>
+                                </button>
+                                </div>
+                                <!-- Campo original oculto -->
+                                <div style="display: none;">{{ form.autores }}</div>
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label">URL</label>
+                                {{form.url}}
+                              </div>
+                            </div>    
+                            <div class="col-md-6">
+                              <div class="form-group icon-input">
+                                <label class="form-control-label">Certificado</label>
+                                <div class="input-wrapper">
+                                  <i class="fas fa-paperclip" style="margin-right: 5px;"></i>{{form.certificado}}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- Asociación a proyecto -->
+                        <div class="seccion-formulario">
+                          <h5>Información adicional</h5>
+                          <div class="col-md-12">
+                            <div class="mt-3">
+                              <div class="switch-container">
+                                <label class="switch">
+                                  <input type="checkbox" id="proyecto-switch" {% if form.proyecto.value %}checked{% endif %}>
+                                  <span class="slider"></span>
+                                </label>
+                                <label for="proyecto-switch" class="form-control-label">Artículo asociado a un resultado de
+                                  proyecto:
+                                  <strong id="proyecto-status">{% if form.proyecto.value %}Sí{% else %}No{% endif %}</strong>
+                                </label>
+                              </div>
+                              <div id="proyecto-select-container"
+                                class="proyecto-select-container {% if form.proyecto.value %}visible{% endif %}">
+                                <label class="form-control-label">¿Cuál proyecto?</label>
+                                <select name="proyecto" id="id_proyecto" class="form-control">
+                                  <option value="">Seleccione un proyecto</option>
+                                  {% for proyecto in proyectos %}
+                                      <option value="{{ proyecto.id }}" {% if form.proyecto.value == proyecto.id %}selected{% endif %}>
+                                        {{ proyecto.nombre_proyecto }}
+                                      </option>
+                                    {% endfor %}
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Botones -->
+                  <div class="row mt-4">
+                    <div class="col-md-12 text-center">
+                      <a href="{% url 'Evento_List_Investigador' %}" class="btn btn-cancelar ml-3">Cancelar</a>
+                      <button type="submit" class="btn boton-form"><i class="fas fa-check"></i> Guardar</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para crear nuevo evento base -->
+<div class="modal fade" id="modal-evento-base" tabindex="-1" aria-labelledby="modalEventoBaseLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalEventoBaseLabel">Crear Nuevo Evento Base</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="evento-base-form">
+          <div class="mb-3">
+            <label for="evento-base-titulo" class="form-label required-field">Título del evento</label>
+            <input type="text" class="form-control" id="evento-base-titulo" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="evento-base-tipo" class="form-label required-field">Tipo de evento</label>
+            <select class="form-select" id="evento-base-tipo" required>
+              {% for value, text in form.fields.tipo.choices %}
+              <option value="{{ value }}">{{ text }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="evento-base-institucion" class="form-label required-field">Institución</label>
+            <select class="form-select" id="evento-base-institucion" name="institucion" required>
+                <option value="">---------</option>
+                {% for i in instituciones %}
+                    <option value="{{ i.id }}">{{ i.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+          <div class="mb-3">
+            <label for="evento-base-pais" class="form-label required-field">País</label>
+            <input type="text" class="form-control" id="evento-base-pais" required>
+          </div>
+
+          <div class="mb-3" id="evento-base-provincia-container" style="display:none;">
+            <label for="evento-base-provincia" class="form-label required-field">Provincia</label>
+            <select class="form-select" id="evento-base-provincia">
+              <option value="">Seleccione una provincia</option>
+              <option value="PRI">Pinar del Río</option>
+              <option value="ART">Artemisa</option>
+              <option value="HAB">La Habana</option>
+              <option value="MAY">Mayabeque</option>
+              <option value="MTZ">Matanzas</option>
+              <option value="VCL">Villa Clara</option>
+              <option value="CFG">Cienfuegos</option>
+              <option value="SSP">Sancti Spíritus</option>
+              <option value="CFG">Ciego de Ávila</option>
+              <option value="CAM">Camagüey</option>
+              <option value="LTU">Las Tunas</option>
+              <option value="HOL">Holguín</option>
+              <option value="GRA">Granma</option>
+              <option value="SCU">Santiago de Cuba</option>
+              <option value="GTM">Guantánamo</option>
+              <option value="IJV">Isla de la Juventud</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <div class="col-md-12 text-center">
+          <button type="button" class="btn btn-cancelar" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn boton-form" id="guardar-evento-base"><i class="fas fa-check"></i> Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+<script src="{% static 'js/validations.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Buscar Eventos -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  // --- Referencias ---
+  const form = document.getElementById("formu");
+
+  const eventoSearchInput = document.getElementById("eventoSearchInput");
+  const eventoDropdown    = document.getElementById("eventoDropdown");
+  const selectedEventoDiv = document.getElementById("selected-evento");
+
+  const tituloHiddenInput = document.getElementById("id_titulo");   // campo real de Django
+  const eventoBaseInput   = document.getElementById("evento_base"); // hidden que envías al backend
+
+  const tipoInput         = document.getElementById("evento-tipo");
+  const institucionInput  = document.getElementById("evento-institucion");
+  const paisInput         = document.getElementById("evento-pais");
+  const provinciaInput    = document.getElementById("evento-provincia");
+  const provinciaContainer= document.getElementById("evento-provincia-container");
+
+  // --- Helpers ---
+  function syncTituloDesdeInput() {
+    if (tituloHiddenInput && eventoSearchInput) {
+      tituloHiddenInput.value = eventoSearchInput.value;
+    }
+    // Si escribe manualmente, NO hay evento_base seleccionado
+    if (eventoBaseInput) eventoBaseInput.value = "";
+    if (selectedEventoDiv) selectedEventoDiv.textContent = "";
+  }
+
+  function setProvinciaSegunPaisYEvento(evento) {
+    if (!provinciaContainer || !provinciaInput || !paisInput) return;
+
+    if ((paisInput.value || "").trim().toLowerCase() === "cuba") {
+      provinciaContainer.style.display = "block";
+      provinciaInput.required = true;
+
+      if (evento && evento.provincia) {
+        const provOption = Array.from(provinciaInput.options)
+          .find(opt =>
+            opt.text.trim().toLowerCase() === evento.provincia.trim().toLowerCase() ||
+            opt.value == evento.provincia
+          );
+        if (provOption) provinciaInput.value = provOption.value;
+      }
+    } else {
+      provinciaContainer.style.display = "none";
+      provinciaInput.required = false;
+      provinciaInput.value = "";
+    }
+  }
+
+  // --- Búsqueda y render del dropdown ---
+  async function searchEventos(query) {
+    if (!eventoDropdown) return;
+
+    try {
+      eventoDropdown.innerHTML = '<div class="p-2 text-center">Buscando eventos...</div>';
+      eventoDropdown.style.display = "block";
+
+      const response = await fetch(`/Investigador/api_eventos_base/?search=${encodeURIComponent(query)}`);
+      if (!response.ok) throw new Error("Error en la respuesta del servidor");
+
+      const eventos = await response.json();
+      eventoDropdown.innerHTML = "";
+
+      if (!eventos.length) {
+        eventoDropdown.innerHTML = '<div class="p-2 text-center">No se encontraron eventos</div>';
+        return;
+      }
+
+      eventos.forEach(evento => {
+        const item = document.createElement("div");
+        item.className = "select-item p-2 border-bottom"; // <- esta clase ya la usabas
+        item.style.cursor = "pointer";
+
+        // guarda el id para el hidden evento_base
+        item.dataset.id = evento.id;
+
+        const title = document.createElement("div");
+        title.className = "fw-bold";
+        title.textContent = evento.titulo || "";
+
+        const info = document.createElement("div");
+        info.className = "text-muted small";
+        info.textContent = `${evento.tipo || ""} | ${evento.institucion || ""} | ${evento.pais || ""}${evento.provincia ? " - " + evento.provincia : ""}`;
+
+        item.appendChild(title);
+        item.appendChild(info);
+
+        item.addEventListener("click", () => {
+          // título visible y oculto
+          if (eventoSearchInput)  eventoSearchInput.value  = evento.titulo || "";
+          if (tituloHiddenInput)  tituloHiddenInput.value  = evento.titulo || "";
+
+          // setear evento_base (CLAVE)
+          if (eventoBaseInput)    eventoBaseInput.value    = item.dataset.id || "";
+
+          // pintar selección abajo si quieres
+          if (selectedEventoDiv)  selectedEventoDiv.textContent = evento.titulo || "";
+
+          // setear selects auxiliares
+          if (tipoInput && evento.tipo) {
+            const tipoOption = Array.from(tipoInput.options)
+              .find(opt =>
+                opt.text.trim().toLowerCase() === (evento.tipo || "").trim().toLowerCase() ||
+                opt.value == evento.tipo
+              );
+            if (tipoOption) tipoInput.value = tipoOption.value;
+          }
+
+          if (institucionInput && evento.institucion) {
+            const instOption = Array.from(institucionInput.options)
+              .find(opt =>
+                opt.text.trim().toLowerCase() === (evento.institucion || "").trim().toLowerCase() ||
+                opt.value == evento.institucion
+              );
+            if (instOption) institucionInput.value = instOption.value;
+          }
+
+          if (paisInput) paisInput.value = evento.pais || "";
+          setProvinciaSegunPaisYEvento(evento);
+
+          if (eventoDropdown) eventoDropdown.style.display = "none";
+          console.log("Evento seleccionado y campos rellenados:", evento);
+        });
+
+        eventoDropdown.appendChild(item);
+      });
+
+    } catch (error) {
+      console.error("Error al buscar eventos:", error);
+      if (eventoDropdown) {
+        eventoDropdown.innerHTML = '<div class="p-2 text-center text-danger">Error al buscar eventos</div>';
+      }
+    }
+  }
+
+  // --- Listeners del input de búsqueda ---
+  if (eventoSearchInput) {
+    eventoSearchInput.addEventListener("input", () => {
+      if (tituloHiddenInput) tituloHiddenInput.value = eventoSearchInput.value;
+      if (eventoBaseInput) eventoBaseInput.value = "";  
+      searchEventos(eventoSearchInput.value.trim());
+    });
+
+    eventoSearchInput.addEventListener("focus", () => {
+      if (!eventoSearchInput.value.trim()) searchEventos("");
+    });
+
+    eventoSearchInput.addEventListener("blur", () => {
+      setTimeout(() => {
+        if (eventoDropdown) eventoDropdown.style.display = "none";
+      }, 200);
+    });
+  }
+
+  // --- Validación del submit ---
+  if (form) {
+    form.addEventListener("submit", (e) => {
+      if (!tituloHiddenInput || !tituloHiddenInput.value.trim()) {
+        e.preventDefault();
+        alert("Debes escribir un título o seleccionar un evento antes de enviar el formulario");
+        if (eventoSearchInput) eventoSearchInput.focus();
+      }
+    });
+  }
+});
+</script>
+<!-- Crear Evento Base-->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("evento-base-form");
+    const saveBtn = document.getElementById("guardar-evento-base");
+
+    // Campos del formulario principal que se deben autorrellenar después de crear el evento
+    const mainTituloInput = document.getElementById("eventoSearchInput");
+    const mainTipoSelect = document.getElementById("evento-tipo");
+    const mainInstitucionSelect = document.getElementById("evento-institucion");
+    const mainPaisInput = document.getElementById("evento-pais");
+    const mainProvinciaSelect = document.getElementById("evento-provincia");
+
+    // Campos del modal (formulario base)
+    const modalTituloInput = document.getElementById("evento-base-titulo");
+    const modalTipoSelect = document.getElementById("evento-base-tipo");
+    const modalInstitucionSelect = document.getElementById("evento-base-institucion");
+    const modalPaisInput = document.getElementById("evento-base-pais");
+    const modalProvinciaSelect = document.getElementById("evento-base-provincia");
+    const modalProvinciaContainer = document.getElementById("evento-base-provincia-container");
+
+    // Mostrar/ocultar select de provincias según país en el modal
+    if (modalPaisInput) {
+      modalPaisInput.addEventListener('input', function () {
+        const paisValue = this.value.trim().toLowerCase();
+        if (paisValue === 'cuba') {
+          modalProvinciaContainer.style.display = 'block';
+          modalProvinciaSelect.required = true;
+        } else {
+          modalProvinciaContainer.style.display = 'none';
+          modalProvinciaSelect.value = '';
+          modalProvinciaSelect.required = false;
+        }
+      });
+    }
+
+    // Guardar evento base y autorrellenar campos del formulario principal
+    saveBtn.addEventListener("click", async (e) => {
+      e.preventDefault();
+
+      const data = {
+        titulo: modalTituloInput.value.trim(),
+        tipo: modalTipoSelect.value,
+        institucion: modalInstitucionSelect.value,
+        pais: modalPaisInput.value.trim(),
+        provincia: modalProvinciaSelect.value,
+      };
+
+      try {
+        const response = await fetch("/Investigador/api_crear_evento_base/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": getCookie("csrftoken"),
+          },
+          body: new URLSearchParams(data).toString(),
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+          console.error("Errores:", result.errors);
+          alert("Error al crear el evento: " + JSON.stringify(result.errors));
+          return;
+        }
+
+      const evento = result.evento_base;
+
+      // Autorrellenar campos del formulario principal
+      if (mainTituloInput) mainTituloInput.value = evento.titulo;
+      if (mainTipoSelect) mainTipoSelect.value = evento.tipo;
+      if (mainInstitucionSelect) mainInstitucionSelect.value = evento.institucion.id || evento.institucion;
+      if (mainPaisInput) mainPaisInput.value = evento.pais;
+      if (mainProvinciaSelect) mainProvinciaSelect.value = evento.provincia || '';
+
+       const mainProvinciaContainer = mainProvinciaSelect.closest(".col-md-6");
+
+      // Mostrar u ocultar select de provincia según país
+      if (mainPaisInput.value.trim().toLowerCase() === "cuba") {
+        if (mainProvinciaContainer) mainProvinciaContainer.style.display = "block";
+        mainProvinciaSelect.required = true;
+      } else {
+        if (mainProvinciaContainer) mainProvinciaContainer.style.display = "none";
+        mainProvinciaSelect.required = false;
+        mainProvinciaSelect.value = "";
+      }
+      
+      // Cerrar modal con Bootstrap
+      const modalEl = document.getElementById("modal-evento-base");
+      if (modalEl) {
+        const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modal.hide();
+        document.body.classList.remove('modal-open');
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(b => b.remove());
+      }
+
+    } catch (error) {
+      console.error("Error en la petición:", error);
+      alert("Error en la petición al servidor.");
+    }
+  });
+
+  // Función para obtener CSRF token en Django
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+      const cookies = document.cookie.split(";");
+      for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.startsWith(name + "=")) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+});
+</script>
+<!-- Mostrar provincias solo si el pais es cuba-->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  // Campo país generado por Django
+  const paisInput = document.querySelector("#evento-pais");
+  // Contenedor del campo provincia
+  const provinciaContainer = document.getElementById("evento-provincia-container");
+  // Campo provincia
+  const provinciaSelect = document.querySelector("#evento-provincia");
+
+
+
+  if (!paisInput || !provinciaContainer || !provinciaSelect) return;
+
+  // Función que decide si mostrar el select de provincia
+  function actualizarProvincia() {
+    const paisValue = paisInput.value.trim().toLowerCase();
+    if (paisValue === "cuba") {
+      provinciaContainer.style.display = "block";
+      provinciaSelect.required = true;
+    } else {
+      provinciaContainer.style.display = "none";
+      provinciaSelect.value = "";
+      provinciaSelect.required = false;
+    }
+  }
+
+  // Ocultar al cargar
+  actualizarProvincia();
+
+  // Detectar cambios manuales
+  paisInput.addEventListener("input", actualizarProvincia);
+  paisInput.addEventListener("change", actualizarProvincia);
+
+  // Detectar cambios por autocompletado o evento base (si el valor se setea por JS)
+  const observer = new MutationObserver(() => {
+    actualizarProvincia();
+  });
+  observer.observe(paisInput, { attributes: true, attributeFilter: ["value"] });
+});
+</script>
+<!-- Proyecto -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const proyectoSwitch = document.getElementById('proyecto-switch');
+    const proyectoContainer = document.getElementById('proyecto-select-container');
+    const proyectoSelect = document.getElementById('id_proyecto');
+    const proyectoStatus = document.getElementById('proyecto-status'); // Added status element
+
+    if (proyectoSwitch) {
+      proyectoContainer.classList.toggle('visible', proyectoSwitch.checked);
+      if (proyectoStatus) {
+        proyectoStatus.textContent = proyectoSwitch.checked ? 'Sí' : 'No';
+      }
+
+      proyectoSwitch.addEventListener('change', function () {
+        const isChecked = this.checked;
+        proyectoContainer.classList.toggle('visible', isChecked);
+
+        if (proyectoStatus) {
+          proyectoStatus.textContent = isChecked ? 'Sí' : 'No';
+        }
+
+        if (!isChecked) {
+          proyectoSelect.value = '';
+        } else {
+          setTimeout(() => proyectoSelect.focus(), 300);
+        }
+      });
+
+      document.getElementById('formu')?.addEventListener('submit', function (e) {
+        if (proyectoSwitch.checked && !proyectoSelect.value) {
+          e.preventDefault();
+          alert('Por favor seleccione un proyecto o desactive la opción "¿Pertenece a un proyecto?"');
+          proyectoSelect.focus();
+        }
+      });
+    }
+  });
+</script> 
+<!-- Autores -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const searchInput = document.getElementById('user-search');
+      const dropdown = document.getElementById('user-dropdown');
+      const selectedUsersContainer = document.getElementById('selected-users');
+      const hiddenSelect = document.querySelector('select[name="autores"]');
+      const selectedUsers = new Map();
+      const currentUserId = '{{ user.id }}';
+      const currentUserName = '{{ user.get_full_name|default:user.username }}';
+    
+      // Cargar usuarios seleccionados inicialmente
+      if (hiddenSelect) {
+        Array.from(hiddenSelect.selectedOptions).forEach(option => {
+          selectedUsers.set(option.value, {
+            id: option.value,
+            name: option.textContent
+          });
+        });
+      }
+    
+      // Añadir usuario actual si no está seleccionado
+      if (currentUserId && !selectedUsers.has(currentUserId)) {
+        selectedUsers.set(currentUserId, {
+          id: currentUserId,
+          name: currentUserName
+        });
+      }
+    
+      function updateSelectedUsers() {
+        selectedUsersContainer.innerHTML = '';
+        selectedUsers.forEach(user => {
+          const badge = document.createElement('span');
+          badge.className = 'item-badge';
+          const displayName = (user.id === currentUserId) ? `${user.name} (Tú)` : user.name;
+          badge.textContent = displayName;
+
+          if (user.id !== currentUserId) {
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.textContent = '×';
+            removeBtn.onclick = (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              selectedUsers.delete(user.id);
+              updateSelectedUsers();
+              updateHiddenSelect();
+            };
+            badge.appendChild(removeBtn);
+          }
+
+          selectedUsersContainer.appendChild(badge);
+        });
+      }
+
+      function updateHiddenSelect() {
+        if (!hiddenSelect) return;
+        
+        Array.from(hiddenSelect.options).forEach(option => option.selected = false);
+        
+        selectedUsers.forEach(user => {
+          let opt = hiddenSelect.querySelector(`option[value="${user.id}"]`);
+          if (!opt) {
+            opt = new Option(user.name, user.id, true, true);
+            if (user.is_colaborador) opt.dataset.tipo = "colaborador";
+            hiddenSelect.appendChild(opt);
+          }
+          opt.selected = true;
+        });
+        
+        hiddenSelect.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    
+      // Buscar usuarios
+      async function searchUsers(query) {
+        try {
+          dropdown.innerHTML = '<div class="p-2 text-center">Buscando usuarios...</div>';
+          dropdown.style.display = 'block';
+          
+          const response = await fetch(`/Investigador/api_usuarios/?search=${encodeURIComponent(query)}`);
+          if (!response.ok) throw new Error('Error en la respuesta del servidor');
+          
+          const users = await response.json();
+          dropdown.innerHTML = '';
+          
+          if (users.length === 0) {
+            const noResults = document.createElement('div');
+            noResults.className = 'p-2 text-center';
+            noResults.textContent = 'No se encontraron usuarios';
+            dropdown.appendChild(noResults);
+            return;
+          }
+          
+          users.forEach(user => {
+            const item = document.createElement('div');
+            item.className = 'select-item';
+            
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'item-title';
+            nameDiv.textContent = user.name;
+            
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'item-info';
+            
+            const infoTexts = [];
+            if (user.carnet) infoTexts.push(`Carnet: ${user.carnet}`);
+            if (user.area) infoTexts.push(`Área: ${user.area}`);
+            if (user.departamento) infoTexts.push(`Depto: ${user.departamento}`);
+            
+            infoDiv.textContent = infoTexts.join(' | ');
+            item.appendChild(nameDiv);
+            if (infoTexts.length > 0) item.appendChild(infoDiv);
+            
+            const tipo = user.tipo || "usuario"; // tu API debería devolver "usuario" o "colaborador"
+            const userKey = `${tipo}-${user.id}`;
+
+            if (selectedUsers.has(user.id.toString())) {
+              item.classList.add('selected');
+              item.style.backgroundColor = '#e9ecef';
+            }
+    
+            const isCurrentUser = user.id.toString() === currentUserId;
+            if (isCurrentUser) {
+              item.classList.add('disabled');
+              item.style.opacity = '0.7';
+              item.style.cursor = 'not-allowed';
+            }
+    
+            item.onclick = () => {
+              if (isCurrentUser) {
+                alert('No puedes eliminarte a ti mismo como autor.');
+                return;
+              }
+              
+              if (selectedUsers.has(userKey)) {
+                selectedUsers.delete(userKey);
+              } else {
+                selectedUsers.set(userKey, {
+                  id: userKey,
+                  name: user.full_name || user.name,
+                  is_colaborador: tipo === "colaborador"
+                });
+              }
+
+              updateSelectedUsers();
+              updateHiddenSelect();
+            };
+    
+            dropdown.appendChild(item);
+          });
+        } catch (error) {
+          console.error('Error al buscar usuarios:', error);
+          dropdown.innerHTML = '<div class="p-2 text-center text-danger">Error al buscar usuarios</div>';
+        }
+      }
+    
+      // Event listeners para selector de participantes
+      if (searchInput) {
+        searchInput.addEventListener('focus', () => {
+          if (searchInput.value.trim() === '') searchUsers('');
+          else dropdown.style.display = 'block';
+        });
+    
+        searchInput.addEventListener('input', () => {
+          const query = searchInput.value.trim();
+          searchUsers(query);
+        });
+    
+        searchInput.addEventListener('blur', () => {
+          setTimeout(() => { dropdown.style.display = 'none'; }, 200);
+        });
+    
+        dropdown.addEventListener('mousedown', (e) => e.preventDefault());
+      }
+    
+      // Inicializar
+      updateSelectedUsers();
+      updateHiddenSelect();
+});
+</script> 
+{% endblock %}

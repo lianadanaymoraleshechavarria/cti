@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Container CSS -->
+{% block css %}
+<link rel="stylesheet" href=" {% static 'Plataforma/css/estilobeta.css' %}">
+{% endblock %}
+<!-- End Container CSS -->
+
+{% block content %}
+<div class="container-form">
+    <div class="form">
+        <div class="contact-form">
+            <form action="{% url 'tipo_premio_create_ajax' %}" method="POST">
+                {% csrf_token %}
+                <h3 class="title">Nuevo Tipo de Premio</h3>
+                
+                <!-- Nombre -->
+                <div class="input-container">
+                    <input type="text" name="nombre" class="input" required id="id_nombre" value="{{ form.nombre.value|default_if_none:'' }}">
+                    <label for="id_nombre">Nombre</label>
+                    <span>Nombre</span>
+                    {% if form.nombre.errors %}
+                        <div class="text-danger">{{ form.nombre.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="input-container">
+                    <input name="institucion" class="input" id="id_institucion" value="{{ form.institucion.value|default_if_none:'' }}" />
+                    <label for="id_institucion">Institución</label>
+                    <span>Institución</span>
+                    {% if form.institucion.errors %}
+                        <div class="text-danger">{{ form.institucion.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="btn">
+                    <input type="submit" value="Crear" class="btn1" id="boton">
+                    <a href="{% url 'TipoEvento_List' %}" class="btn2">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- Container JS -->
+{% block js %}
+<script src="{% static 'Plataforma/js/FormularioSelect.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault(); // evitar el envío normal del formulario
+
+        const nombre = document.getElementById('id_nombre').value.trim();
+        const institucion = document.getElementById('id_institucion').value.trim();
+
+        if (!nombre) {
+            alert('Por favor complete el nombre del tipo de premio');
+            return;
+        }
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: new URLSearchParams({
+                'nombre': nombre,
+                'institucion': institucion
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Tipo de premio creado con ID: " + data.id);
+                form.reset();
+            } else {
+                alert("Error: " + JSON.stringify(data.errors || data.message));
+            }
+        });
+    });
+
+    // Auto cerrar alertas
+    setTimeout(() => {
+        document.querySelectorAll('.alert').forEach(alert => {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 5000);
+});
+</script>
+
+{% endblock %}

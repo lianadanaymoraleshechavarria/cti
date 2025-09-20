@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Container CSS -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'Plataforma/css/estilobeta.css' %}">
+<style>
+    .error-message {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    #error-container {
+        margin: 0 auto;
+        max-width: 600px;
+    }
+    .alert {
+        margin-bottom: 20px;
+    }
+    .select-container {
+        position: relative;
+        margin: 1rem 0;
+    }
+    .select-container select {
+        width: 100%;
+        padding: 0.8rem;
+        border: 1.5px solid #bbb;
+        border-radius: 5px;
+        outline: none;
+        font-size: 0.95rem;
+        transition: all 0.3s;
+    }
+    .select-container label {
+        position: absolute;
+        left: 10px;
+        top: -10px;
+        background-color: white;
+        padding: 0 5px;
+        font-size: 0.9rem;
+        color: #666;
+        transition: all 0.3s;
+    }
+    .select-container select:focus {
+        border-color: #007bff;
+    }
+    .select-container select:focus + label {
+        color: #007bff;
+    }
+
+    .btn1:hover{
+        background-color: transparent;
+        color: #585252;
+    }
+
+</style>
+{% endblock %}
+<!-- End Container CSS -->
+
+{% block content %}
+<div id="error-container">
+    {% if form.errors %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Por favor corrige los errores siguientes:</strong>
+            <ul class="mb-0">
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <li>{{ field.label }}: {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endif %}
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<div class="container-form">
+    <div class="form">
+        <div class="contact-form">
+            <span class="circle one"></span>
+            <span class="circle two"></span>
+            <form action="." method="POST" id="departamento-form">
+                {% csrf_token %}
+                <h3 class="title">Editar departamento</h3>
+                
+                <div class="input-container {% if form.nombre_departamento.value %}focus{% endif %}">
+                    <input 
+                        type="text" 
+                        name="{{ form.nombre_departamento.name }}" 
+                        id="{{ form.nombre_departamento.id_for_label }}" 
+                        class="input" 
+                        value="{{ form.nombre_departamento.value|default_if_none:'' }}"
+                        {% if form.nombre_departamento.field.required %}required{% endif %}>
+                    <label for="{{ form.nombre_departamento.id_for_label }}">Nombre del departamento</label>
+                    <span>Nombre del departamento</span>
+                    <div id="nombre-error" class="error-message">
+                        {% for error in form.nombre_departamento.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div class="select-container">
+                    <select 
+                        name="{{ form.area.name }}" 
+                        id="{{ form.area.id_for_label }}"
+                        {% if form.area.field.required %}required{% endif %}>
+                        <option value="">Seleccione un área</option>
+                        {% for choice in form.area.field.choices %}
+                            <option value="{{ choice.0 }}" 
+                                {% if form.area.value|stringformat:"s" == choice.0|stringformat:"s" %}selected{% endif %}>
+                                {{ choice.1 }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <label for="{{ form.area.id_for_label }}">Área</label>
+                    <div id="area-error" class="error-message">
+                        {% for error in form.area.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <input type="submit" value="Actualizar Departamento" class="btn1" id="boton">
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- Container JS -->
+{% block js %}
+<script src="{% static 'Plataforma/js/FormularioSelect.js' %}"></script>
+<script>
+$(document).ready(function() {
+    // Form validation
+    $('#departamento-form').on('submit', function(e) {
+        let isValid = true;
+        const nombre = $('#id_nombre_departamento').val().trim();
+        
+        // Clear previous errors
+        $('.error-message').text('');
+        
+        // Validate nombre_departamento
+        if (nombre === '') {
+            $('#nombre-error').text('Este campo es obligatorio');
+            isValid = false;
+        } else if (nombre.length > 50) {
+            $('#nombre-error').text('El nombre no puede exceder los 50 caracteres');
+            isValid = false;
+        }
+        
+        // Validate area (if required)
+        {% if form.area.field.required %}
+        const area = $('#id_area').val();
+        if (!area) {
+            $('#area-error').text('Debe seleccionar un área');
+            isValid = false;
+        }
+        {% endif %}
+        
+        if (!isValid) {
+            e.preventDefault();
+        }
+    });
+
+    // Input animation
+    const inputs = document.querySelectorAll(".input");
+    
+    function focusFunc() {
+        let parent = this.parentNode;
+        parent.classList.add("focus");
+    }
+    
+    function blurFunc() {
+        let parent = this.parentNode;
+        if (this.value == "") {
+            parent.classList.remove("focus");
+        }
+    }
+    
+    inputs.forEach((input) => {
+        input.addEventListener("focus", focusFunc);
+        input.addEventListener("blur", blurFunc);
+    });
+
+    // Initialize fields with focus if they have value
+    $('.input-container input').each(function() {
+        if ($(this).val() !== '') {
+            $(this).parent().addClass('focus');
+        }
+    });
+});
+</script>
+{% endblock %}

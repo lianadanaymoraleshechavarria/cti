@@ -1,0 +1,937 @@
+{% load static %}
+
+<!-- Sidebar -->
+<div id="bdSidebar"
+    class="d-flex flex-column flex-shrink-0 pt-0 pb-0 text-white offcanvas-md offcanvas-start responsivo"
+    style="width: 17%; height: 100vh; overflow-y: auto;">
+    <!-- Modificar la estructura del enlace del logo para asegurar que sea clickeable -->
+    {% if user.is_superuser or user.Administrador%}
+    <a href="{% url 'Dashboard_Admin' %}" %}>
+        <img src="{% static 'img/Id UHo-03-white.png' %}" width="200" height="80px" alt="Universidad de Holguín">
+    </a>
+
+    {% elif user.rol == 'Investigador' %}
+    <a href="{% url 'Dashboard_Investigador' %}" %}>
+        <img src="{% static 'img/Id UHo-03-white.png' %}" width="200" height="80px" alt="Universidad de Holguín">
+    </a>
+
+    {% elif user.rol == 'Vicerrector' %}
+    <a href="{% url 'Dashboard_Vicerrector' %}" %}>
+        <img src="{% static 'img/Id UHo-03-white.png' %}" width="200" height="80px" alt="Universidad de Holguín">
+    </a>
+    {% elif user.rol == 'Jefe_departamento' %}
+    <a href="{% url 'Dashboard_JefeDepartamento' %}" %}>
+        <img src="{% static 'img/Id UHo-03-white.png' %}" width="200" height="80px" alt="Universidad de Holguín">
+    </a>
+    {% elif user.rol == 'Jefe_area' %}
+    <a href="{% url 'Dashboard_JefeArea' %}" %}>
+
+        <img src="{% static 'img/Id UHo-03-white.png' %}" width="200" height="80px" alt="Universidad de Holguín">
+    </a>
+
+    {% else %}
+    <a href="#" class="navbar-brand">
+        <img src="{% static 'img/Id UHo-03-white.png' %}" width="200" height="80px" alt="Universidad de Holguín">
+    </a>
+    {% endif %}
+    <hr>
+    {% if user.is_superuser or user.Administrador%}
+    <ul class="mynav nav nav-pills flex-column mb-auto p-2">
+        <li class="nav-item mb-1" aria-label="">
+            <a href="#" class="usuario">
+                <i class="bi bi-person-circle mx-1"></i>
+                Bienvenido, <strong>{{ user.username }}</strong>
+            </a>
+        </li>
+        <!-- Icono de notificaciones para Admin -->
+        <li class="nav-item mb-1" aria-label="Notificaciones">
+            <a href="{% url 'lista_notificaciones' %}" class="d-flex align-items-center">
+                <div class="notification-icon">
+                    <i class="fas fa-bell text-white"></i>
+                    {% if tiene_notificaciones_no_leidas %}
+                    <span class="notification-badge">{{ contador_notificaciones_no_leidas }}</span>
+                    {% endif %}
+                </div>
+                Notificaciones
+            </a>
+        </li>
+        <li>
+            <a class="nav-link text-white " data-bs-toggle="collapse" aria-expanded="false"
+                data-bs-target="#Gestionar-collapse" aria-controls="contents-collapse">
+                <i class="fas fa-gear text-white"></i> Gestionar <i class="fas fa-angle-down text-white"></i>
+            </a>
+        </li>
+        <ul class="list-unstyled ps-3 collapse" id="Gestionar-collapse">
+            </li>
+            <li class="nav-item mb-1" aria-label="Usuarios">
+                <a href="{% url 'Usuarios' %}" class="">
+                    <i class="fas fa-solid fa-users mx-1"></i>
+                    Usuarios
+                </a>
+            </li>
+            <li class="nav-item mb-1" aria-label="Departamento_List">
+                <a href="{% url 'Departamento_List' %}" class="">
+                    <i class="fas fa-solid fa-users mx-1"></i>
+                    Departamentos
+                </a>
+            </li>
+            <li class="nav-item mb-1" aria-label="Area_List">
+                <a href="{% url 'Area_List' %}" class="">
+                    <i class="fas fa-solid fa-users mx-1"></i>
+                    Areas
+                </a>
+            </li>
+
+            <a class="nav-link text-white " data-bs-toggle="collapse" aria-expanded="false"
+                data-bs-target="#Opciones-collapse" aria-controls="contents-collapse">
+                <i class="fas fa-edit text-white"></i> Editar Opciones
+                <i class="fas fa-angle-down text-white"></i></b>
+            </a>
+            </li>
+            <ul class="list-unstyled ps-3 collapse" id="Opciones-collapse">
+
+                <li class="nav-item mb-1" aria-label="editar_nombres_roles">
+                    <a href="{% url 'editar_nombres_roles' %}" class="">
+                        Roles
+                    </a>
+                </li>
+                <li class="nav-item mb-1" aria-label="Cargo_List">
+                    <a href="{% url 'Cargo_List' %}" class="">
+                        Cargo
+                    </a>
+                </li>
+                <li class="nav-item mb-1" aria-label="CategoriaCientificaList">
+                    <a href="{% url 'CategoriaCientificaList' %}" class="">
+                        Categorias Cientificas
+                    </a>
+                </li>
+                <li class="nav-item mb-1" aria-label="CategoriaDocenteList">
+                    <a href="{% url 'CategoriaDocenteList' %}" class="">
+                        Categorias Docentes
+                    </a>
+                </li>
+                <li class="nav-item mb-1" aria-label="BasesDastos">
+                    <a href="{% url 'BasesDatosList' %}" class="">
+                        Bases de datos
+                    </a>
+                </li>
+                <li class="nav-item mb-1" aria-label="TipoEvento_List">
+                    <a href="{% url 'TipoEvento_List' %}" class="">
+                        Tipos de Eventos
+                    </a>
+                </li>
+                <li class="nav-item mb-1" aria-label="CarcterEvento_List">
+                    <a href="{% url 'CarcterEvento_List' %}" class="">
+                        Carácteres de Eventos
+                    </a>
+                </li>
+
+                <li class="nav-item mb-1" aria-label="Modalidad_List">
+                    <a href="{% url 'Modalidad_List' %}" class="">
+                        Modalidades de Eventos
+                    </a>
+                </li>
+
+                <li class="nav-item mb-1" aria-label="TipoPremio_List">
+                    <a href="{% url 'TipoPremio_List' %}" class="">
+                        Tipos de Premios
+                    </a>
+                </li>
+                <li class="nav-item mb-1" aria-label="CaracterPremio_List">
+                    <a href="{% url 'CaracterPremio_List' %}" class="">
+                        Carácteres de Premios
+                    </a>
+                </li>
+                <li class="nav-item mb-1" aria-label="Revista_Libro_Conferencia_List">
+                    <a href="{% url 'Revista_Libro_Conferencia_List' %}" class="">
+                        Crear Revistas, Libro u otros.
+                    </a>
+                </li>
+            </ul>
+        </ul>
+
+        <li class="nav-item mb-1" aria-label="Artículos">
+            <a href="{% url 'Articulo_List_Admin' %}" class="">
+                <i class="fa-solid fa-scroll"></i>
+                Artículos
+            </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+            <a href="{% url 'Evento_List_Admin' %}" class="">
+                <i class="fas fa-people-group "></i>
+                Eventos
+            </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+            <a href="{% url 'Premio_List_Admin' %}" class="">
+                <i class="fas fa-award "></i>
+                Premios
+            </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+            <a href="{% url 'Proyecto_List_Admin' %}" class="">
+                <i class="fas fa-shapes"></i>
+                Proyectos
+            </a>
+        </li>
+
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+            <a href="{% url 'Programa_List_Admin' %}" class="">
+                <i class="fas fa-check-circle "></i>
+                Programas
+            </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="Usuarios">
+            <a href="{% url 'reporte' %}" class="">
+                <i class="fa fa-area-chart" aria-hidden="true"></i>
+                Reportes
+            </a>
+        </li>
+    </ul>
+    <hr class="mb-0">
+    <div>
+        <ul class="mynav nav nav-pills flex-column mb-auto p-2">
+            <li class="nav-item mb-1 " aria-label="CerrarSesion">
+                <a class="" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    Cerrar Sesión
+                </a>
+            </li>
+        </ul>
+    </div>
+    {% endif %}
+
+    {% if user.rol == 'Investigador' %}
+    <ul class="mynav nav nav-pills flex-column mb-auto p-2">
+        <li class="nav-item mb-1" aria-label="">
+            <a href="#" class="usuario">
+                <i class="bi bi-person-circle mx-1"></i>
+                Bienvenido, Investigador: <strong>{{ user.username }}</strong>
+            </a>
+
+        <li class="nav-item mb-1" aria-label="Notificaciones">
+            <a href="{% url 'lista_notificaciones' %}" class="d-flex align-items-center">
+                <div class="notification-icon">
+                    <i class="fas fa-bell text-white"></i>
+                    {% if tiene_notificaciones_no_leidas %}
+                    <span class="notification-badge">{{ contador_notificaciones_no_leidas }}</span>
+                    {% endif %}
+                </div> Notificaciones
+            </a>
+        </li>
+        <li>
+            <a class="nav-link text-white " data-bs-toggle="collapse" aria-expanded="false"
+                data-bs-target="#Perfil-collapse" aria-controls="contents-collapse">
+                <i class="fas fa-user-graduate text-white"></i>
+                Mi Perfil Académico
+                <i class="fas fa-angle-down text-white"></i>
+            </a>
+        </li>
+        <ul class="list-unstyled ps-3 collapse" id="Perfil-collapse">
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Perfil_Detail_Investigador' %}" class="">
+                    <i class="fas fa-user"></i>
+                    Perfil
+                </a>
+            </li>
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Colaboradores_List' %}" class="">
+                    <i class="fas  fa-people-group"></i>
+                    Colaboradores
+                </a>
+            </li>
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Colaboradores_List' %}" class="">
+                    <i class="fas fa-chart-bar"></i>
+                    Resultados en Proyectos
+                </a>
+            </li>
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Colaboradores_List' %}" class="">
+                    <i class="fas  fa-school"></i>
+                    Programas
+                </a>
+            </li>
+        </ul>
+
+        </li>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+            <a href="{% url 'Curriculo_List_Investigador' %}" class="">
+                <i class="fas  fa-id-card text-white"></i>
+                Mi Currículo
+            </a>
+        </li>
+
+        <li class="nav-item mb-1" aria-label="Artículos">
+            <a href="{% url 'Articulo_List_Investigador' %}" class="">
+                <i class="fa-solid fa-scroll"></i>
+                Mis Artículos
+            </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+            <a href="{% url 'Evento_List_Investigador' %}" class="">
+                <i class="fas fa-calendar"></i>
+                Mis Eventos
+            </a>
+        </li>
+
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+            <a href="{% url 'Premio_List_Investigador' %}" class="">
+                <i class="fas  fa-award"></i>
+                Mis Premios
+            </a>
+        </li>
+    </ul>
+    <hr class="mb-0">
+    <div>
+        <ul class="mynav nav nav-pills flex-column mb-auto p-2">
+            <li class="nav-item mb-1 " aria-label="CerrarSesion">
+                <a class="" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    Cerrar Sesión
+                </a>
+            </li>
+        </ul>
+    </div>
+    {% endif %}
+
+    {% if user.rol == 'Vicerrector' %}
+    <ul class="mynav nav nav-pills flex-column mb-auto p-2">
+        <li class="nav-item mb-1" aria-label="">
+            <a href="#" class="usuario">
+                <i class="bi bi-person-circle mx-1"></i>
+                Bienvenido, Vicerrector: <strong>{{ user.username }}</strong>
+            </a>
+        </li>
+
+        <!-- Icono de notificaciones para Vicerrector -->
+        <li class="nav-item mb-1" aria-label="Notificaciones">
+            <a href="{% url 'lista_notificaciones' %}" class="d-flex align-items-center">
+                <div class="notification-icon">
+                    <i class="fas fa-bell text-white"></i>
+                    {% if tiene_notificaciones_no_leidas %}
+                    <span class="notification-badge">{{ contador_notificaciones_no_leidas }}</span>
+                    {% endif %}
+                </div> Notificaciones
+            </a>
+        </li>
+
+        <li class="nav-item mb-1" aria-label="MisTramites">
+            <a href="{% url 'Perfil_Detail_Investigador' %}" data-bs-toggle="collapse" aria-expanded="false"
+                data-bs-target="#Perfil-collapse" aria-controls="contents-collapse">
+                <i class="fas fa-user-graduate text-white"></i>
+                Mi Perfil Académico
+                <i class="fas fa-angle-down text-white"></i>
+            </a>
+        </li>
+        <ul class="list-unstyled ps-3 collapse" id="Perfil-collapse">
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Perfil_Detail_Investigador' %}" class="">
+                    <i class="fas fa-user"></i>
+                    Perfil
+                </a>
+            </li>
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Colaboradores_List' %}" class="">
+                    <i class="fas  fa-people-group"></i>
+                    Colaboradores
+                </a>
+            </li>
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Colaboradores_List' %}" class="">
+                    <i class="fas fa-chart-bar"></i>
+                    Resultados en Proyectos
+                </a>
+            </li>
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Colaboradores_List' %}" class="">
+                    <i class="fas  fa-school"></i>
+                    Programas
+                </a>
+            </li>
+        </ul>
+        </li>
+
+        <li>
+            <a class="nav-link text-white " data-bs-toggle="collapse" aria-expanded="false"
+                data-bs-target="#Publicaciones-collapse" aria-controls="contents-collapse">
+                <i class="fas fa-list text-white"></i> Mis Marcadores <i class="fas fa-angle-down text-white"></i>
+            </a>
+        </li>
+        <ul class="list-unstyled ps-3 collapse" id="Publicaciones-collapse">
+
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Curriculo_List_Investigador' %}" class="">
+                    <i class="fas  fa-id-card text-white"></i>
+                    Mi Currículo
+                </a>
+            </li>
+
+            <li class="nav-item mb-1" aria-label="Artículos">
+                <a href="{% url 'Articulo_List_Investigador' %}" class="">
+                    <i class="fa-solid fa-scroll"></i>
+                    Mis Artículos
+                </a>
+            </li>
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Evento_List_Investigador' %}" class="">
+                    <i class="fas fa-calendar"></i>
+                    Mis Eventos
+                </a>
+            </li>
+
+
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Premio_List_Investigador' %}" class="">
+                    <i class="fas  fa-award"></i>
+                    Mis Premios
+                </a>
+            </li>
+        </ul>
+        <li>
+            <a class="nav-link text-white " data-bs-toggle="collapse" aria-expanded="false"
+                data-bs-target="#Gestionar-collapse" aria-controls="contents-collapse">
+                <i class="fas fa-gear text-white"></i> Gestionar <i class="fas fa-angle-down text-white"></i>
+            </a>
+        </li>
+        <ul class="list-unstyled ps-3 collapse" id="Gestionar-collapse">
+            </li>
+            <li class="nav-item mb-1" aria-label="Usuarios">
+                <a href="{% url 'Usuarios' %}" class="">
+                    <i class="fas fa-solid fa-users mx-1"></i>
+                    Usuarios
+                </a>
+            </li>
+            <li class="nav-item mb-1" aria-label="Departamento_List">
+                <a href="{% url 'Departamento_List' %}" class="">
+                    <i class="fas fa-solid fa-users mx-1"></i>
+                    Departamentos
+                </a>
+            </li>
+            <li class="nav-item mb-1" aria-label="Area_List">
+                <a href="{% url 'Area_List' %}" class="">
+                    <i class="fas fa-solid fa-users mx-1"></i>
+                    Areas
+                </a>
+            </li>
+
+            <a class="nav-link text-white " data-bs-toggle="collapse" aria-expanded="false"
+                data-bs-target="#Opciones-collapse" aria-controls="contents-collapse">
+                <i class="fas fa-edit text-white"></i> Editar Opciones
+                <i class="fas fa-angle-down text-white"></i></b>
+            </a>
+            </li>
+            <ul class="list-unstyled ps-3 collapse" id="Opciones-collapse">
+
+                <li class="nav-item mb-1" aria-label="editar_nombres_roles">
+                    <a href="{% url 'editar_nombres_roles' %}" class="">
+                        Roles
+                    </a>
+                </li>
+                <li class="nav-item mb-1" aria-label="Cargo_List">
+                    <a href="{% url 'Cargo_List' %}" class="">
+                        Cargo
+                    </a>
+                </li>
+                <li class="nav-item mb-1" aria-label="CategoriaCientificaList">
+                    <a href="{% url 'CategoriaCientificaList' %}" class="">
+                        Categorias Cientificas
+                    </a>
+                </li>
+                <li class="nav-item mb-1" aria-label="CategoriaDocenteList">
+                    <a href="{% url 'CategoriaDocenteList' %}" class="">
+                        Categorias Docentes
+                    </a>
+                </li>
+                <li class="nav-item mb-1" aria-label="BasesDastos">
+                    <a href="{% url 'BasesDatosList' %}" class="">
+                        Bases de datos
+                    </a>
+                </li>
+                <li class="nav-item mb-1" aria-label="TipoEvento_List">
+                    <a href="{% url 'TipoEvento_List' %}" class="">
+                        Tipos de Eventos
+                    </a>
+                </li>
+                <li class="nav-item mb-1" aria-label="CarcterEvento_List">
+                    <a href="{% url 'CarcterEvento_List' %}" class="">
+                        Carácteres de Eventos
+                    </a>
+                </li>
+
+                <li class="nav-item mb-1" aria-label="Modalidad_List">
+                    <a href="{% url 'Modalidad_List' %}" class="">
+                        Modalidades de Eventos
+                    </a>
+                </li>
+
+                <li class="nav-item mb-1" aria-label="TipoPremio_List">
+                    <a href="{% url 'TipoPremio_List' %}" class="">
+                        Tipos de Premios
+                    </a>
+                </li>
+                <li class="nav-item mb-1" aria-label="CaracterPremio_List">
+                    <a href="{% url 'CaracterPremio_List' %}" class="">
+                        Carácteres de Premios
+                    </a>
+                </li>
+                <li class="nav-item mb-1" aria-label="Revista_Libro_Conferencia_List">
+                    <a href="{% url 'Revista_Libro_Conferencia_List' %}" class="">
+                        Crear Revistas, Libro u otros.
+                    </a>
+                </li>
+            </ul>
+        </ul>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+            <a href="{% url 'Articulo_List_Vicerrector' %}" class="">
+                <i class="fa-solid fa-scroll"></i>
+                Artículos
+            </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+            <a href="{% url 'Evento_List_Vicerrector' %}" class="">
+                <i class="fas fa-calendar"></i>
+                Eventos
+            </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="Premio">
+            <a href="{% url 'Premio_List_Vicerrector' %}" class="">
+                <i class="fas fa-award"></i>
+                Premios
+            </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="Proyectos">
+            <a href="{% url 'Proyecto_List_Vicerrector' %}" class="">
+                <i class="fas fa-shapes"></i>
+                Proyectos
+            </a>
+        </li>
+
+        <li class="nav-item mb-1" aria-label="Programa List">
+            <a href="{% url 'Programa_List_Vicerrector' %}" class="">
+                <i class="fas fa-check-circle"></i>
+                Programas
+            </a>
+        </li>
+        </li>
+        <li class="nav-item mb-1" aria-label="Usuarios">
+            <a href="{% url 'reporte' %}" class="">
+                <i class="fa fa-area-chart" aria-hidden="true"></i>
+                Reportes
+            </a>
+        </li>
+    </ul>
+    <hr class="mb-0">
+    <div>
+        <ul class="mynav nav nav-pills flex-column mb-auto p-2">
+            <li class="nav-item mb-1 " aria-label="CerrarSesion">
+                <a class="" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    Cerrar Sesión
+                </a>
+            </li>
+        </ul>
+    </div>
+    {% endif %}
+    {% if user.rol == 'Jefe_departamento' %}
+    <ul class="mynav nav nav-pills flex-column mb-auto p-2">
+        <li class="nav-item mb-1" aria-label="">
+            <a href="#" class="usuario">
+                <i class="bi bi-person-circle mx-1"></i>
+                Bienvenido, Jefe del departamento: <strong>{{ user.username }}</strong>
+            </a>
+        </li>
+
+        <!-- Icono de notificaciones para Jefe de Departamento -->
+        <li class="nav-item mb-1" aria-label="Notificaciones">
+            <a href="{% url 'lista_notificaciones' %}" class="d-flex align-items-center">
+                <div class="notification-icon">
+                    <i class="fas fa-bell text-white"></i>
+                    {% if tiene_notificaciones_no_leidas %}
+                    <span class="notification-badge">{{ contador_notificaciones_no_leidas }}</span>
+                    {% endif %}
+                </div>
+                Notificaciones
+            </a>
+        </li>
+
+        <li class="nav-item mb-1" aria-label="MisTramites">
+            <a href="{% url 'Perfil_Detail_Investigador' %}" data-bs-toggle="collapse" aria-expanded="false"
+                data-bs-target="#Perfil-collapse" aria-controls="contents-collapse">
+                <i class="fas fa-user-graduate text-white"></i></i>
+                Mi Perfil Académico
+                <i class="fas fa-angle-down text-white"></i>
+            </a>
+        </li>
+        <ul class="list-unstyled ps-3 collapse" id="Perfil-collapse">
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Perfil_Detail_Investigador' %}" class="">
+                    <i class="fas fa-user"></i>
+                    Perfil
+                </a>
+            </li>
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Colaboradores_List' %}" class="">
+                    <i class="fas  fa-people-group"></i>
+                    Colaboradores
+                </a>
+            </li>
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Colaboradores_List' %}" class="">
+                    <i class="fas fa-chart-bar"></i>
+                    Resultados en Proyectos
+                </a>
+            </li>
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Colaboradores_List' %}" class="">
+                    <i class="fas fa-school"></i>
+                    Programas
+                </a>
+            </li>
+        </ul>
+
+        <li>
+            <a class="nav-link text-white " data-bs-toggle="collapse" aria-expanded="false"
+                data-bs-target="#Publicaciones-collapse" aria-controls="contents-collapse">
+                <i class="fas fa-list text-white"></i> Mis Marcadores <i class="fas fa-angle-down text-white"></i>
+            </a>
+        </li>
+        <ul class="list-unstyled ps-3 collapse" id="Publicaciones-collapse">
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Curriculo_List_Investigador' %}" class="">
+                    <i class="fas  fa-id-card text-white"></i>
+                    Mi Currículo
+                </a>
+            </li>
+
+            <li class="nav-item mb-1" aria-label="Artículos">
+                <a href="{% url 'Articulo_List_Investigador' %}" class="">
+                    <i class="fa-solid fa-scroll"></i>
+                    Mis Artículos
+                </a>
+            </li>
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Evento_List_Investigador' %}" class="">
+                    <i class="fas fa-calendar"></i>
+                    Mis Eventos
+                </a>
+            </li>
+
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Premio_List_Investigador' %}" class="">
+                    <i class="fas  fa-award"></i>
+                    Mis Premios
+                </a>
+            </li>
+        </ul>
+
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+            <a href="{% url 'List_Investigador_JefeDepartamento' %}" class="">
+                <i class="fas fa-flask text-white"></i>
+                Investigadores
+            </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+            <a href="{% url 'Articulo_List_JefeDepartamento' %}" class="">
+                <i class="fa-solid fa-scroll"></i>
+                Artículos
+            </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+            <a href="{% url 'Evento_List_JefeDepartamento' %}" class="">
+                <i class="fas fa-calendar"></i>
+                Eventos
+            </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="Premio">
+            <a href="{% url 'Premio_List_JefeDepartamento' %}" class="">
+                <i class="fas fa-award"></i>
+                Premios
+            </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="Proyectos">
+            <a href="{% url 'Proyecto_List_JefeDepartamento' %}" class="">
+                <i class="fas fa-shapes"></i>
+                Proyectos
+            </a>
+        </li>
+
+        <li class="nav-item mb-1" aria-label="Programa List">
+            <a href="{% url 'Programa_List_JefeDepartamento' %}" class="">
+                <i class="fas fa-check-circle"></i>
+                Programas
+            </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="Usuarios">
+            <a href="{% url 'reporte' %}" class="">
+                <i class="fa fa-area-chart" aria-hidden="true"></i>
+                Reportes
+            </a>
+        </li>
+
+    </ul>
+    <hr class="mb-0">
+    <div>
+        <ul class="mynav nav nav-pills flex-column mb-auto p-2">
+            <li class="nav-item mb-1 " aria-label="CerrarSesion">
+                <a class="" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    Cerrar Sesión
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    {% endif %}
+
+    {% if user.rol == 'Jefe_area' or user.rol == 'jefe de area' %}
+    <ul class="mynav nav nav-pills flex-column mb-auto p-2">
+        <li class="nav-item mb-1" aria-label="">
+            <a href="#" class="usuario">
+                <i class="bi bi-person-circle mx-1"></i>
+                Bienvenido, Jefe del Area: <strong>{{ user.username }}</strong>
+            </a>
+        </li>
+
+        <!-- Icono de notificaciones para Jefe de Área -->
+        <li class="nav-item mb-1" aria-label="Notificaciones">
+            <a href="{% url 'lista_notificaciones' %}" class="d-flex align-items-center">
+                <div class="notification-icon">
+                    <i class="fas fa-bell text-white"></i>
+                    {% if tiene_notificaciones_no_leidas %}
+                    <span class="notification-badge">{{ contador_notificaciones_no_leidas }}</span>
+                    {% endif %}
+                </div>
+                Notificaciones
+            </a>
+        </li>
+
+        <li class="nav-item mb-1" aria-label="MisTramites">
+            <a href="{% url 'Perfil_Detail_Investigador' %}" data-bs-toggle="collapse" aria-expanded="false"
+                data-bs-target="#Perfil-collapse" aria-controls="contents-collapse">
+                <i class="fas fa-user-graduate text-white"></i></i>
+                Mi Perfil Académico
+                <i class="fas fa-angle-down text-white"></i>
+            </a>
+        </li>
+        <ul class="list-unstyled ps-3 collapse" id="Perfil-collapse">
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Perfil_Detail_Investigador' %}" class="">
+                    <i class="fas fa-user"></i>
+                    Perfil
+                </a>
+            </li>
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Colaboradores_List' %}" class="">
+                    <i class="fas  fa-people-group"></i>
+                    Colaboradores
+                </a>
+            </li>
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Colaboradores_List' %}" class="">
+                    <i class="fas fa-chart-bar"></i>
+                    Resultados en Proyectos
+                </a>
+            </li>
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Colaboradores_List' %}" class="">
+                    <i class="fas fa-school"></i>
+                    Programas
+                </a>
+            </li>
+        </ul>
+        <li>
+            <a class="nav-link text-white " data-bs-toggle="collapse" aria-expanded="false"
+                data-bs-target="#Publicaciones-collapse" aria-controls="contents-collapse">
+                <i class="fas fa-list text-white"></i> Mis Marcadores <i class="fas fa-angle-down text-white"></i>
+            </a>
+        </li>
+        <li>
+            <a class="nav-link text-white " data-bs-toggle="collapse" aria-expanded="false"
+                data-bs-target="#Gestionar-collapse" aria-controls="contents-collapse">
+                <i class="fas fa-gear text-white"></i> Gestionar
+                <i class="fas fa-angle-down text-white"></i>
+            </a>
+        </li>
+        <ul class="list-unstyled ps-3 collapse" id="Gestionar-collapse">
+            </li>
+            <li class="nav-item mb-1" aria-label="Usuarios">
+                <a href="{% url 'Usuarios' %}" class="">
+                    <i class="fas fa-solid fa-users mx-1"></i>
+                    Usuarios
+                </a>
+            </li>
+            <li class="nav-item mb-1" aria-label="Departamento_List">
+                <a href="{% url 'Departamento_List' %}" class="">
+                    <i class="fas fa-solid fa-users mx-1"></i>
+                    Departamentos
+                </a>
+            </li>
+            <li class="nav-item mb-1" aria-label="Area_List">
+                <a href="{% url 'Area_List' %}" class="">
+                    <i class="fas fa-solid fa-users mx-1"></i>
+                    Areas
+                </a>
+            </li>
+            <a class="nav-link text-white " data-bs-toggle="collapse" aria-expanded="false"
+                data-bs-target="#Opciones-collapse" aria-controls="contents-collapse">
+                <i class="fas fa-edit text-white"></i> Editar Opciones
+                <i class="fas fa-angle-down text-white"></i></b>
+            </a>
+            </li>
+            <ul class="list-unstyled ps-3 collapse" id="Opciones-collapse">
+
+                <li class="nav-item mb-1" aria-label="editar_nombres_roles">
+                    <a href="{% url 'editar_nombres_roles' %}" class="">
+                        Roles
+                    </a>
+                </li>
+                <li class="nav-item mb-1" aria-label="Cargo_List">
+                    <a href="{% url 'Cargo_List' %}" class="">
+                        Cargo
+                    </a>
+                </li>
+                <li class="nav-item mb-1" aria-label="CategoriaCientificaList">
+                    <a href="{% url 'CategoriaCientificaList' %}" class="">
+                        Categorias Cientificas
+                    </a>
+                </li>
+                <li class="nav-item mb-1" aria-label="CategoriaDocenteList">
+                    <a href="{% url 'CategoriaDocenteList' %}" class="">
+                        Categorias Docentes
+                    </a>
+                </li>
+                <li class="nav-item mb-1" aria-label="BasesDastos">
+                    <a href="{% url 'BasesDatosList' %}" class="">
+                        Bases de datos
+                    </a>
+                </li>
+                <li class="nav-item mb-1" aria-label="TipoEvento_List">
+                    <a href="{% url 'TipoEvento_List' %}" class="">
+                        Tipos de Eventos
+                    </a>
+                </li>
+                <li class="nav-item mb-1" aria-label="CarcterEvento_List">
+                    <a href="{% url 'CarcterEvento_List' %}" class="">
+                        Carácteres de Eventos
+                    </a>
+                </li>
+
+                <li class="nav-item mb-1" aria-label="Modalidad_List">
+                    <a href="{% url 'Modalidad_List' %}" class="">
+                        Modalidades de Eventos
+                    </a>
+                </li>
+
+                <li class="nav-item mb-1" aria-label="TipoPremio_List">
+                    <a href="{% url 'TipoPremio_List' %}" class="">
+                        Tipos de Premios
+                    </a>
+                </li>
+                <li class="nav-item mb-1" aria-label="CaracterPremio_List">
+                    <a href="{% url 'CaracterPremio_List' %}" class="">
+                        Carácteres de Premios
+                    </a>
+                </li>
+                <li class="nav-item mb-1" aria-label="Revista_Libro_Conferencia_List">
+                    <a href="{% url 'Revista_Libro_Conferencia_List' %}" class="">
+                        Crear Revistas, Libro u otros.
+                    </a>
+                </li>
+            </ul>
+        </ul>
+
+        <ul class="list-unstyled ps-3 collapse" id="Publicaciones-collapse">
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Curriculo_List_Investigador' %}" class="">
+                    <i class="fas fa-id-card text-white"></i>
+                    Mi Currículo
+                </a>
+            </li>
+
+            <li class="nav-item mb-1" aria-label="Artículos">
+                <a href="{% url 'Articulo_List_Investigador' %}" class="">
+                    <i class="fa-solid fa-scroll"></i>
+                    Mis Artículos
+                </a>
+            </li>
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Evento_List_Investigador' %}" class="">
+                    <i class="fas fa-calendar"></i>
+                    Mis Eventos
+                </a>
+            </li>
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Premio_List_Investigador' %}" class="">
+                    <i class="fas fa-award"></i>
+                    Mis Premios
+                </a>
+            </li>
+        </ul>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+            <a href="{% url 'Articulo_List_JefeArea' %}" class="">
+                <i class="fa-solid fa-scroll"></i>
+                Artículos
+            </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+            <a href="{% url 'Evento_List_JefeArea' %}" class="">
+                <i class="fas fa-calendar"></i>
+                Eventos
+            </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="Premio">
+            <a href="{% url 'Premio_List_JefeArea' %}" class="">
+                <i class="fas fa-award"></i>
+                Premios
+            </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="Proyectos">
+            <a href="{% url 'Proyecto_List_JefeArea' %}" class="">
+                <i class="fas fa-shapes"></i>
+                Proyectos
+            </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="Programa List">
+            <a href="{% url 'Programa_List_JefeArea' %}" class="">
+                <i class="fas fa-check-circle"></i>
+                Programas
+            </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="Usuarios">
+            <a href="{% url 'reporte' %}" class="">
+                <i class="fa fa-area-chart" aria-hidden="true"></i>
+                Reportes
+            </a>
+        </li>
+    </ul>
+    <hr class="mb-0">
+    <div>
+        <ul class="mynav nav nav-pills flex-column mb-auto p-2">
+            <li class="nav-item mb-1 " aria-label="CerrarSesion">
+                <a class="" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    Cerrar Sesión
+                </a>
+            </li>
+        </ul>
+    </div>
+    {% endif %}
+
+</div>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"><i class="bi bi-exclamation-triangle"></i>
+                    Advertencia</h5>
+                <button type="button" class="btn-close cerrar" data-bs-dismiss="modal" aria-label="Close"
+                    style="box-shadow: none"></button>
+            </div>
+            <div class="modal-body">
+                ¿Desea cerrar esta sesión?
+            </div>
+            <div class="modal-footer">
+
+                <a href="{% url 'CerrarSesion' %}" class="btn btn-primary">Aceptar</a>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>

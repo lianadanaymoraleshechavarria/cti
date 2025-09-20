@@ -1,0 +1,67 @@
+{% load static%}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Conatiner CSS -->
+    <link rel="stylesheet" href="{% static 'Usuarios/css/Login.css' %}">
+    <link rel="stylesheet" href="{% static 'Usuarios/libs/boxicons-2.1.4/css/boxicons.min.css' %}">
+    <link rel="stylesheet" href="{% static 'Usuarios/libs/Bootstrap/css/bootstrap.min.css' %}">
+    <link rel="icon" type="image/png" sizes="50x50" href="{% static 'Usuarios/img/Id UHo-03.png' %}">
+    <!-- End Conatiner CSS -->
+    <title>Sistema de gestión de resultados e indicadores de Ciencia, Tecnología e 
+        Innovación de la Universidad de Holguín</title>
+</head>
+
+<body>  
+    <div class="container">  
+        {% if response %}
+        {% if response == 'incorrecto' %}
+        <div style="height:40px; position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem;"
+            class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button style="font-size: 10px; border-bottom: none; position: relative; box-shadow: none;" type="button"
+                class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </button>
+        </div>
+        {% endif %}
+        {% endif %}
+        <div class="login-container">
+            <form action="" method="POST">
+                {% csrf_token %}
+                <img class="logo" style="margin-left:50px;" src="{% static 'Usuarios/img/Id UHo-01.png' %}" alt="">
+                <h2 style="color:#222e58;">Restablecer Contraseña</h2>
+                <div class="text">
+                    <p>¿Olvidaste tu contraseña? </br>
+                        Ingrese su dirección de correo electrónico y le enviaremos las instrucciones para configurar una
+                        nueva.</p>
+                </div>
+                <div class="input-container">
+                    {% for i in form %}
+                        {{ i }}
+                        {% endfor %}
+                    <label for="">Email</label>
+                    <span>Email</span>
+                  </div>
+                <a class="a" href="{% url 'Login' %}">¿Recordaste la contraseña?</a>
+                <input type="submit" class="btn1" id="boton" value="Restablecer Contraseña">
+            </form>
+            <div id="error-container">
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Conatiner JS -->
+    <script src="{% static 'Usuarios/js/jquery-3.7.1.js' %}"></script>
+    <script src="{% static 'Usuarios/js/popper.min.js' %}"></script>
+    <script src="{% static 'Usuarios/js/FormularioSelect.js' %}"></script>
+    <script src="{% static 'Usuarios/js/InputRC.js' %}"></script>
+    <script src="{% static 'Usuarios/libs/Bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <!-- End Conatiner JS -->
+
+</body>
+
+</html>

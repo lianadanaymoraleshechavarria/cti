@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+  <style>
+    .detail-container {
+      background-color:rgb(19, 64, 23);
+      border-radius: 0.25rem;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    
+    .detail-label {
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 0.25rem;
+    }
+    
+    .detail-value {
+      color: #212529;
+    }
+    
+    .empty-value {
+      color: #6c757d;
+      font-style: italic;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="content" >
+    <div class="col">
+      <div class="container-form">
+        <div class="form">
+          <div class="container-fluid py-4">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="card">
+                  <div class="card-header pb-0">
+                    <div class="title">
+                      <h3 class="title-text p-3">Detalles de Revista/Libro/Conferencia</h3>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="detail-container">
+                          <div class="detail-label">Título</div>
+                          <div class="detail-value">{{ objeto.titulo }}</div>
+                        </div>
+                      </div>
+                      
+                      <div class="col-md-6">
+                        <div class="detail-container">
+                          <div class="detail-label">Editorial</div>
+                          <div class="detail-value">{{ objeto.editorial }}</div>
+                        </div>
+                      </div>
+                      
+                      <div class="col-md-6">
+                        <div class="detail-container">
+                          <div class="detail-label">ISSN</div>
+                          <div class="detail-value">
+                            {% if objeto.issn %}
+                              {{ objeto.issn }}
+                            {% else %}
+                              <span class="empty-value">No disponible</span>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="col-md-6">
+                        <div class="detail-container">
+                          <div class="detail-label">ISBN</div>
+                          <div class="detail-value">
+                            {% if objeto.isbn %}
+                              {{ objeto.isbn }}
+                            {% else %}
+                              <span class="empty-value">No disponible</span>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="col-md-6">
+                        <div class="detail-container">
+                          <div class="detail-label">País</div>
+                          <div class="detail-value">
+                            {% if objeto.pais %}
+                              {{ objeto.get_pais_display }}
+                            {% else %}
+                              <span class="empty-value">No especificado</span>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="col-md-6">
+                        <div class="detail-container">
+                          <div class="detail-label">Idioma</div>
+                          <div class="detail-value">
+                            {% if objeto.idioma %}
+                              {{ objeto.get_idioma_display }}
+                            {% else %}
+                              <span class="empty-value">No especificado</span>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="boot d-flex flex-wrap justify-content-center align-items-center mt-4">
+                      <a href="{% url 'Revista_Libro_Conferencia_List' %}" class="btn btn-primary btn-sm m-2 text-decoration-none">Volver a la lista</a>
+                      <a href="{% url 'Revista_Libro_Conferencia_Update' objeto.id %}" class="btn btn-primary btn-sm m-2 text-decoration-none">Editar</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>    
+    </div>
+  </div>
+{% endblock %}
+
+{% block js %}
+  <script src="{% static 'js/validations.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,683 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+<style>
+  .notificaciones-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .notificacion {
+    padding: 20px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    background: white;
+  }
+  
+  .notificacion:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+  }
+  
+  .notificacion-no-leida {
+    background: linear-gradient(135deg, #f0f7ff 0%, #e3f2fd 100%);
+    border-left: 5px solid #2196f3;
+  }
+  
+  .notificacion-leida {
+    background-color: #f8f9fa;
+    border-left: 5px solid #6c757d;
+    opacity: 0.85;
+  }
+  
+  .notificacion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+  
+  .notificacion-titulo {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #1a1a1a;
+    margin: 0;
+    flex: 1;
+  }
+  
+  .notificacion-mensaje {
+    color: #495057;
+    margin: 10px 0;
+    line-height: 1.5;
+  }
+  
+  .notificacion-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e9ecef;
+  }
+  
+  .notificacion-fecha {
+    font-size: 0.85rem;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+  }
+  
+  .notificacion-fecha i {
+    margin-right: 5px;
+  }
+  
+  .notificacion-acciones {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  
+  .badge-estado {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  
+  .badge-aprobado {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+  }
+  
+  .badge-rechazado {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+  }
+  
+  .badge-pendiente {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+  }
+  
+  .notificaciones-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  
+  .notificaciones-stats {
+    display: flex;
+    gap: 20px;
+    font-size: 0.9rem;
+    color: #6c757d;
+  }
+  
+  .sin-notificaciones {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  
+  .sin-notificaciones i {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.5;
+  }
+  
+  .btn-eliminar {
+    background: none;
+    border: none;
+    color: #dc3545;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-eliminar:hover {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .acciones-masivas {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  
+  .loading {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+  
+  .notificacion-tipo {
+    display: inline-block;
+    padding: 2px 8px;
+    background-color: #e9ecef;
+    color: #495057;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-left: 10px;
+  }
+
+  /* Estilos para modales */
+  .modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+  }
+
+  .modal-title {
+    color: #495057 !important;
+    font-weight: 600;
+  }
+
+  .modal-body {
+    color: #495057 !important;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .modal-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+  }
+
+  .btn-modal-cancelar {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+  }
+
+  .btn-modal-cancelar:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+  }
+
+  .btn-modal-confirmar {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+  }
+
+  .btn-modal-confirmar:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+  }
+
+  .btn-modal-marcar {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: white;
+  }
+
+  .btn-modal-marcar:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+  }
+  
+  @media (max-width: 768px) {
+    .notificaciones-header {
+      flex-direction: column;
+      gap: 15px;
+      text-align: center;
+    }
+    
+    .notificacion-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .badge-estado {
+      position: static;
+      margin-top: 10px;
+    }
+    
+    .notificacion-meta {
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    
+    .acciones-masivas {
+      justify-content: center;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+  <div class="notificaciones-container">
+    <div class="notificaciones-header">
+      <div>
+        <h3 class="mb-2">
+          <i class="fas fa-bell"></i> Mis Notificaciones
+        </h3>
+        <div class="notificaciones-stats">
+          <span><strong>{{ no_leidas }}</strong> sin leer</span>
+          <span><strong>{{ total }}</strong> total</span>
+        </div>
+      </div>
+      
+      {% if notificaciones %}
+        <div class="acciones-masivas">
+          <button id="marcar-todas-btn" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalMarcarTodas">
+            <i class="fas fa-check-double"></i> Marcar todas como leídas
+          </button>
+          <button id="eliminar-todas-btn" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalEliminarTodas">
+            <i class="fas fa-trash"></i> Eliminar todas
+          </button>
+        </div>
+      {% endif %}
+    </div>
+    
+    {% if notificaciones %}
+      {% for notificacion in notificaciones %}
+        <div class="notificacion {% if not notificacion.leida %}notificacion-no-leida{% else %}notificacion-leida{% endif %}" 
+             data-id="{{ notificacion.id }}">
+          
+          <div class="notificacion-header">
+            <h5 class="notificacion-titulo">
+              {{ notificacion.titulo }}
+              <span class="notificacion-tipo">{{ notificacion.tipo_contenido }}</span>
+            </h5>
+            <button class="btn-eliminar" data-id="{{ notificacion.id }}" data-bs-toggle="modal" data-bs-target="#modalEliminar{{ notificacion.id }}" title="Eliminar notificación">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          
+          {% if "aprobado" in notificacion.titulo.lower %}
+            <span class="badge-estado badge-aprobado">Aprobado</span>
+          {% elif "rechazado" in notificacion.titulo.lower %}
+            <span class="badge-estado badge-rechazado">Rechazado</span>
+          {% elif "pendiente" in notificacion.titulo.lower %}
+            <span class="badge-estado badge-pendiente">Pendiente</span>
+          {% endif %}
+          
+          <div class="notificacion-mensaje">{{ notificacion.mensaje }}</div>
+          
+          <div class="notificacion-meta">
+            <div class="notificacion-fecha">
+              <i class="fas fa-clock"></i>
+              {{ notificacion.fecha_creacion|date:"d/m/Y H:i" }}
+            </div>
+            
+            <div class="notificacion-acciones">
+              <a href="{% url 'ver_notificacion' notificacion.id %}" class="btn btn-sm btn-primary">
+                <i class="fas fa-eye"></i> Ver detalles
+              </a>
+              
+              {% if request.user.rol in 'Vicerrector,Jefe_area,Jefe_departamento,Administrador' and 'pendiente' in notificacion.titulo.lower %}
+                <a href="{% url 'cambiar_estado_desde_notificacion' notificacion.id %}" class="btn btn-sm btn-warning">
+                  <i class="fas fa-edit"></i> Cambiar estado
+                </a>
+              {% endif %}
+              
+              {% if not notificacion.leida %}
+                <button class="btn btn-sm btn-outline-secondary marcar-leida-btn" data-id="{{ notificacion.id }}">
+                  <i class="fas fa-check"></i> Marcar como leída
+                </button>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal para eliminar notificación individual -->
+        <div class="modal fade" id="modalEliminar{{ notificacion.id }}" tabindex="-1" aria-labelledby="modalEliminarLabel{{ notificacion.id }}" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="modalEliminarLabel{{ notificacion.id }}">
+                  <i class="bi bi-exclamation-triangle"></i> Eliminar Notificación
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="box-shadow: none"></button>
+              </div>
+              <div class="modal-body">
+                ¿Desea eliminar la notificación seleccionada?
+                <br><strong>"{{ notificacion.titulo }}"</strong>
+                <br><br>Esta acción será permanente.
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-modal-cancelar" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-modal-confirmar" onclick="eliminarNotificacion({{ notificacion.id }}, this)" data-bs-dismiss="modal">Eliminar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+      
+      <!-- Paginación -->
+      {% if notificaciones.has_other_pages %}
+        <nav aria-label="Paginación de notificaciones" class="mt-4">
+          <ul class="pagination justify-content-center">
+            {% if notificaciones.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?page=1">&laquo; Primera</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="?page={{ notificaciones.previous_page_number }}">Anterior</a>
+              </li>
+            {% endif %}
+            
+            <li class="page-item active">
+              <span class="page-link">
+                Página {{ notificaciones.number }} de {{ notificaciones.paginator.num_pages }}
+              </span>
+            </li>
+            
+            {% if notificaciones.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ notificaciones.next_page_number }}">Siguiente</a>
+              </li>
+              <li class="page-item">
+                <a class="page-link" href="?page={{ notificaciones.paginator.num_pages }}">Última &raquo;</a>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
+      {% endif %}
+      
+    {% else %}
+      <div class="sin-notificaciones">
+        <i class="fas fa-bell-slash"></i>
+        <h4>No tienes notificaciones</h4>
+        <p>Cuando recibas notificaciones aparecerán aquí.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Modal para marcar todas como leídas -->
+<div class="modal fade" id="modalMarcarTodas" tabindex="-1" aria-labelledby="modalMarcarTodasLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalMarcarTodasLabel">
+          <i class="bi bi-check-circle"></i> Marcar Todas como Leídas
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="box-shadow: none"></button>
+      </div>
+      <div class="modal-body">
+        ¿Desea marcar todas las notificaciones como leídas?
+        <br><br>Se marcarán <strong>{{ no_leidas }}</strong> notificaciones como leídas.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-modal-cancelar" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-modal-marcar" onclick="marcarTodasComoLeidas()" data-bs-dismiss="modal">Marcar Todas</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para eliminar todas las notificaciones -->
+<div class="modal fade" id="modalEliminarTodas" tabindex="-1" aria-labelledby="modalEliminarTodasLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalEliminarTodasLabel">
+          <i class="bi bi-exclamation-triangle"></i> Eliminar Todas las Notificaciones
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="box-shadow: none"></button>
+      </div>
+      <div class="modal-body">
+        ¿Desea eliminar TODAS las notificaciones?
+        <br><br>Se eliminarán <strong>{{ total }}</strong> notificaciones.
+        <br><br><strong>Esta acción será permanente y no se puede deshacer.</strong>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-modal-cancelar" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-modal-confirmar" onclick="eliminarTodasNotificaciones()" data-bs-dismiss="modal">Eliminar Todas</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Elementos
+  const botonesMarcarLeida = document.querySelectorAll('.marcar-leida-btn');
+  
+  // Marcar una notificación como leída
+  botonesMarcarLeida.forEach(boton => {
+    boton.addEventListener('click', function() {
+      const notificacionId = this.getAttribute('data-id');
+      marcarComoLeida(notificacionId, this);
+    });
+  });
+  
+  // Función para marcar una notificación como leída
+  function marcarComoLeida(id, boton) {
+    fetch(`/Investigador/notificaciones/marcar-leida/${id}/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const notificacion = boton.closest('.notificacion');
+        notificacion.classList.remove('notificacion-no-leida');
+        notificacion.classList.add('notificacion-leida');
+        boton.remove();
+        actualizarContador();
+        mostrarMensaje('Notificación marcada como leída', 'success');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      mostrarMensaje('Error al marcar como leída', 'error');
+    });
+  }
+
+  // Función para eliminar una notificación (llamada desde el modal)
+  window.eliminarNotificacion = function(id, boton) {
+    fetch(`/Investigador/notificaciones/eliminar/${id}/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const notificacion = document.querySelector(`[data-id="${id}"]`);
+        if (notificacion) {
+          notificacion.style.animation = 'slideOut 0.3s ease-out';
+          setTimeout(() => {
+            notificacion.remove();
+            actualizarContador();
+            verificarSinNotificaciones();
+          }, 300);
+        }
+        mostrarMensaje('Notificación eliminada', 'success');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      mostrarMensaje('Error al eliminar la notificación', 'error');
+    });
+  }
+
+  // Función para marcar todas como leídas (llamada desde el modal)
+  window.marcarTodasComoLeidas = function() {
+    const marcarTodasBtn = document.getElementById('marcar-todas-btn');
+    if (marcarTodasBtn) {
+      marcarTodasBtn.classList.add('loading');
+    }
+
+    fetch('/Investigador/notificaciones/marcar-todas-leidas/', {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        document.querySelectorAll('.notificacion-no-leida').forEach(notificacion => {
+          notificacion.classList.remove('notificacion-no-leida');
+          notificacion.classList.add('notificacion-leida');
+
+          const boton = notificacion.querySelector('.marcar-leida-btn');
+          if (boton) boton.remove();
+        });
+
+        actualizarContador();
+        mostrarMensaje(`${data.count} notificaciones marcadas como leídas`, 'success');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      mostrarMensaje('Error al marcar las notificaciones', 'error');
+    })
+    .finally(() => {
+      if (marcarTodasBtn) {
+        marcarTodasBtn.classList.remove('loading');
+      }
+    });
+  }
+
+  // Función para eliminar todas las notificaciones (llamada desde el modal)
+  window.eliminarTodasNotificaciones = function() {
+    const eliminarTodasBtn = document.getElementById('eliminar-todas-btn');
+    if (eliminarTodasBtn) {
+      eliminarTodasBtn.classList.add('loading');
+    }
+
+    fetch('/Investigador/notificaciones/eliminar-todas/', {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Recargar la página para mostrar el estado sin notificaciones
+        window.location.reload();
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      mostrarMensaje('Error al eliminar las notificaciones', 'error');
+    })
+    .finally(() => {
+      if (eliminarTodasBtn) {
+        eliminarTodasBtn.classList.remove('loading');
+      }
+    });
+  }
+
+  // Función para verificar si no hay notificaciones
+  function verificarSinNotificaciones() {
+    const notificaciones = document.querySelectorAll('.notificacion');
+    if (notificaciones.length === 0) {
+      window.location.reload();
+    }
+  }
+
+  // Función para actualizar el contador de notificaciones
+  function actualizarContador() {
+    fetch('/Investigador/notificaciones/contador/')
+      .then(response => response.json())
+      .then(data => {
+        const contador = document.getElementById('notificaciones-contador');
+        if (contador) {
+          contador.textContent = data.contador;
+          if (data.contador === 0) {
+            contador.style.display = 'none';
+          } else {
+            contador.style.display = 'inline-block';
+          }
+        }
+      })
+      .catch(error => console.error('Error:', error));
+  }
+  
+  // Función para mostrar mensajes
+  function mostrarMensaje(mensaje, tipo) {
+    // Crear elemento de mensaje
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${tipo === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
+    alert.style.position = 'fixed';
+    alert.style.top = '20px';
+    alert.style.right = '20px';
+    alert.style.zIndex = '9999';
+    alert.innerHTML = `
+      ${mensaje}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(alert);
+    
+    // Auto-eliminar después de 3 segundos
+    setTimeout(() => {
+      if (alert.parentNode) {
+        alert.remove();
+      }
+    }, 3000);
+  }
+  
+  // Función para obtener el token CSRF
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+});
+
+// Animación CSS para eliminar notificaciones
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes slideOut {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+  }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

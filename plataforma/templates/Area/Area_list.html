@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Container CSS -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/Dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'css/datatableSD.css' %}">
+<style>
+    .card-header.Area {
+        background-color: rgb(255, 255, 255);
+        color: black;
+    }
+</style>
+{% endblock %}
+<!-- End Container CSS -->
+
+{% block content %}
+<main class="content-inside px-3 py-2">
+    <section id="tablaAreas">
+        <div class="card">
+            <div class="card-header Area d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    Áreas
+                </h5>
+                <a href="{% url 'Area_create' %}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus me-1"></i> Crear Área
+                </a>
+            </div>
+            <div class="p-2">
+                <table id="Areas" class="display table table-striped table-hover table-primary" style="width:100%; height:100%;">
+                    <thead class="encabezado">
+                        <tr>
+                            <th scope="col" style="color: white; text-align: start;">#</th>
+                            <th scope="col" style="color: white; text-align: start;">Nombre del Área</th>
+                            <th scope="col" style="color: white; text-align: center;">Opciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for area in object_list %}
+                        <tr>
+                            <td style="text-align: start;">{{ forloop.counter }}</td>
+                            <td style="text-align: start;">{{ area.nombre_area }}</td>
+                            <td style="text-align: center; font-size: 1.2rem;">
+                                <a class="iconos p-2" href="{% url 'Area_Update' area.id %}" title="Editar">
+                                    <i class="fas fa-solid fa-pen-to-square"></i>
+                                </a>
+                                <a class="iconos p-2" data-bs-toggle="modal" data-bs-target="#Area{{ area.id }}" title="Eliminar">
+                                    <i class="fas fa-solid fa-trash-can"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" style="text-align: center;">No hay áreas registradas</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Modales de Confirmación -->
+{% for area in object_list %}
+<div class="modal fade" id="Area{{ area.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel" style="color:black">
+                    <i class="bi bi-exclamation-triangle" style="color:black"></i> Advertencia
+                </h5>
+                <button type="button" class="btn-close cerrar" data-bs-dismiss="modal" aria-label="Close" style="box-shadow: none"></button>
+            </div>
+            <div class="modal-body" style="color:black">
+                ¿Desea eliminar el área "{{ area.nombre_area }}"?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form method="post" action="{% url 'Area_Delete' area.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
+
+<!-- Container JS -->
+{% block js %}
+<script src="{% static 'libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+
+<script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/pdfmake.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/bottons.colVis.min.js' %}"></script>
+
+<script src="{% static 'libs/Datatable/JS/dataTables.responsive.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>
+
+<script>
+$(document).ready(function() {
+    $('#Areas').DataTable({
+        responsive: true,
+        dom: 'Bfrtip',
+        buttons: [
+            'copy', 'csv', 'excel', 'pdf', 'print', 'colvis'
+        ],
+        language: {
+            url: "{% static 'libs/Datatable/dataTableLenguage.json' %}"
+        },
+        columnDefs: [
+            { orderable: false, targets: [2] }
+        ]
+    });
+});
+</script>
+{% endblock %}
+<!-- End Container JS -->

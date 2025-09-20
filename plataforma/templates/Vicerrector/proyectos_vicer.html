@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Conatiner CSS -->
+{% block css %}
+<link rel="stylesheet" href=" {% static 'css/Dashboard.css' %}">
+<link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'css/datatableSD.css' %}">
+{% endblock %}
+<!-- End Conatiner CSS -->
+
+{% block content %}
+<div class="main" style="padding-top:60px;">
+  <main class="content-inside px-3 py-2">
+    <div class="container-fluid">
+      <div class="container-fluid">
+          <!--Table Element-->
+        <section id="tablaTramites">
+          <div class="card card-a p-3 h-100">
+            <div class="card-header">
+              <h5 class="card-title title-t" style=" text-align: start;">
+                  Proyectos
+              </h5>
+              <div class="boot d-flex flex-wrap justify-content-start align-items-center">
+                <a href="{% url 'Proyecto_Create' %}" class="btn1 m-2 btn btn-success btn-sm text-decoration-none">Añadir</a>
+              </div>
+            </div>
+            <table id="Proyectos" class="display table table-striped table-hover table-bg-success" style="width:100%; height: 100%;">
+              <thead class="encabezado">
+                <tr>
+                  <th scope="col" style="color: white; text-align: center;">No</th>
+                  <th scope="col" style="color: white; text-align: center;">Nombre</th>
+                  <th scope="col" style="color: white; text-align: center;">Jefe</th>
+                  <th scope="col" style="color: white; text-align: center;">Área</th>
+                  <th scope="col" style="color: white; text-align: center;">Código</th>
+                  <th scope="col" style="color: white; text-align: center;">Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for p in proyecto %}
+                  <tr>
+                    <td style=" text-align: center;">{{forloop.counter}}</td>
+                    <td style="text-align: center;"><a class="details" style="color:blue " href="{% url "Proyecto_Detail_Vicerrector" p.id %}"> {{p.nombre_proyecto}} </a></td>
+                    <td style=" text-align: center;">{{p.jefe_proyecto}}</td>
+                    <td style=" text-align: center;">{{p.area}}</td>
+                    <td style="text-align: center;">{{p.codigo_proyecto }}</td>
+                    <td style="text-align: center;">{{p.aprobacion }}</td>
+                  </tr>   
+                {% endfor %} 
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section class="mb-2 row row-gap-1">
+          <section class="col-md-6 col-sm-12" id="graficaProyectos">
+            <div class="card">
+              <div class="p-2">
+                <div id="grafEstadosProyectos">
+                </div>
+              </div>
+            </div>
+          </section>
+          <section class="col-md-6 col-sm-12" id="graficaBarMarcadores">
+            <div class="card">
+               <div class="p-2">
+                <div id="grafDepartamentosProyectos">
+                </div>
+              </div>
+            </div>
+          </section>
+          <section class="col-md-6 col-sm-12" id="graficaBarMarcadores">
+            <div class="card">
+               <div class="p-2">
+                <div id="grafSubtiposProyectos">
+                </div>
+                <div class="leyenda">
+                  <ul>
+                      <li><span style="color: #7cb5ec;">PE</span> - Proyectos Empresariales</li>
+                      <li><span style="color: #93ba22;">PI</span> - Proyectos Institucionales</li>
+                      <li><span style="color: #90ed7d;">PNE</span> - Proyectos con Entidades No Empresariales y de la Administración Pública</li>
+                      <li><span style="color: #f7a35c;">PDL</span> - Proyectos de Desarrollo Local</li>
+                      <li><span style="color: #8085e9;">PRCI</span> - Proyectos en Relación con la Colaboración Internacional</li>
+                  </ul>
+              </div>
+              </div>
+            </div>
+          </section>
+          <section class="col-md-6 col-sm-12" id="graficaBarMarcadores">
+            <div class="card">
+               <div class="p-2">
+                <div id="grafSectorEstrategico">
+                </div>
+              </div>
+            </div>
+          </section>
+        </section>
+      </div>
+  </main>
+</div>
+ 
+  {% endblock %}
+
+  <!-- Conatiner JS -->
+  {% block js%}
+  <script src="{% static 'libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/dataTables.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+  
+  <script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/pdfmake.min.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/bottons.colVis.min.js' %}"></script>
+  
+  <script src="{% static 'libs/Datatable/JS/dataTables.responsive.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>
+  
+  <script src="{% static 'libs/Datatable/JS/Proyectos_expo.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/highcharts.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/modules/accessibility.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/modules/exporting.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/modules/offline-exporting.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/modules/export-data.js' %}"></script>
+
+
+  <script>
+    $(document).ready(function() {
+        // Datos para la gráfica de estados de proyectos
+        var estadosProyectos = {{ estados_proyectos_json|safe }};
+        var dataEstadosProyectos = estadosProyectos.map(function(item) {
+            return { name: item.estado_proyecto, y: item.count };
+        });
+    
+        // Inicializar la gráfica de estados de proyectos
+        Highcharts.chart('grafEstadosProyectos', {
+            chart: { type: 'pie' },
+            title: { text: 'Estados de Proyectos' },
+            series: [{
+                name: 'Cantidad',
+                data: dataEstadosProyectos
+            }]
+        });
+
+
+        // Datos para la gráfica de proyectos por departamento
+    var departamentosProyectos = {{ departamentos_proyectos_json|safe }};
+    var dataDepartamentosProyectos = departamentosProyectos.map(function(item) {
+        return { name: item.departamento, y: item.count };
+    });
+
+    // Inicializar la gráfica de proyectos por departamento
+    Highcharts.chart('grafDepartamentosProyectos', {
+        chart: { type: 'bar' },
+        title: { text: 'Proyectos por Departamento' },
+        xAxis: {
+            categories: departamentosProyectos.map(function(item) { return item.departamento; })
+        },
+        yAxis: {
+            title: { text: 'Cantidad de Proyectos' }
+        },
+        series: [{
+            name: 'Proyectos',
+            data: dataDepartamentosProyectos
+        }],
+        legend: {
+            enabled: false
+        },
+        credits: {
+            enabled: false
+        }
+    });
+
+    // Datos para la gráfica de subtipos de proyectos
+    var subtiposProyectos = {{ subtipos_proyectos_json|safe }};
+    var dataSubtiposProyectos = subtiposProyectos.map(function(item) {
+        return { name: item.subtipo_proyecto, y: item.count };
+    });
+
+    // Colores para los subtipos de proyectos
+    var coloresSubtipos = {
+        'PE': '#7cb5ec', // Color para Proyectos Empresariales
+        'PI': '#93ba22', // Color para Proyectos Institucionales
+        'PNE': '#90ed7d', // Color para Proyectos con Entidades No Empresariales y de la Administración Pública
+        'PDL': '#f7a35c', // Color para Proyectos de Desarrollo Local
+        'PRCI': '#8085e9' // Color para Proyectos en Relación con la Colaboración Internacional
+    };
+
+    // Inicializar la gráfica de subtipos de proyectos como una gráfica de dona
+    Highcharts.chart('grafSubtiposProyectos', {
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: 'Subtipos de Proyectos'
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.y}</b>'
+        },
+        accessibility: {
+            point: {
+                valueSuffix: '%'
+            }
+        },
+        plotOptions: {
+            pie: {
+                innerSize: '50%'
+            }
+        },
+        series: [{
+            name: 'Cantidad',
+            data: dataSubtiposProyectos,
+            colors: Object.values(coloresSubtipos) // Asigna los colores definidos a los segmentos de la gráfica
+        }],
+        legend: {
+            enabled: false // Desactivamos la leyenda automática de Highcharts
+        }
+    });
+
+    // Datos para la gráfica de sectores estratégicos
+    var sectoresEstrategicos = {{ sector_estrategico|safe }};
+    var dataSectoresEstrategicos = sectoresEstrategicos.map(function(item) {
+        return { name: item.sector_estrategico, y: item.count };
+    });
+
+    // Inicializar la gráfica de sectores estratégicos como una gráfica de barras
+    Highcharts.chart('grafSectorEstrategico', {
+        chart: {
+            type: 'bar'
+        },
+        title: {
+            text: 'Sectores Estratégicos'
+        },
+        xAxis: {
+            categories: sectoresEstrategicos.map(function(item) { return item.sector_estrategico; }),
+            title: {
+                text: null
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Cantidad de Proyectos',
+                align: 'high'
+            },
+            labels: {
+                overflow: 'justify'
+            }
+        },
+        tooltip: {
+            valueSuffix: ' proyectos'
+        },
+        plotOptions: {
+            bar: {
+                dataLabels: {
+                    enabled: true
+                }
+              }
+        },
+        legend: {
+            enabled: false
+        },
+        series: [{
+            name: 'Proyectos',
+            data: dataSectoresEstrategicos
+        }]
+    });
+    
+     
+  });
+</script>
+
+  {% endblock %}
+  <!-- End Conatiner JS -->

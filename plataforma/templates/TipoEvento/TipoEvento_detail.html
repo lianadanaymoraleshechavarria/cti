@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Container CSS -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/Dashboard.css' %}">
+<style>
+    .detail-card {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .detail-header {
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .detail-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 5px;
+    }
+    
+    .detail-subtitle {
+        font-size: 0.9rem;
+        color: #666;
+    }
+    
+    .detail-content {
+        margin-bottom: 20px;
+    }
+    
+    .detail-label {
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 5px;
+    }
+    
+    .detail-value {
+        color: #333;
+        background-color: #f9f9f9;
+        padding: 10px;
+        border-radius: 4px;
+        border-left: 3px solid #007bff;
+    }
+    
+    .detail-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding-top: 15px;
+        border-top: 1px solid #eee;
+    }
+</style>
+{% endblock %}
+<!-- End Container CSS -->
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="detail-card">
+                <div class="detail-header">
+                    <h1 class="detail-title">{{ tipo_evento.nombre }}</h1>
+                    <p class="detail-subtitle">
+                        <small>Creado: {{ tipo_evento.fecha_creacion|date:"d/m/Y H:i" }}</small>
+                        {% if tipo_evento.fecha_modificacion %}
+                        <small class="ms-3">Última modificación: {{ tipo_evento.fecha_modificacion|date:"d/m/Y H:i" }}</small>
+                        {% endif %}
+                    </p>
+                </div>
+                
+                <div class="detail-content">
+                    <div class="mb-4">
+                        <p class="detail-label">Descripción:</p>
+                        <div class="detail-value">
+                            {% if tipo_evento.descripcion %}
+                                {{ tipo_evento.descripcion|linebreaks }}
+                            {% else %}
+                                <em>Sin descripción</em>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="detail-footer">
+                    <a href="{% url 'TipoEvento_List' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> Volver
+                    </a>
+                    <a href="{% url 'TipoEvento_Update' tipo_evento.id %}" class="btn btn-primary">
+                        <i class="fas fa-edit me-1"></i> Editar
+                    </a>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteTipoEvento">
+                        <i class="fas fa-trash me-1"></i> Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Eliminación -->
+<div class="modal fade" id="deleteTipoEvento" tabindex="-1" aria-labelledby="deleteTipoEventoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteTipoEventoLabel">Confirmar eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ¿Está seguro de que desea eliminar el tipo de evento "{{ tipo_evento.nombre }}"?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form action="{% url 'TipoEvento_Delete' tipo_evento.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

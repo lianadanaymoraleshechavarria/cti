@@ -1,0 +1,28 @@
+.imagen{
+    width: 100%;
+    height: 100%;
+}
+
+.parrafo{
+    margin-left:1rem;
+}
+
+/*Accordion*/
+.accordion{ 
+    --bs-accordion-btn-focus-box-shadow:none;
+    --bs-accordion-active-bg:none;
+    --bs-accordion-active-color:none;
+}
+.row-acordion{
+    box-shadow: 15px 15px 10px 3px rgba(0,0,0,0.2) !important;
+
+}
+
+@media(max-width:767px){
+    .imagen{
+        width: 100%;
+        height: 100%;
+    }
+
+}
+

@@ -1,0 +1,90 @@
+.user-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.user-select-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #E0DFE2;
+  border-radius: 4px;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #424045;
+  background-color: #fff;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.user-select-input:focus {
+  border-color: #E0DFE2;
+  outline: 0;
+  box-shadow: 0px 0px 0px 3.2px rgba(114, 190, 68, 0.4);
+}
+
+.user-select-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: #fff;
+  border: 1px solid #E0DFE2;
+  border-radius: 4px;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175);
+  display: none;
+}
+
+.user-select-input:focus + .user-select-dropdown,
+.user-select-dropdown:hover {
+  display: block;
+}
+
+.user-select-item {
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.user-select-item:hover {
+  background-color: #f8f9fa;
+}
+
+.user-select-selected {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.user-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1;
+  color: #fff;
+  background-color: #007bff;
+  border-radius: 0.25rem;
+}
+
+.user-badge button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.25rem;
+  line-height: 1;
+  padding: 0 0 0 0.25rem;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.user-badge button:hover {
+  opacity: 1;
+}
+
+/* Estilo para el select original que estamos ocultando */
+select.user-select {
+  display: none;
+}

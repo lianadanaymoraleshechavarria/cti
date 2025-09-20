@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/formss.css' %}">
+  <style>
+    /* Estilos adicionales */
+    .help-text {
+      font-size: 0.85rem;
+      color: #6c757d;
+      margin-top: 0.25rem;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="content" >
+    <div class="col">
+      <div class="container-form">
+        <div class="form">
+          <div class="container-fluid py-4">
+            <div class="row">
+              <div id="error-container">
+              </div>
+              <div class="col-md-12">
+                <div class="card">
+                  {% if messages %}
+                  {% for message in messages %}
+                    {% if message.tags == 'success' %}
+                      <div style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem; z-index: 2000;"
+                          class="alert alert-success alert-dismissible fade show" role="alert">
+                    {% elif message.tags == 'error' %}
+                      <div style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem; z-index: 2000; "
+                          class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {% endif %}
+                      {{ message }}
+                        <button style="font-size: 10px; border-bottom: none; position: relative; box-shadow: none;" type="button"
+                          class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                  {% endfor %}
+                {% endif %}
+                  <div class="card-header pb-0">
+                    <div class="title">
+                      <h3 class="title-text p-3">Registro de Revista/Libro/Conferencia</h3>
+                      <p class="text">
+                          Por favor, complete todos los campos requeridos para registrar su publicación.
+                          Su información es vital para mantener un registro adecuado de las publicaciones académicas.
+                      </p>
+                    </div>
+                  </div>
+                  <form id="formu" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="card-body">
+                      <div class="row">
+
+                        
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label for="titulo" class="form-control-label">Título</label>
+                            {{ form.titulo }}
+                            <div class="help-text">{{ form.titulo.help_text }}</div>
+                          </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label for="editorial" class="form-control-label">Editorial</label>
+                            {{ form.editorial }}
+                            <div class="help-text">{{ form.editorial.help_text }}</div>
+                          </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label for="issn" class="form-control-label">ISSN</label>
+                            {{ form.issn }}
+                            <div class="help-text">{{ form.issn.help_text }}</div>
+                          </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label for="isbn" class="form-control-label">ISBN</label>
+                            {{ form.isbn }}
+                            <div class="help-text">{{ form.isbn.help_text }}</div>
+                          </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                          <div class="form-group select">
+                            <label for="pais" class="form-control-label">País</label>
+                            {{ form.pais }}
+                            <div class="help-text">{{ form.pais.help_text }}</div>
+                          </div>
+                        </div>
+
+                        <div class="col-md-6">
+                          <div class="form-group select">
+                            <label for="pais" class="form-control-label">Idexacion</label>
+                            {{ form.index }}
+                            <div class="help-text">{{ form.index.help_text }}</div>
+                          </div>
+                        </div>
+
+                        <div class="col-md-6">
+                          <div class="form-group select">
+                            <label for="pais" class="form-control-label">Url</label>
+                            {{ form.url }}
+                            <div class="help-text">{{ form.url.help_text }}</div>
+                          </div>
+                        </div>
+                        
+                        
+                        <div class="col-md-6">
+                          <div class="form-group select">
+                            <label for="idioma" class="form-control-label">Idioma</label>
+                            {{ form.idioma }}
+                            <div class="help-text">{{ form.idioma.help_text }}</div>
+                          </div>
+                        </div>
+                      </div>   
+                    </div>
+                    <div class="boot d-flex flex-wrap justify-content-center align-items-center">
+                      <button type="submit" id="boton" class="btn btn-primary btn-sm m-2">Guardar</button>
+                      <a href="{% url 'Revista_Libro_Conferencia_List' %}" class="btn btn-primary btn-sm m-2 text-decoration-none">Cancelar</a> 
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>    
+    </div>
+  </div>
+{% endblock %}
+
+{% block js %}
+  <script src="{% static 'js/validations.js' %}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Validación de formulario
+      const form = document.getElementById('formu');
+      
+      form.addEventListener('submit', function(event) {
+        let isValid = true;
+        
+        // Validar título
+        const titulo = document.getElementById('id_titulo');
+        if (!titulo.value.trim()) {
+          isValid = false;
+          titulo.classList.add('is-invalid');
+        } else {
+          titulo.classList.remove('is-invalid');
+        }
+        
+        // Validar editorial
+        const editorial = document.getElementById('id_editorial');
+        if (!editorial.value.trim()) {
+          isValid = false;
+          editorial.classList.add('is-invalid');
+        } else {
+          editorial.classList.remove('is-invalid');
+        }
+        
+        // Validar ISSN (si se proporciona)
+        const issn = document.getElementById('id_issn');
+        if (issn.value.trim() && !/^\d{4}-\d{4}$/.test(issn.value.trim())) {
+          isValid = false;
+          issn.classList.add('is-invalid');
+        } else {
+          issn.classList.remove('is-invalid');
+        }
+        
+        // Validar ISBN (si se proporciona)
+        const isbn = document.getElementById('id_isbn');
+        if (isbn.value.trim() && !/^(?:\d{10}|\d{13})$/.test(isbn.value.trim().replace(/-/g, ''))) {
+          isValid = false;
+          isbn.classList.add('is-invalid');
+        } else {
+          isbn.classList.remove('is-invalid');
+        }
+        
+        if (!isValid) {
+          event.preventDefault();
+          const errorContainer = document.getElementById('error-container');
+          errorContainer.innerHTML = `
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+              Por favor, corrija los errores en el formulario antes de continuar.
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          `;
+        }
+      });
+    });
+  </script>
+{% endblock %}

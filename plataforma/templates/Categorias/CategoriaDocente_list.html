@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Container CSS -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/Dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'css/datatableSD.css' %}">
+{% endblock %}
+<!-- End Container CSS -->
+
+{% block content %}
+<main class="content-inside px-3 py-2">
+    <section id="tablaCategoriasDocentes">
+        <div class="card">
+            <div class="card-header CategoriaDocente d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    Categorías Docentes
+                </h5>
+                <a href="{% url 'CategoriaDocente_create' %}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus me-1"></i> Crear Categoría
+                </a>
+            </div>
+            <div class="p-2">
+                <table id="CategoriasDocentes" class="display table table-striped table-hover table-primary" style="width:100%; height:100%;">
+                    <thead class="encabezado">
+                        <tr>
+                            <th scope="col" style="color: white; text-align: start;">#</th>
+                            <th scope="col" style="color: white; text-align: start;">Nombre de la Categoría</th>
+                            <th scope="col" style="color: white; text-align: center;">Opciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for categoria in categorias_docentes %}
+                        <tr>
+                            <td style="text-align: start;">{{ forloop.counter }}</td>
+                            <td style="text-align: start;">{{ categoria.nombre_categoria_docente }}</td>
+                            <td style="text-align: center; font-size: 1.2rem;">
+                                <a class="iconos p-2" href="{% url 'CategoriaDocente_Update' categoria.id %}" title="Editar">
+                                    <i class="fas fa-solid fa-pen-to-square"></i>
+                                </a>
+                                <a class="iconos p-2" data-bs-toggle="modal" data-bs-target="#CategoriaDocente{{ categoria.id }}" title="Eliminar">
+                                    <i class="fas fa-solid fa-trash-can"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        
+                        <!-- Modal -->
+                        <div class="modal fade" id="CategoriaDocente{{ categoria.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel" style="color:black">
+                                            <i class="bi bi-exclamation-triangle" style="color:black"></i> Advertencia
+                                        </h5>
+                                        <button type="button" class="btn-close cerrar" data-bs-dismiss="modal" aria-label="Close" style="box-shadow: none"></button>
+                                    </div>
+                                    <div class="modal-body" style="color:black">
+                                        ¿Desea eliminar la categoría docente "{{ categoria.nombre_categoria_docente }}"?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <form method="post" action="{% url 'CategoriaDocente_Delete' categoria.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-primary">Confirmar</button>
+                                        </form>
+                                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancelar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" style="text-align: center;">No hay categorías docentes registradas</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
+<!-- Container JS -->
+{% block js %}
+<script src="{% static 'libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+
+<script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/pdfmake.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/bottons.colVis.min.js' %}"></script>
+
+<script src="{% static 'libs/Datatable/JS/dataTables.responsive.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>
+
+<script src="{% static 'libs/Highcharts/code/highcharts.js' %}"></script>
+<script src="{% static 'libs/Highcharts/code/modules/accessibility.js' %}"></script>
+<script src="{% static 'libs/Highcharts/code/modules/exporting.js' %}"></script>
+<script src="{% static 'libs/Highcharts/code/modules/offline-exporting.js' %}"></script>
+<script src="{% static 'libs/Highcharts/code/modules/export-data.js' %}"></script>
+
+<script>
+$(document).ready(function() {
+    $('#CategoriasDocentes').DataTable({
+        responsive: true,
+        dom: 'Bfrtip',
+        buttons: [
+            'copy', 'csv', 'excel', 'pdf', 'print', 'colvis'
+        ],
+        language: {
+            url: "{% static 'libs/Datatable/dataTableLenguage.json' %}"
+        },
+        columnDefs: [
+            { orderable: false, targets: [2] }
+        ]
+    });
+});
+</script>
+{% endblock %}
+<!-- End Container JS -->

@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Container CSS -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/Dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'css/datatableSD.css' %}">
+{% endblock %}
+<!-- End Container CSS -->
+
+{% block content %}
+<div class="main" style="padding-top:60px;">
+  <main class="content-inside px-3 py-2">
+    <div class="container-fluid">
+      <div class="container-fluid">
+        <section id="tablaTramites">
+          <div class="card card-a p-3 h-100">
+            <div class="card-header">
+              <h5 class="card-title title-t" style="text-align: start;">
+                Cargos
+              </h5>
+            </div>
+            <div class="boot d-flex flex-wrap justify-content-start align-items-center">
+              <a href="{% url 'Cargo_Create' %}" class="btn btn-primary btn-sm">Crear Cargo</a>
+            </div>
+          </div>
+          
+          <table id="Cargos" class="display table table-striped table-hover table-primary" style="width:100%; height:100%;">
+            <thead class="encabezado">
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Nombre del Cargo</th>
+                <th scope="col" class="text-center">Opción</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for cargo in object_list %}
+              <tr>
+                <td style="text-align: start;">{{ forloop.counter }}</td>
+                <td style="text-align: start;">{{ cargo.nombre_cargo }}</td>
+                <td style="text-align: center; font-size: 1.2rem;">
+                  <a class="iconos p-2" href="{% url 'Cargo_Update' cargo.id %}">
+                    <i class="fas fa-solid fa-pen-to-square"></i>
+                  </a>
+                  <a class="iconos p-2" data-bs-toggle="modal" data-bs-target="#Cargo{{ cargo.id }}">
+                    <i class="fas fa-solid fa-trash-can"></i>
+                  </a>
+                </td>
+              </tr>
+              
+              <!-- Modal -->
+              <div class="modal fade" id="Cargo{{ cargo.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel" style="color:black">
+                        <i class="bi bi-exclamation-triangle" style="color:black"></i> Advertencia
+                      </h5>
+                      <button type="button" class="btn-close cerrar" data-bs-dismiss="modal" aria-label="Close" style="box-shadow: none"></button>
+                    </div>
+                    <div class="modal-body" style="color:black">
+                      ¿Desea eliminar este Cargo?
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancelar</button>
+                      <form method="post" action="{% url 'Cargo_Delete' cargo.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancelar</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </tbody>
+          </table>
+        </section>
+        
+       
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}
+
+<!-- Container JS -->
+{% block js %}
+<script src="{% static 'Plataforma/libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+
+<script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/pdfmake.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/bottons.colVis.min.js' %}"></script>
+
+<script src="{% static 'libs/Datatable/JS/dataTables.responsive.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>
+
+<script src="{% static 'libs/Highcharts/code/highcharts.js' %}"></script>
+<script src="{% static 'libs/Highcharts/code/modules/accessibility.js' %}"></script>
+<script src="{% static 'libs/Highcharts/code/modules/exporting.js' %}"></script>
+<script src="{% static 'libs/Highcharts/code/modules/offline-exporting.js' %}"></script>
+<script src="{% static 'libs/Highcharts/code/modules/export-data.js' %}"></script>
+
+<script>
+$(document).ready(function() { 
+  // Initialize DataTable
+  $('#Cargos').DataTable({
+    responsive: true,
+    dom: 'Bfrtip',
+    buttons: [
+      'copy', 'csv', 'excel', 'pdf', 'print'
+    ],
+    language: {
+        url: "{% static 'libs/Datatable/dataTableLenguage.json' %}"
+    },
+  });
+
+  // Example chart initialization (adapt to your needs)
+  /*
+  Highcharts.chart('grafCargos', {
+    chart: {
+      type: 'pie'
+    },
+    title: {
+      text: 'Distribución de Cargos'
+    },
+    series: [{
+      name: 'Cargos',
+      data: [
+        ['Administrativos', 45],
+        ['Docentes', 30],
+        ['Directivos', 25]
+      ]
+    }]
+  });
+  */
+});
+</script>
+{% endblock %}
+<!-- End Container JS -->

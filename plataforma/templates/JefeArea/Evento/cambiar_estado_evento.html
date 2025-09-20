@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Conatiner CSS -->
+{% block css %}
+<link rel="stylesheet" href=" {% static 'Plataforma/css/estilobeta.css' %}">
+{% endblock %}
+<!-- End Conatiner CSS -->
+
+{% block content %}
+<div class="container-form">
+    <div class="form-rol">
+        <div class="contact-form">
+            <span class="circle one"></span>
+            <span class="circle two"></span>
+            <form  method="POST">
+                {% csrf_token %}
+                <h3 class="title">Cambiar</h3>  
+                {% if response %}
+                {% if response == 'incorrecto' %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert"
+                style="height:40px; position: fixed; right: 20px; top: 50px; display: flex; align-items: center; padding-right: 0rem;">
+                {{ message }}
+                <button style="font-size: 10px; border-bottom: none; position: relative; box-shadow: none;" type="button"
+                    class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </button>
+                </div>
+                {% endif %}
+                {% endif %}
+                <div class="input-container select-rol">
+                    <input type="hidden" name="estado">
+                    <div class="input selector">
+                    </div>
+                    <label for="">Estado del Evento</label>
+                    <span>Estado del Evento</span>
+                  </div>
+                  <div class="select-options" name="role">
+                    {% for estado in estados %}
+                    <div aria-valuetext="{{estado}}" value="{{estado}}" class="element">{{estado}}</div>
+                    {% endfor %}
+                  </div>
+                
+                  <div class="btn">
+                    <a href="{% url 'Evento_List_JefeArea' %}" class="btn2">Cancelar</a>
+                    <input type="submit" value="Aceptar" class="btn2">
+                  </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- Conatiner JS -->
+{% block js %}
+<script src="{% static 'Plataforma/js/Cambio Estado Evento.js' %}"></script>
+
+
+{% endblock %}
+<!-- End Conatiner JS -->

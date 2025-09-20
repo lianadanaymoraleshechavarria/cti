@@ -1,0 +1,63 @@
+.row {
+    display: flex; /* Hace que los elementos hijos se comporten como flex items */
+    justify-content: center; /* Cambia esto */
+    align-items: center; /* Alinea verticalmente los elementos */
+    padding-top: 20px;
+}
+
+.buscar:focus {
+    color: #000000;
+    background-color: transparent;
+    border-color:  #93ba22;
+    outline: 0;
+    box-shadow: 0 3px 9px rgba(36, 36, 37, 0.493), 3px 4px 8px rgba(94, 114, 228, 0.1);
+}
+.buscar {
+    /* Cambia flex-grow: 1; a un ancho específico o max-width */
+    width: 50%; /* Ajusta este valor según tus necesidades */
+    max-width: 300px; /* Asegura que el input no crezca indefinidamente */
+    display: block;
+    justify-content: end!important;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 300;
+    line-height: 1.4rem;
+    color: #000000;
+    background-color: transparent!important;
+    background-clip: padding-box;
+    border: 2px solid #212d57;
+    appearance: none;
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+
+.boton-buscar {
+    /* Elimina el margin-left */
+    display: block;
+    justify-content: start;
+    align-items: center;
+    width: auto; /* Cambia esto para que el botón solo ocupe el espacio de su contenido */
+    padding: 0.6rem 1.3rem;
+    background-color: #212d57 !important;
+    border: 2px solid #fafafa;
+    font-size: 1rem;
+    color: #ffffff;
+    line-height: 1;
+    border-radius: 25px;
+    outline: none;
+    text-decoration: none;
+    cursor: pointer;
+    transition: 0.3s;
+    text-align: center;
+    font-weight: 600;
+    
+}
+
+.boton-buscar:focus{
+    background-color: #93ba22 !important;
+    color: #fff;
+    outline: 0;
+    box-shadow: 0 3px 9px rgba(36, 36, 37, 0.493), 3px 4px 8px rgba(94, 114, 228, 0.1);
+}

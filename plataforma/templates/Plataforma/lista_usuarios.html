@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Container CSS -->
+{% block css %}
+<link rel="stylesheet" href=" {% static 'Plataforma/css/Dashboard.css' %}">
+<link rel="stylesheet" href=" {% static 'Plataforma/libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'Plataforma/libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'Plataforma/libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'Plataforma/css/datatableSD.css' %}">
+
+{% endblock %}
+<!-- End Container CSS -->
+
+{% block content %}
+<main class="content-inside px-3 py-2 mx-2">
+    <div class="row">
+        <nav class="pt-2">
+            <div class="card-header grupo">
+                <h5 class="card-title">
+                    Administración
+                </h5>
+                <a href="{% url 'Registrar' %}" class="btn btn-primary btn-sm ">Crear</a>
+            </div>
+            <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
+                <button class="nav-link active text-primary" style="color:black;" id="nav-general-tab" data-bs-toggle="tab" data-bs-target="#nav-general" type="button" role="tab" aria-controls="nav-general" aria-selected="true"><i class=""></i><b>Usuarios</b></button>
+            </div>
+        </nav>
+    <section class="tab-content" id="nav-tabContent" >
+     <div class="tab-pane fade show active" id="nav-general" role="tabpanel" aria-labelledby="nav-general-tab"> 
+        <div class="card">
+            <div class="p-2">
+            <table id="Usuarios" class="display table table-striped table-hover table-primary" style="width:100%">
+                <thead class="encabezado">
+                    <tr>
+                        <th scope="col" style="color: white; text-align: start;">#</th>
+                        <th scope="col" style="color: white; text-align: start;">Usuario</th>
+                        <th scope="col" style="color: white; text-align: start;">Teléfono</th>
+                        <th scope="col" style="color: white; text-align: start;">Email</th>
+                        <th scope="col" style="color: white; text-align: start;">Última Conexión</th>
+                        <th scope="col" style="color: white; text-align: start;">Rol</th>
+                        <th scope="col" style="color: white; text-align: start;">Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr>
+                        <td style="text-align: start;">{{ forloop.counter }}</td>
+                        <td style="text-align: start;">{{ usuario.username }}</td>
+                        <td style="text-align: start;">
+                            {% if usuario.telefono %}
+                            {{ usuario.telefono }}
+                            {% else %}
+                            N/A
+                            {% endif %}
+                        </td>
+                        <td style="text-align: start;">
+                            {% if usuario.email %}
+                            <a class="iconos" href="mailto:{{ usuario.email }}">{{ usuario.email }}</a>
+                            {% else %}
+                            N/A
+                            {% endif %}
+                        </td>
+                        
+                        <td style="text-align: start;">
+                            {% if usuario.last_login %}
+                            {{ usuario.last_login }}
+                            {% else %}
+                            N/A
+                            {% endif %}
+                        </td>
+                        <td style="text-align: start;">
+                            <div class="d-flex align-items-center">
+                                {% with usuario.rol as rol_actual %}
+                                    {{ rol_actual }}
+                                {% endwith %}
+                                <!-- Added role change buttons -->
+                                <div class="ms-2">
+                                    {% if user.rol == 'Jefe_area' %}
+                                        <a href="{% url 'CambiarRolJefeArea' usuario.id %}" class="btn2 btn-sm">
+                                            <i class="fas fa-user-tag"></i> Cambiar
+                                        </a>
+                                    {% elif user.rol == 'Vicerrector' %}
+                                        <a href="{% url 'CambiarRolVicerrector' usuario.id %}" class="btn2 btn-sm">
+                                            <i class="fas fa-user-tag"></i> Cambiar
+                                        </a>
+                                    {% elif user.rol == 'Administrador' %}
+                                        <a href="{% url 'CambiarRol' usuario.id %}" class="btn2 btn-sm">
+                                            <i class="fas fa-user-tag"></i> Cambiar
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td style="text-align: center; font-size: 1.2rem;">
+                            <a class="iconos p-2" data-bs-toggle="modal" data-bs-target="#Usuario{{ usuario.id }}"><i class="ico fas fa-solid fa-trash-can"></i></a>
+                        </td>
+                    </tr>
+                    <!-- Modal -->
+                    <div class="modal fade" id="Usuario{{ usuario.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel" style="color:black"><i class="bi bi-exclamation-triangle"
+                                style="color:black"></i> Advertencia</h5>
+                            <button type="button" class="btn-close cerrar" data-bs-dismiss="modal" aria-label="Close" style="box-shadow: none"></button>
+                            </div>
+                            <div class="modal-body" style="color:black">
+                            ¿Desea eliminar este usuario?
+                            </div>
+                            <div class="modal-footer">
+                            
+                            <a href="{% url 'EliminarUsuario' usuario.id %}" class="btn btn-primary">Aceptar</a>
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancelar</button>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        </div>
+     </div>
+    </section>
+</main>
+{% endblock %}
+
+<!-- Container JS -->
+{% block js%}
+<script src="{% static 'Plataforma/libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+<!--Botones DataTables-->
+<script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.buttons.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/jszip.min.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/pdfmake.min.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/vfs_fonts.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/buttons.html5.min.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/buttons.print.min.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/bottons.colVis.min.js' %}"></script>
+<!--DataTables responsivo-->
+<script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.responsive.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>
+<!--Inicializar DataTables-->
+<script src="{% static 'Plataforma/libs/Datatable/JS/Usuarios.js' %}"></script>
+{% endblock %}

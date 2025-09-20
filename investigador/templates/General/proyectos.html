@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Conatiner CSS -->
+{% block css %}
+<link rel="stylesheet" href=" {% static 'css/Dashboard.css' %}">
+<link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'css/datatableSD.css' %}">
+{% endblock %}
+<!-- End Conatiner CSS -->
+
+{% block content %}
+<div class="main" style="padding-top:60px;">
+  <main class="content-inside px-3 py-2">
+    <div class="container-fluid">
+      <div class="container-fluid">
+          <!--Table Element-->
+        <section id="tablaTramites">
+          <div class="card card-a p-3 h-100">
+            <div class="card-header">
+              <h5 class="card-title title-t" style=" text-align: start;">
+                  Proyectos
+              </h5>
+            </div>
+            <table id="Proyectos" class="display table table-striped table-hover table-primary" style="width:100%; height: 100%;">
+              <thead class="encabezado">
+                <tr>
+                  <th scope="col" style="color: white; text-align: center;">No</th>
+                  <th scope="col" style="color: white; text-align: center;">Nombre</th>
+                  <th scope="col" style="color: white; text-align: center;">Jefe</th>
+                  <th scope="col" style="color: white; text-align: center;">Área</th>
+                  <th scope="col" style="color: white; text-align: center;">Código</th>
+                  <th scope="col" style="color: white; text-align: center;">Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for p in proyecto %}
+                  <tr>
+                    <td style=" text-align: center;">{{forloop.counter}}</td>
+                    <td style=" text-align: start;">{{p.nombre_proyecto}}</td>
+                    <td style=" text-align: start;">{{p.jefe_proyecto}}</td>
+                    <td style=" text-align: start;">{{p.area}}</td>
+                    <td style="text-align: start;">{{p.codigo_proyecto }}</td>
+                    <td style="text-align: start;">{{p.aprobacion }}</td>
+                  </tr>   
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+  </main>
+</div>
+ 
+  {% endblock %}
+
+  <!-- Conatiner JS -->
+  {% block js%}
+  <script src="{% static 'libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/dataTables.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+  
+  <script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/pdfmake.min.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/bottons.colVis.min.js' %}"></script>
+  
+  <script src="{% static 'libs/Datatable/JS/dataTables.responsive.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>
+  
+  <script src="{% static 'libs/Datatable/JS/Proyectos_expo.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/highcharts.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/modules/accessibility.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/modules/exporting.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/modules/offline-exporting.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/modules/export-data.js' %}"></script>
+
+  {% endblock %}
+  <!-- End Conatiner JS -->

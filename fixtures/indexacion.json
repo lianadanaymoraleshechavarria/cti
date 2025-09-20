@@ -1,0 +1,30 @@
+[
+  {
+    "model": "tuapp.indexacion",
+    "pk": 1,
+    "fields": {
+      "nombre": "Web of Science"
+    }
+  },
+  {
+    "model": "tuapp.indexacion",
+    "pk": 2,
+    "fields": {
+      "nombre": "Scopus"
+    }
+  },
+  {
+    "model": "tuapp.indexacion",
+    "pk": 3,
+    "fields": {
+      "nombre": "SciELO"
+    }
+  },
+  {
+    "model": "tuapp.indexacion",
+    "pk": 4,
+    "fields": {
+      "nombre": "Redalyc"
+    }
+  }
+]

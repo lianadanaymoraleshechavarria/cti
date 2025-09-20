@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Conatiner CSS -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'Plataforma/css/estilobeta.css' %}">
+{% endblock %}
+<!-- End Conatiner CSS -->
+
+{% block content %}
+<div id="error-container">
+</div>
+<div class="container-form">
+    <div class="form">
+        <div class="contact-form">
+            <span class="circle one"></span>
+            <span class="circle two"></span>
+            <form action="." method="POST">
+                {% csrf_token %}
+                <h3 class="title">Crear Área</h3>
+                <div class="input-container">
+                    <input type="text" name="nombre_area" class="input" required id="area">
+                    <label for="area">Nombre del Área</label>
+                    <span>Nombre del Área</span>
+                </div>
+                
+                {% endfor %}
+                </div>
+                <input type="submit" value="Crear Área" class="btn1" id="boton">
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- Conatiner JS -->
+{% block js %}
+<script src="{% static 'Plataforma/js/FormularioSelect.js' %}"></script>
+<script src="{% static 'Plataforma/js/Crear Grupo.js' %}"></script>
+{% endblock %}
+<!-- End Conatiner JS -->

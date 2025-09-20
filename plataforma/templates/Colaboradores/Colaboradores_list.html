@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Container CSS -->
+{% block css %}
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'css/datatableSD.css' %}">
+<link rel="stylesheet" href="{% static 'css/styless.css' %}">
+{% endblock %}
+<!-- End Container CSS -->
+
+{% block content %}
+<section class="tabla" id="tablaColaboradores">
+    <div class="card-header">
+        <h5 class="card-title" style="text-align:center;">
+            Mis Colaboradores
+        </h5>
+    </div>
+    <div class="boot d-flex flex-wrap justify-content-start align-items-center" style="margin-bottom: 20px;">
+        <a href="{% url 'Colaboradores_Create' %}" class="btn boton-form">
+            <i class="fas fa-plus me-1"></i> Nuevo</a>
+    </div>
+    <div class="table-responsive">
+        <p><strong>Total:</strong> {{ colaboradores|length }} colaboradores</p>
+        {% if colaboradores %}
+        <table id="Colaboradores" class="table table-striped text-light">
+            <thead class="encabezado">
+                <tr>
+                    <th scope="col" style="text-align:center;">No</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Apellidos</th>
+                    <th scope="col">ORCID</th>
+                    <th scope="col">Opciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for colaborador in colaboradores %}
+                <tr>
+                    <td style="text-align:center;">{{ forloop.counter }}</td>
+                    <td>{{ colaborador.nombre }}</td>
+                    <td>{{ colaborador.apellidos }}</td>
+                    <td>{{ colaborador.orci|default:"-" }}</td>
+                    <td>
+                        <a href="{% url 'Colaboradores_Detail' colaborador.id %}" title="Ver detalles" style="text-decoration: none;">
+                            <i class="fas fa-solid fa-info-circle detail mx-1 fs-6"></i>
+                        </a>
+                        <a href="{% url 'Colaboradores_Update' colaborador.id %}" title="Editar colaborador" style="text-decoration: none;">
+                            <i class="fas fa-solid fa-pen-to-square update mx-1 fs-6"></i>
+                        </a>
+                        <a data-bs-toggle="modal" data-bs-target="#Colaborador{{ colaborador.id }}" style="text-decoration: none;"
+                            title="Eliminar colaborador">
+                            <i class="fas fa-solid fa-trash-can delete mx-1 fs-6"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="alert alert-warning text-center">
+            <i class="fas fa-info-circle me-2"></i>
+            No hay colaboradores registrados
+        </div>
+        {% endif %}
+
+        <!-- Modales de Eliminación -->
+        {% for colaborador in colaboradores %}
+        <div class="modal fade" id="Colaborador{{ colaborador.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel" style="color:black">
+                            <i class="bi bi-exclamation-triangle" style="color:black"></i> Advertencia
+                        </h5>
+                        <button type="button" class="btn-close cerrar" data-bs-dismiss="modal" aria-label="Close"
+                            style="box-shadow: none"></button>
+                    </div>
+                    <div class="modal-body" style="color:black">
+                        ¿Desea eliminar al colaborador "{{ colaborador.apellidos }}, {{ colaborador.nombre }}"?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancelar</button>
+                        <form method="post" action="{% url 'Colaboradores_Delete' colaborador.id %}"
+                            style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary">Confirmar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
+
+<!-- Container JS -->
+{% block js %}
+<script src="{% static 'libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/pdfmake.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.colVis.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.responsive.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>
+
+<script>
+    $(document).ready(function () {
+        // Solo inicializar DataTables si la tabla existe y tiene datos
+        if ($('#Colaboradores').length && $('#Colaboradores tbody tr').length > 0) {
+
+            // Debug: Verificar estructura antes de inicializar
+            console.log("Inicializando DataTables...");
+            console.log("Número de columnas en thead:", $('#Colaboradores thead th').length);
+            console.log("Número de filas en tbody:", $('#Colaboradores tbody tr').length);
+
+            // Verificar que cada fila tenga exactamente 5 columnas
+            var allRowsValid = true;
+            $('#Colaboradores tbody tr').each(function (index) {
+                var numCols = $(this).find('td').length;
+                console.log("Fila " + index + " tiene " + numCols + " columnas");
+                if (numCols !== 5) {
+                    console.error("Error: Fila " + index + " no tiene 5 columnas");
+                    allRowsValid = false;
+                }
+            });
+
+            if (allRowsValid) {
+                try {
+                    // Inicializar DataTables con configuración segura
+                    var table = $('#Colaboradores').DataTable({
+                        responsive: true,
+                        dom: 'Bfrtip',
+                        buttons: [
+                            'copy', 'csv', 'excel', 'pdf', 'print', 'colvis'
+                        ],
+                        language: {
+                            url: "{% static 'libs/Datatable/dataTableLenguage.json' %}"
+                        },
+                        columnDefs: [
+                            {
+                                targets: [0, 4],
+                                orderable: false,
+                                searchable: false
+                            },
+                            {
+                                responsivePriority: 1,
+                                targets: [1, 2]
+                            },
+                            {
+                                responsivePriority: 2,
+                                targets: [0, 3, 4]
+                            }
+                        ],
+                        order: [[1, 'asc']],
+                        pageLength: 10,
+                        // Configuración adicional para evitar errores
+                        autoWidth: false,
+                        processing: false,
+                        serverSide: false,
+                        // Manejo de errores
+                        initComplete: function (settings, json) {
+                            console.log("DataTables inicializado correctamente");
+                        },
+                        drawCallback: function (settings) {
+                            console.log("Tabla redibujada");
+                        }
+                    });
+
+                    console.log("DataTable inicializado con " + table.columns().count() + " columnas");
+
+                } catch (error) {
+                    console.error("Error al inicializar DataTables:", error);
+                }
+            } else {
+                console.error("No se puede inicializar DataTables: estructura de tabla inválida");
+            }
+        } else {
+            console.log("No se inicializa DataTables: tabla vacía o no existe");
+        }
+    });
+</script>
+{% endblock %}
+<!-- End Container JS -->

@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Conatiner CSS -->
+{% block css %}
+<link rel="stylesheet" href=" {% static 'css/Dashboard.css' %}">
+<link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'css/datatableSD.css' %}">
+{% endblock %}
+<!-- End Conatiner CSS -->
+
+{% block content %}
+<div class="main" style="padding-top:60px;">
+  <main class="content-inside px-3 py-2">
+    <div class="container-fluid">
+      <div class="container-fluid">
+          <!--Table Element-->
+          <section id="tablaTramites">
+            <div class="card card-a p-3 h-100">
+              <div class="card-header">
+                <h5 class="card-title title-t" style=" text-align: start;">
+                    Eventos
+                </h5>
+              </div>
+              <table id="Eventos" class="display table table-striped table-hover table-primary" style="width:100%; height: 100%;">
+                <thead class="encabezado">
+                  <tr>
+                    <th scope="col" style="color: white; text-align: center;">No</th>
+                    <th scope="col" style="color: white; text-align: center;">Autores</th>
+                    <th scope="col" style="color: white; text-align: center;">Título</th>
+                    <th scope="col" style="color: white; text-align: center;">ISBN</th>
+                    <th scope="col" style="color: white; text-align: center;">Fecha</th>
+                    <th scope="col" style="color: white; text-align: center;">Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for e in evento %}
+                    <tr>
+                      <td style=" text-align: center;">{{forloop.counter}}</td>
+                      <td style=" text-align: start;">{{e.autores}}</td>
+                      <td style=" text-align: start;">{{e.titulo}}</td>
+                      <td style=" text-align: start;">{{e.isbn}}</td>
+                      <td style="text-align: start;">{{e.fecha }}</td>
+                      <td style="text-align: start;">{{e.aprobacion }}</td>
+                    </tr>   
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+        <section class="mb-2 row row-gap-1">
+          <section class="col-md-6 col-sm-12" id="graficaEventos">
+            <div class="card">
+              <div class="p-2">
+                <div id="grafTiposEvento">
+                </div>
+              </div>
+            </div>
+          </section>
+          <section class="col-md-6 col-sm-12" id="graficaBarMarcadores">
+            <div class="card">
+               <div class="p-2">
+                <div id="container">
+                </div>
+              </div>
+            </div>
+          </section>
+        </section>
+      </div>
+  </main>
+</div>
+ 
+  {% endblock %}
+
+  <!-- Conatiner JS -->
+  {% block js%}
+  <script src="{% static 'Plataforma/libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+  <script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.js' %}"></script>
+  <script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+  
+  <script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/pdfmake.min.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/bottons.colVis.min.js' %}"></script>
+  
+  <script src="{% static 'libs/Datatable/JS/dataTables.responsive.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>
+  
+  <script src="{% static 'libs/Datatable/JS/Eventos_expo.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/highcharts.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/modules/accessibility.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/modules/exporting.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/modules/offline-exporting.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/modules/export-data.js' %}"></script>
+ 
+  <script>
+    $(document).ready(function() { 
+      // Datos para la gráfica de tipos de premios
+    var tiposEventos = {{ tipos_eventos_json|safe }};
+    var dataTiposEventos = tiposEventos.map(function(item) {
+        return { name: item.tipo, y: item.count };
+    });
+
+    Highcharts.chart('grafTiposEvento', {
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: 'Tipos de Eventos'
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.y}</b>'
+        },
+        accessibility: {
+            point: {
+              valueSuffix: '%'
+            }
+        },
+        plotOptions: {
+            pie: {
+                innerSize: '50%' 
+            }// Esto crea el "agujero" en el centro, haciendo que sea una gráfica de anillos
+        },
+        series: [{
+            name: 'Cantidad',
+            data: dataTiposEventos,
+        }],
+    });
+
+
+
+    var caracterEventos = {{ caracter_eventos_json|safe }};
+    var dataCaracterEventos = caracterEventos.map(function(item) {
+        return { name: item.tipo, y: item.count };
+    });
+    Highcharts.chart('container', {
+        chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+        },
+        title: {
+            text: 'Carácter de Eventos'
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.y}</b>'
+        },
+        accessibility: {
+            point: {
+              valueSuffix: '%'
+            }
+        },
+        series: [{
+            name: 'Cantidad',
+            data: dataCaracterEventos,
+        }],
+    });
+      
+  });
+  </script>
+  {% endblock %}
+  <!-- End Conatiner JS -->

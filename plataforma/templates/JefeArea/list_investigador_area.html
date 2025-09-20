@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+  <link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+  <link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+  <link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+  <link rel="stylesheet" href="{% static 'css/datatableSD.css' %}">
+  <style>
+    .filtros-container {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .filtro-grupo {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .filtro-grupo label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    
+    .filtro-grupo select {
+      width: 100%;
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid #ced4da;
+    }
+    
+    .btn-filtrar {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .btn-filtrar:hover {
+      background-color: #0069d9;
+    }
+    
+    .btn-limpiar {
+      background-color: #6c757d;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .btn-limpiar:hover {
+      background-color: #5a6268;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <section class="tabla" id="Investigador">
+    <div class="card card-a p-3 h-100">
+      <div class="card-header">
+        <h5 class="card-title title-t" style=" text-align: start;">
+          <i class="fas fa-id-card " style="color:#93ba22"></i>
+            Investigadores
+        </h5>
+        
+        <!-- Filtros -->
+        <div class="filtros-container">
+          <div class="filtro-grupo">
+            <label for="filtro-rol">Filtrar por Rol:</label>
+            <select id="filtro-rol" class="form-select">
+              <option value="">Todos los roles</option>
+              <option value="Investigador">Investigador</option>
+              <option value="Jefe_departamento">Jefe de Departamento</option>
+            </select>
+          </div>
+          
+          <div class="filtro-grupo">
+            <label for="filtro-categoria">Filtrar por Categoría:</label>
+            <select id="filtro-categoria" class="form-select">
+              <option value="">Todas las categorías</option>
+              {% for categoria in categorias %}
+                <option value="{{ categoria.nombre_categoria_docente }}">{{ categoria.nombre_categoria_docente }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <div class="filtros-acciones">
+            <button id="btn-filtrar" class="btn-filtrar">Filtrar</button>
+            <button id="btn-limpiar-filtros" class="btn-limpiar">Limpiar filtros</button>
+          </div>
+        </div>
+      </div>
+      
+      <table id="Investigadores" class="display table table-striped table-hover table-primary" style="width:100%; height: 100%;">
+        <thead class="encabezado">
+          <tr>
+            <th scope="col" style="color: white; text-align: center;">No</th>
+            <th scope="col" style="color: white; text-align: center;">Investigador</th>
+            <th scope="col" style="color: white; text-align: center;">Email</th>
+            <th scope="col" style="color: white; text-align: center;">Cargo</th>
+            <th scope="col" style="color: white; text-align: center;">Categoría Docente</th>
+            <th scope="col" style="color: white; text-align: center;">Categoría Científica</th>
+            <th scope="col" style="color: white; text-align: center;">Rol </th>
+            <th scope="col" style="color: white; text-align: center;">Currículo</th>
+            {% if user.rol != 'admin' and user.rol != 'jefe_area' %}
+            <th scope="col" style="color: white; text-align: center;">Acciones</th>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for i in investigadores %}
+            <tr>
+              <td style=" text-align: center;">{{forloop.counter}}</td>
+              <td style="text-align: center;"><a class="info personal" style=" text-decoration: none; " href="{% url "Informacion_Detail_Investigador_Area" i.id %}">{{ i.nombre}} {{ i.apellidos}}</a></td>
+              <td style="text-align: center;">{{ i.email }}</td>
+              <td style="text-align: center;">{{ i.cargo }}</td>
+              <td style="text-align: center;">{{ i.categoria_docente  }}</td>
+              <td style="text-align: center;">{{ i.categoria_cientifica}}</td>
+              <td style="text-align: center;">{{ i.rol}}</td>
+              <td style="text-align: center;">
+                <a class="info personal" style=" text-decoration: none; " href="{% url "Curriculo_Investigador_JefeArea" i.id %}"> Ver Curriculo</a>
+              </td>
+              {% if user.rol != 'admin' and user.rol != 'jefe_area' %}
+              <td style="text-align: center;">
+                <!-- Aquí estaría la opción para cambiar rol, pero no se muestra para admin o jefe_area -->
+                <a href="{% url 'CambiarRolJefeArea' i.id %}" class="btn btn-sm btn-primary">Cambiar Rol</a>
+              </td>
+              {% endif %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="option bgs">
+      <div class="bg-active" id="bg-active"></div>
+    </div>
+  </section>
+{% endblock %}
+   
+{% block js %}
+  <script src="{% static 'libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/dataTables.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+  <!--Botones DataTables-->  
+  <script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/pdfmake.min.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/bottons.colVis.min.js' %}"></script>  
+  <!--DataTables responsivo-->
+  <script src="{% static 'libs/Datatable/JS/dataTables.responsive.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>  
+  
+  <script>
+    // Asegurarse de que la tabla se inicialice correctamente con las columnas adecuadas
+    $(document).ready(function() {
+      // Detectar si la columna de acciones está presente
+      var hasActionsColumn = {% if user.rol != 'admin' and user.rol != 'jefe_area' %}true{% else %}false{% endif %};
+      
+      // Inicializar DataTable
+      var table = $('#Investigadores').DataTable({
+        responsive: true,
+        dom: 'Bfrtip',
+        buttons: [
+          'copy', 'csv', 'excel', 'pdf', 'print'
+        ],
+        language: {
+          url: "{% static 'libs/Datatable/dataTableLenguage.json' %}"
+        },
+        columnDefs: [
+          { targets: [0], orderable: true, searchable: false }, // Columna No
+          { targets: [7], orderable: false, searchable: false } // Columna Currículo
+        ]
+      });
+      
+      // Función para aplicar filtros a la tabla
+      function aplicarFiltros() {
+        // Obtener valores de los filtros
+        var rolSeleccionado = $('#filtro-rol').val();
+        var categoriaSeleccionada = $('#filtro-categoria').val();
+        
+        // Limpiar todos los filtros primero
+        table.columns().search('').draw();
+        
+        // Aplicar filtros de forma secuencial con expresiones regulares exactas
+        if (rolSeleccionado) {
+          // Usar expresión regular exacta para el rol
+          table.column(6).search('^' + rolSeleccionado + '$', true, false).draw();
+        }
+        
+        if (categoriaSeleccionada) {
+          // Usar expresión regular exacta para la categoría
+          table.column(4).search('^' + categoriaSeleccionada + '$', true, false).draw();
+        }
+        
+        // Debug
+        console.log("Filtros aplicados - Rol:", rolSeleccionado, 
+                    "Categoría:", categoriaSeleccionada);
+      }
+
+      // Evento para el botón de filtrar
+      $('#btn-filtrar').on('click', aplicarFiltros);
+
+      // Evento para el botón de limpiar filtros
+      $('#btn-limpiar-filtros').on('click', function() {
+        // Limpiar los selects/inputs
+        $('#filtro-rol').val('');
+        $('#filtro-categoria').val('');
+        
+        // Limpiar los filtros en la tabla
+        table.columns().search('').draw();
+        table.search('').draw(); // Limpiar búsqueda global
+        
+        // Debug
+        console.log("Filtros limpiados");
+      });
+
+      // Debug: Verificar estructura de la tabla
+      console.log("Estructura de columnas:");
+      $('#Investigadores thead th').each(function(index) {
+        console.log(index + ": " + $(this).text().trim());
+      });
+    });
+  </script>
+{% endblock %}

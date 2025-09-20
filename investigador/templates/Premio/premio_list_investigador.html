@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'css/datatableSD.css' %}">
+<link rel="stylesheet" href="{% static 'css/styless.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="tabla" id="Premio">
+  <div class="card-header">
+    <h5 class="card-title" style="text-align:center;">
+      Historial de Premios
+    </h5>
+  </div>
+  <div class="boot d-flex flex-wrap justify-content-start align-items-center" style="margin-bottom: 20px;">
+    <a href="{% url 'Premio_Create' %}" class="btn boton-form">
+      <i class="fas fa-plus"></i> Nuevo</a>
+  </div>
+  <div class="table-responsive">
+    <p><strong>Total:</strong> {{ premio|length }} premios</p>
+    <table id="Premios" class="table table-striped text-light">
+    <thead class="encabezado">
+      <tr>
+        <th scope="col">No</th>
+        <th scope="col">Título</th>
+        <th scope="col" d-none d-md-table-cell>Tipo</th>
+        <th scope="col" d-none d-md-table-cell>Carácter</th>
+        <th scope="col">Fecha</th>
+        <th scope="col">Premiados</th>
+        <th scope="col">Estado</th>
+        <th scope="col" style="text-align:center;">Opciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in premio %}
+      <tr class="{% if not p.es_creador %}row-colaborador{% endif %}">
+        <td style="text-align:center;">{{forloop.counter}}</td>
+        <td style="text-align:start;" title="{{ p.titulo }}">{{ p.titulo|truncatechars:40 }}</td>
+        <td style="text-align:start;" title="{{ p.tipo }}">{{ p.tipo|truncatechars:15 }}</td>
+        <td style="text-align:start;">{{ p.caracter }}</td>
+        <td style="text-align:start;">{{ p.fecha_create|date:"d/m/Y" }}</td>
+        <td style="text-align:start;">
+          {% if p.premiados %}
+          <div class="participantes-tooltip">
+            <div class="participantes-info">
+              <span class="participantes-texto">{{ p.usuario }}</span>
+              <span class="participantes-contador">{{ p.contador_participantes }}</span>
+            </div>
+            <div class="participantes-tooltip-content">
+              <ul class="participantes-lista">
+                <li class="participante-item participante-principal">
+                  {{ p.usuario }}<span class="badge-rol badge-creador">Premiado</span>
+                </li>
+                {% for premiado in p.premiados.all %}
+                  {% if premiado.usuario and premiado.usuario.id != p.usuario.id %}
+                    <li class="participante-item participante-secundario">
+                      {{ premiado.usuario.get_full_name|default:premiado.usuario.username }}
+                      <span class="badge-rol badge-colaborador">Colaborador</span>
+                    </li>
+                  {% elif premiado.colaborador %}
+                    <li class="participante-item participante-secundario">
+                      {{ premiado.colaborador.nombre }} {{ premiado.colaborador.apellidos }}
+                      <span class="badge-rol badge-colaborador">Colaborador</span>
+                    </li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+          {% endif %}
+        </td>
+       <td style="text-align:start;">
+        <span style="display: inline-flex; align-items: center; gap: 0.3rem;" class="badge-{% if p.aprobacion == 'Aprobado' %}aprobado{% elif p.aprobacion == 'No Válido' %}rechazado{% else %}pendiente{% endif %}">
+          {% if p.aprobacion == 'Aprobado' %}
+            <i class="fas fa-check-circle me-1"></i>
+          {% elif p.aprobacion == 'No Válido' %}
+            <i class="fas fa-times-circle me-1"></i>
+          {% else %}
+            <i class="fas fa-hourglass-half me-1"></i>
+          {% endif %}
+          {{ p.aprobacion }}
+        </span>
+      </td>
+        <td style="text-align:center;">
+          <a href="{% url 'Premio_Detail_Investigador' p.id %}" title="Ver detalles"> 
+            <i class="fas fa-solid fa-info-circle detail mx-1 fs-6"></i></a>
+          {% if p.aprobacion != "Aprobado" and p.es_creador %}
+          <a href="{% url 'Premio_Update_Investigador' p.id %}" title="Editar premio"> 
+            <i class="fas fa-solid fa-pen-to-square update mx-1 fs-6"></i></a>
+          <a class="iconos" data-bs-toggle="modal" data-bs-target="#Premio{{ p.id }}" title="Eliminar premio">
+            <i class="fas fa-solid fa-trash-can delete mx-1 fs-6"></i></a>
+          {% endif %}
+        </td>
+      </tr>
+      <!-- Modal -->
+      <div class="modal fade" id="Premio{{ p.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel"><i class="bi bi-exclamation-triangle"></i> Eliminar</h5>
+              <button type="button" class="btn-close cerrar" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              ¿Desea eliminar el Premio seleccionado?
+              Esta acci&oacute;n ser&aacute; permanente.
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-cancelar" data-bs-dismiss="modal">Cancelar</button>
+              <a href="{% url 'Premio_Delete_Investigador' p.id  %}" class="btn boton-form">
+                <i class="fas fa-check"></i> Aceptar</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </tbody>
+    </table>
+  </div>
+
+  <div class="option bgs">
+    <div class="bg-active" id="bg-active"></div>
+  </div>
+</section>
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+
+<script src="{% static 'libs/Datatable/JS/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.min.js' %}"></script>
+
+<script src="{% static 'libs/Datatable/JS/dataTables.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+<!--Botones DataTables-->
+<script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/pdfmake.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/bottons.colVis.min.js' %}"></script>
+<!--Inicializar DataTables-->
+<script src="{% static 'libs/Datatable/JS/premios.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% load static %}
+
+<!-- Conatiner CSS -->
+{% block css %}
+<link rel="stylesheet" href=" {% static 'css/Dashboard.css' %}">
+<link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+<link rel="stylesheet" href=" {% static 'css/datatableSD.css' %}">
+{% endblock %}
+<!-- End Conatiner CSS -->
+
+{% block content %}
+<div class="main" style="padding-top:60px;">
+  <main class="content-inside px-3 py-2">
+    <div class="container-fluid">
+      <div class="container-fluid">
+          <!--Table Element-->
+          <section id="tablaTramites">
+            <div class="card card-a p-3 h-100">
+              <div class="card-header">
+                <h5 class="card-title title-t" style=" text-align: start;">
+                    Carácter Evento
+                </h5>
+            </div>
+            <div class="boot d-flex flex-wrap justify-content-start align-items-center">
+              <a href="{% url 'CarcterEvento_Create' %}" class="btn1 m-2 btn btn-primary btn-sm text-decoration-none">Añadir</a>
+            </div>
+              </div>
+              <table id="CaracterEvento" class="display table table-striped table-hover table-primary" style="width:100%; height: 100%;">
+                <thead class="encabezado">
+                  <tr>
+                    <th scope="col" style="color: white; text-align: center;">No</th>
+                    <th scope="col" style="color: white; text-align: center;">Nombre de la Característica</th>
+                    <th scope="col" style="color: white; text-align: center;">Opciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for caracter in CarcterEvento %}
+                    <tr>
+                      <td style="text-align: center;">{{ forloop.counter }}</td>
+                      <td style="text-align: center;">{{ caracter.nombre_caracter_evento }}</td>
+                      <td style="text-align: center; font-size: 1.2rem;">
+                        <a class="iconos p-2" href="{% url 'CarcterEvento_Update' caracter.id %}"><i class=" fas fa-solid fa-pen-to-square"></i></a>
+                        <a class="iconos p-2" data-bs-toggle="modal" data-bs-target="#Caracter{{ caracter.id }}"><i class="fas fa-solid fa-trash-can"></i></a>
+                      </td>
+                    </tr>
+                    
+                    <!-- Modal -->
+                    <div class="modal fade" id="Caracter{{ caracter.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel" style="color:black">
+                              <i class="bi bi-exclamation-triangle" style="color:black"></i> Advertencia
+                            </h5>
+                            <button type="button" class="btn-close cerrar" data-bs-dismiss="modal" aria-label="Close" style="box-shadow: none"></button>
+                          </div>
+                          <div class="modal-body" style="color:black">
+                            ¿Desea eliminar esta Característica de Evento?
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancelar</button>
+                            <form method="post" action="{% url 'CarcterEvento_Delete' caracter.id %}">
+                              {% csrf_token %}
+                              <button type="submit" class="btn btn-primary">Guardar</button>
+                              <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancelar</button>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </section>
+          
+                </div>
+              </div>
+            </section>
+          </section>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+<!-- Conatiner JS -->
+{% block js%}
+<script src="{% static 'Plataforma/libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+
+<script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/pdfmake.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/bottons.colVis.min.js' %}"></script>
+
+<script src="{% static 'libs/Datatable/JS/dataTables.responsive.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>
+
+<script src="{% static 'libs/Highcharts/code/highcharts.js' %}"></script>
+<script src="{% static 'libs/Highcharts/code/modules/accessibility.js' %}"></script>
+<script src="{% static 'libs/Highcharts/code/modules/exporting.js' %}"></script>
+<script src="{% static 'libs/Highcharts/code/modules/offline-exporting.js' %}"></script>
+<script src="{% static 'libs/Highcharts/code/modules/export-data.js' %}"></script>
+
+<script>
+  $(document).ready(function() { 
+    // Initialize DataTable
+    $('#CaracterEvento').DataTable({
+      responsive: true,
+      dom: 'Bfrtip',
+      buttons: [
+        'copy', 'csv', 'excel', 'pdf', 'print'
+      ],
+      language: {
+        url: "{% static 'libs/Datatable/dataTableLenguage.json' %}"
+    },
+    });
+
+    // If you have data for charts, you can add them here
+    // Example:
+    /*
+    var caracterEventosData = {{ caracter_eventos_data|safe }};
+    Highcharts.chart('grafCaracterEventos', {
+      chart: {
+        type: 'pie'
+      },
+      title: {
+        text: 'Distribución de Características de Eventos'
+      },
+      series: [{
+        name: 'Características',
+        data: caracterEventosData
+      }]
+    });
+    */
+  });
+</script>
+{% endblock %}
+<!-- End Conatiner JS -->

@@ -1,0 +1,42 @@
+.encabezado{
+    background: #0d6efd;
+}
+
+.form-select{
+    box-shadow: none !important;
+}
+
+.card-title{
+    color: #0d6efd;
+}
+
+.card-header{
+    background:#fff!important;
+    width: 100%;
+}
+
+input{
+    box-shadow: none !important;
+}
+
+.iconos {
+    color:black;
+    font-size: 1rem;
+}
+
+.iconos i{
+    color:black;
+    font-size: 1.1rem;
+}
+
+.iconos:hover{
+    color: #0d6efd;
+}
+.iconos i:hover{
+    color: #0d6efd;
+}
+
+a{
+    text-decoration: none;
+    color: black;
+}

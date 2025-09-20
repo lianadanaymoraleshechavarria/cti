@@ -1,0 +1,502 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{% static 'libs/Bootstrap/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/Base1.css' %}">
+  <link rel="stylesheet" href="{% static 'css/Base.css' %}">
+  <link rel="stylesheet" href="{% static 'libs/fontawesomefree/css/all.min.css' %}">
+
+  
+
+  <link rel="stylesheet" href="{% static 'libs/Bootstrap/icon/bootstrap-icons.min.css' %}">
+  <link rel="icon" type="image/png" sizes="50x50" href="{% static 'img/Id UHo-03-white.png' %}">
+
+  <!-- Conatiner CSS -->
+  {% block css %}
+  {% endblock %}
+  <!-- End Conatiner CSS -->
+
+  <title> Universidad de Holguín</title>
+
+
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <div class="container-fluid p-0 d-flex h-100">
+    <div id="bdSidebar"
+      class="d-flex flex-column flex-shrink-0 p-3  pt-0 pb-0 text-white offcanvas-md offcanvas-start responsivo"
+      style="width: 250px; background: linear-gradient(to bottom, #93ba22, #007fff);">
+      <!-- Modificar la estructura del enlace del logo para asegurar que sea clickeable -->
+      {% if user.is_superuser or user.Administrador %}
+        <a href="{% url 'Dashboard_Admin' %}" class="navbar-brand" onclick="window.location='{% url 'Dashboard_Admin' %}'">
+          <img src="{% static 'img/Id UHo-03-white.png' %}" width="200" height="80px" alt="Universidad de Holguín">
+        </a>
+        
+      {% elif user.rol == 'Investigador' %}
+        <a href="{% url 'Dashboard_Investigador' %}"  %}>
+          <img src="{% static 'img/Id UHo-03-white.png' %}" width="200" height="80px" alt="Universidad de Holguín">
+        </a>
+
+        
+      {% elif user.rol == 'Vicerrector' %}
+        <a href="{% url 'Dashboard_Vicerrector' %}  %}">
+          <img src="{% static 'img/Id UHo-03-white.png' %}" width="200" height="80px" alt="Universidad de Holguín">
+        </a>
+      {% elif user.rol == 'Jefe_departamento' %}
+        <a href="{% url 'Dashboard_JefeDepartamento' %}  %} ">
+          <img src="{% static 'img/Id UHo-03-white.png' %}" width="200" height="80px" alt="Universidad de Holguín">
+        </a>
+      {% elif user.rol == 'jefe_area' %}
+        <a href="{% url 'Dashboard_JefeArea' %}  %}">
+          <img src="{% static 'img/Id UHo-03-white.png' %}" width="200" height="80px" alt="Universidad de Holguín">
+        </a>
+    
+      {% else %}
+        <a href="#" class="navbar-brand">
+          <img src="{% static 'img/Id UHo-03-white.png' %}" width="200" height="80px" alt="Universidad de Holguín">
+        </a>
+      {% endif %}
+      <hr>
+      {% if user.is_superuser or user.Administrador%}
+      <ul class="mynav nav nav-pills flex-column mb-auto">
+        <li class="nav-item mb-1" aria-label="">
+          <a href="#" class="usuario" >
+            <i class="bi bi-person-circle mx-1" style="font-size:1.1rem;"></i>
+             Bienvenido, <strong>{{ user.username }}</strong>
+          </a>
+        </li>
+        <li>
+          <a  class="nav-link text-white " data-bs-toggle="collapse" aria-expanded="false" data-bs-target="#Gestionar-collapse" aria-controls="contents-collapse">
+              <i class="fas fa-list text-white"></i> <b>Gestionar <i class="fas fa-angle-down text-white"></i></b>
+          </a>
+        </li>
+        <ul class="list-unstyled ps-3 collapse" id="Gestionar-collapse">
+        </li>
+        <li class="nav-item mb-1" aria-label="Usuarios">
+          <a href="{% url 'Usuarios' %}" class="">
+            <i class="fas fa-solid fa-users mx-1" ></i>
+            Usuarios
+          </a>
+        </li>
+      </li>
+      <li>
+        <a  class="nav-link text-white " data-bs-toggle="collapse" aria-expanded="false" data-bs-target="#AD-collapse" aria-controls="contents-collapse">
+            <i class="fas fa-list text-white"></i> <b>Gestionar Areas y Departamentos <i class="fas fa-angle-down text-white"></i></b>
+        </a>
+    </li>
+    <ul class="list-unstyled ps-3 collapse" id="AD-collapse">
+      <li class="nav-item mb-1" aria-label="Area_List">
+        <a href="{% url 'Area_List' %}" class="">
+          <i class="fas fa-solid fa-users mx-1" ></i>
+          Area
+        </a>
+      </li>
+      <li class="nav-item mb-1" aria-label="Departamento_List">
+        <a href="{% url 'Departamento_List' %}" class="">
+          <i class="fas fa-solid fa-users mx-1" ></i>
+          Departamento
+        </a>
+      </li>
+  <li>
+  </ul>
+    <a  class="nav-link text-white " data-bs-toggle="collapse" aria-expanded="false" data-bs-target="#Publicaciones-collapse" aria-controls="contents-collapse">
+        <i class="fas fa-list text-white"></i> <b>Editar Nomenclaturas <i class="fas fa-angle-down text-white"></i></b>
+    </a>
+</li>
+<ul class="list-unstyled ps-3 collapse" id="Publicaciones-collapse">
+
+  <li class="nav-item mb-1" aria-label="editar_nombres_roles">
+    <a href="{% url 'editar_nombres_roles' %}" class="">
+        <i class="fas fa-solid fa-users mx-1"></i>
+        Editar Roles
+    </a>
+</li>
+</li>
+
+<li class="nav-item mb-1" aria-label="CategoriaCientificaList">
+  <a href="{% url 'CategoriaCientificaList' %}" class="">
+    <i class="fas fa-solid fa-users mx-1"></i>
+    Editar Categorias Cientificas
+  </a>
+</li>
+<li class="nav-item mb-1" aria-label="CategoriaDocenteList">
+  <a href="{% url 'CategoriaDocenteList' %}" class="">
+    <i class="fas fa-solid fa-users mx-1"></i>
+    Editar Categorias Docentes
+  </a>
+</li>    
+</ul>
+</ul>
+
+
+
+
+        <li class="nav-item mb-1" aria-label="Artículos">
+          <a href="{% url 'Articulo_List_Admin' %}" class="">
+            <i class= "fa-solid fa-scroll" ></i>
+              Artículos
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+          <a href="{% url 'Evento_List_Admin' %}" class="">
+            <i class="fas fa-people-group "></i>
+              Eventos
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+          <a href="{% url 'Proyecto_List_Admin' %}" class="">
+            <i class="fas fa-shapes " ></i>
+              Proyectos
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+          <a href="{% url 'Premio_List_Admin' %}" class="">
+            <i class="fas  fa-award " ></i>
+              Premios
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+          <a href="{% url 'Programa_List_Admin' %}" class="">
+            <i class="fas fa-check-circle "></i>
+              Programa
+          </a>
+        </li>
+      </ul>
+      <hr class="mb-0">
+      <div>
+        <ul class="mynav nav nav-pills flex-column mb-auto ">
+          <li class="nav-item mb-1 " aria-label="CerrarSesion">
+            <a class="" data-bs-toggle="modal" data-bs-target="#exampleModal">
+              Cerrar Sesión
+            </a>
+          </li>
+        </ul>
+      </div>
+      {% endif %}
+       
+      
+      {% if user.rol == 'Investigador' %}
+      <ul class="mynav nav nav-pills flex-column mb-auto">
+        <li class="nav-item mb-1" aria-label="">
+          <a href="#" class="usuario" >
+            <i class="bi bi-person-circle mx-1" style="font-size:1.1rem;"></i>
+             Bienvenido, Investigador: <strong>{{ user.username }}</strong>
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+          <a href="{% url 'Curriculo_List_Investigador' %}" class="">
+            <i class="fas  fa-id-card text-white"></i>
+              Mi Currículo 
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="MisTramites">
+          <a href="{% url 'Perfil_Detail_Investigador' %}" class="">
+            <i class="fas fa-user text-white"></i>
+            Mi Perfil Académico
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="Artículos">
+          <a href="{% url 'Articulo_List_Investigador' %}" class="">
+            <i class= "fa-solid fa-scroll fa-beat-fade" style="--fa-beat-fade-opacity:  0.67; --fa-beat-fade-scale: 1.00;"></i>
+              Artículos
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+          <a href="{% url 'Evento_List_Investigador' %}" class="">
+            <i class="fas  fa-people-group  fa-beat-fade" style="--fa-beat-fade-opacity:  0.67; --fa-beat-fade-scale: 1.00;"></i>
+              Eventos
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+          <a href="{% url 'Proyecto_List_Investigador' %}" class="">
+            <i class="fas fa-shapes fa-beat-fade" style="--fa-beat-fade-opacity:  0.67; --fa-beat-fade-scale: 1.00;"></i>
+              Proyectos
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+          <a href="{% url 'Programa_List_Investigador' %}" class="">
+            <i class="fas fa-check-circle fa-beat-fade" style="--fa-beat-fade-opacity:  0.67; --fa-beat-fade-scale: 1.00;"></i>
+              Programas
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+          <a href="{% url 'Premio_List_Investigador' %}" class="">
+            <i class="fas  fa-award fa-beat-fade" style="--fa-beat-fade-opacity:  0.67; --fa-beat-fade-scale: 1.00;"></i>
+              Premios
+          </a>
+        </li>
+      </ul>
+      <hr class="mb-0">
+      <div>
+        <ul class="mynav nav nav-pills flex-column mb-auto ">
+          <li class="nav-item mb-1 " aria-label="CerrarSesion">
+            <a class="" data-bs-toggle="modal" data-bs-target="#exampleModal">
+              Cerrar Sesión
+            </a>
+          </li>
+        </ul>
+      </div>
+      {% endif %}
+      
+      
+      {% if user.rol == 'Vicerrector' %}
+      <ul class="mynav nav nav-pills flex-column mb-auto">
+        <li class="nav-item mb-1" aria-label="">
+          <a href="#" class="usuario" >
+            <i class="bi bi-person-circle mx-1" style="font-size:1.1rem;"></i>
+             Bienvenido, Vicerrector: <strong>{{ user.username }}</strong>
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="MisTramites">
+          <a href="{% url 'Perfil_Detail_Investigador' %}" class="">
+            <i class="fas fa-user fa-beat-fade text-white" style="--fa-beat-fade-opacity:  0.67; --fa-beat-fade-scale: 1.00;"></i></i>
+            Perfil
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+          <a href="{% url 'List_Investigador_Vicerrector' %}" class="">
+            <i class="fas fa-user  fa-beat-fade text-white" style="--fa-beat-fade-opacity:  0.67; --fa-beat-fade-scale: 1.00;"></i></i>
+              Investigadores 
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+          <a href="{% url 'Articulo_List_Vicerrector' %}" class="">
+            <i class= "fa-solid fa-scroll fa-beat-fade" style="--fa-beat-fade-opacity:  0.67; --fa-beat-fade-scale: 1.00;"></i>
+              Artículos 
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+          <a href="{% url 'Evento_List_Vicerrector' %}" class="">
+            <i class="fas  fa-people-group  fa-beat-fade" style="--fa-beat-fade-opacity:  0.67; --fa-beat-fade-scale: 1.00;"></i>
+              Eventos
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="Proyectos">
+          <a href="{% url 'Proyecto_List_Vicerrector' %}" class="">
+            <i class="fas fa-shapes fa-beat-fade" style="--fa-beat-fade-opacity:  0.67; --fa-beat-fade-scale: 1.00;"></i>
+              Proyectos
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="Premio">
+          <a href="{% url 'Premio_List_Vicerrector' %}" class="">
+            <i class="fas fa-award fa-beat-fade" style="--fa-beat-fade-opacity:  0.67; --fa-beat-fade-scale: 1.00;"></i>
+              Premios
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="Programa List">
+          <a href="{% url 'Programa_List_Vicerrector' %}" class="">
+            <i class="fas fa-check-circle fa-beat-fade" style="--fa-beat-fade-opacity:  0.67; --fa-beat-fade-scale: 1.00;"></i>
+            Programas
+          </a>
+        </li>
+      </ul>
+      <hr class="mb-0">
+      <div>
+        <ul class="mynav nav nav-pills flex-column mb-auto ">
+          <li class="nav-item mb-1 " aria-label="CerrarSesion">
+            <a class="" data-bs-toggle="modal" data-bs-target="#exampleModal">
+              Cerrar Sesión
+            </a>
+          </li>
+        </ul>
+      </div>
+      
+      {% endif %}
+
+
+  
+      {% if user.rol == 'Jefe_departamento' %}
+      <ul class="mynav nav nav-pills flex-column mb-auto">
+        <li class="nav-item mb-1" aria-label="">
+          <a href="#" class="usuario" >
+            <i class="bi bi-person-circle mx-1" style="font-size:1.1rem;"></i>
+             Bienvenido, Jefe del departamento: <strong>{{ user.username }}</strong>
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="MisTramites">
+          <a href="{% url 'Perfil_Detail_Investigador' %}" class="">
+            <i class="fas fa-user fa-beat-fade text-white" style="--fa-beat-fade-opacity:  0.67; --fa-beat-fade-scale: 1.00;"></i></i>
+            Perfil
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+          <a href="{% url 'List_Investigador_JefeDepartamento' %}" class="">
+            <i class="fas fa-user  fa-beat-fade text-white" style="--fa-beat-fade-opacity:  0.67; --fa-beat-fade-scale: 1.00;"></i></i>
+              Investigadores 
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+          <a href="{% url 'Articulo_List_JefeDepartamento' %}" class="">
+            <i class= "fa-solid fa-scroll fa-beat-fade" style="--fa-beat-fade-opacity:  0.67; --fa-beat-fade-scale: 1.00;"></i>
+              Artículos 
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+          <a href="{% url 'Evento_List_JefeDepartamento' %}" class="">
+            <i class="fas  fa-people-group  fa-beat-fade" style="--fa-beat-fade-opacity:  0.67; --fa-beat-fade-scale: 1.00;"></i>
+              Eventos
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="Proyectos">
+          <a href="{% url 'Proyecto_List_JefeDepartamento' %}" class="">
+            <i class="fas fa-shapes fa-beat-fade" style="--fa-beat-fade-opacity:  0.67; --fa-beat-fade-scale: 1.00;"></i>
+              Proyectos
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="Premio">
+          <a href="{% url 'Premio_List_JefeDepartamento' %}" class="">
+            <i class="fas fa-award fa-beat-fade" style="--fa-beat-fade-opacity:  0.67; --fa-beat-fade-scale: 1.00;"></i>
+              Premios
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="Programa List">
+          <a href="{% url 'Programa_List_JefeDepartamento' %}" class="">
+            <i class="fas fa-check-circle fa-beat-fade" style="--fa-beat-fade-opacity:  0.67; --fa-beat-fade-scale: 1.00;"></i>
+            Programas
+          </a>
+        </li>
+      </ul>
+      <hr class="mb-0">
+      <div>
+        <ul class="mynav nav nav-pills flex-column mb-auto ">
+          <li class="nav-item mb-1 " aria-label="CerrarSesion">
+            <a class="" data-bs-toggle="modal" data-bs-target="#exampleModal">
+              Cerrar Sesión
+            </a>
+          </li>
+        </ul>
+      </div>
+      
+      {% endif %}
+
+      {% if user.rol == 'Jefe_area' or user.rol == 'jefe de area' %}
+      <ul class="mynav nav nav-pills flex-column mb-auto">
+        <li class="nav-item mb-1" aria-label="">
+          <a href="#" class="usuario" >
+            <i class="bi bi-person-circle mx-1" style="font-size:1.1rem;"></i>
+             Bienvenido, Jefe del Area: <strong>{{ user.username }}</strong>
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="MisTramites">
+          <a href="{% url 'Perfil_Detail_Investigador' %}" class="">
+            <i class="fas fa-user fa-beat-fade text-white" style="--fa-beat-fade-opacity:  0.67; --fa-beat-fade-scale: 1.00;"></i></i>
+            Perfil
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+          <a href="{% url 'ListaUsuarios' %}" class="">
+            <i class="fas fa-user  fa-beat-fade text-white" style="--fa-beat-fade-opacity:  0.67; --fa-beat-fade-scale: 1.00;"></i></i>
+              Investigadores 
+          </a>
+
+        </li>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+          <a href="{% url 'Articulo_List_JefeArea' %}" class="">
+            <i class= "fa-solid fa-scroll fa-beat-fade" style="--fa-beat-fade-opacity:  0.67; --fa-beat-fade-scale: 1.00;"></i>
+              Artículos 
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="InfoPersonal">
+          <a href="{% url 'Evento_List_JefeArea' %}" class="">
+            <i class="fas  fa-people-group  fa-beat-fade" style="--fa-beat-fade-opacity:  0.67; --fa-beat-fade-scale: 1.00;"></i>
+              Eventos
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="Proyectos">
+          <a href="{% url 'Proyecto_List_JefeArea' %}" class="">
+            <i class="fas fa-shapes fa-beat-fade" style="--fa-beat-fade-opacity:  0.67; --fa-beat-fade-scale: 1.00;"></i>
+              Proyectos
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="Premio">
+          <a href="{% url 'Premio_List_JefeArea' %}" class="">
+            <i class="fas fa-award fa-beat-fade" style="--fa-beat-fade-opacity:  0.67; --fa-beat-fade-scale: 1.00;"></i>
+              Premios
+          </a>
+        </li>
+        <li class="nav-item mb-1" aria-label="Programa List">
+          <a href="{% url 'Programa_List_JefeArea' %}" class="">
+            <i class="fas fa-check-circle fa-beat-fade" style="--fa-beat-fade-opacity:  0.67; --fa-beat-fade-scale: 1.00;"></i>
+            Programas
+          </a>
+        </li>
+      </ul>
+      <hr class="mb-0">
+      <div>
+        <ul class="mynav nav nav-pills flex-column mb-auto ">
+          <li class="nav-item mb-1 " aria-label="CerrarSesion">
+            <a class="" data-bs-toggle="modal" data-bs-target="#exampleModal">
+              Cerrar Sesión
+            </a>
+          </li>
+        </ul>
+      </div>
+      
+      {% endif %}      
+    
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel"><i class="bi bi-exclamation-triangle"></i> Advertencia</h5>
+            <button type="button" class="btn-close cerrar" data-bs-dismiss="modal" aria-label="Close" style="box-shadow: none"></button>
+          </div>
+          <div class="modal-body">
+            ¿Desea cerrar esta sesión?
+          </div>
+          <div class="modal-footer">
+            <a href="{% url 'CerrarSesion' %}" class="btn btn-primary">Aceptar</a>
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancelar</button>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="contenedor">
+      <div class="p-2 d-md-none d-flex text-white responsivo">
+        <a href="#" class="text-white" data-bs-toggle="offcanvas" data-bs-target="#bdSidebar">
+          <i class="fa fa-solid fa-bars"></i>
+        </a>
+        <span class="ms-3">Universidad de Holguín</span>
+      </div>
+      <!-- End Sidebar -->
+
+      <div class="main-container">
+        <div class="row content">
+          <div class="col">
+            <!-- Container -->
+            {% block content %}
+            {% endblock %}
+            <!-- End Container -->
+          </div>
+
+          <!-- Footer -->
+          <p class="text-center pb-2 footer">Copyright &copy; 2024 Estadisticas de la Universidad de Holguín. All rights reserved.
+          </p>
+          <!-- End Footer -->
+          
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body>
+
+  <!-- Container JS -->
+  {% block js %}
+  {% endblock %}
+  <script src=" {% static 'libs/Bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src=" {% static 'libs/fontawesomefree/js/all.min.js' %}"></script>
+  <script src=" {% static 'js/script.js' %}"></script>
+  <script src=" {% static 'js/Modals.js' %}"></script>
+  <!-- End Container JS -->

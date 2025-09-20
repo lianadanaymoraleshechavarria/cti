@@ -1,0 +1,101 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{% static 'libs/Bootstrap/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'libs/fontawesomefree/css/all.min.css' %}">
+  <link rel="stylesheet" href="{% static 'libs/Bootstrap/icon/bootstrap-icons.min.css' %}">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <link rel="icon" type="image/png" sizes="50x50" href="{% static 'img/Id UHo-03-white.png' %}">
+
+  <!-- Conatiner CSS -->
+  {% block css %}
+  {% endblock %}
+  <!-- End Conatiner CSS -->
+
+  <title> Universidad de Holguín</title>
+
+</head>
+
+<body>
+  <div class="container-fluid p-0 d-flex" style="min-height: 100vh; overflow: hidden;">
+    {% include "menu.html" %}
+
+    <div class="flex-grow-1 d-flex flex-column">
+      <main class="flex-grow-1 overflow-auto">
+
+        <!-- Mensajes de alerta -->
+        {% if messages %}
+        <div class="container mt-3">
+          {% for message in messages %}
+          <div
+            class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show"
+            role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        <!-- Fin mensajes de alerta -->
+
+        <div class="container-fluid mt-3">
+          {% block content %}
+          {% endblock %}
+        </div>
+      </main>
+      <footer class="text-center py-1 footer">
+        &copy; 2025 Estadísticas de la Universidad de Holguín.
+      </footer>
+    </div>
+  </div>
+
+  <!-- Container JS -->
+  {% block js %}
+  {% endblock %}
+  <script src=" {% static 'libs/Bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src=" {% static 'libs/fontawesomefree/js/all.min.js' %}"></script>
+  <script src=" {% static 'js/script.js' %}"></script>
+  <script src=" {% static 'js/Modals.js' %}"></script>
+
+  <!-- Script para actualizar notificaciones -->
+  {% if user.rol == 'Vicerrector' or user.rol == 'Jefe_departamento' or user.rol == 'Jefe_area' %}
+  <script>
+    // Función para actualizar el contador de notificaciones
+    function actualizarContadorNotificaciones() {
+      fetch('{% url "obtener_contador_notificaciones" %}')
+        .then(response => response.json())
+        .then(data => {
+          const contadorElements = document.querySelectorAll('.notification-badge');
+          contadorElements.forEach(element => {
+            if (data.contador > 0) {
+              element.textContent = data.contador;
+              element.style.display = 'inline-block';
+            } else {
+              element.style.display = 'none';
+            }
+          });
+        })
+        .catch(error => console.error('Error al actualizar notificaciones:', error));
+    }
+
+    // Actualizar cada 60 segundos
+    document.addEventListener('DOMContentLoaded', function () {
+      // Actualizar al cargar la página
+      actualizarContadorNotificaciones();
+
+      // Configurar actualización periódica
+      setInterval(actualizarContadorNotificaciones, 60000);
+    });
+  </script>
+  <!-- End Container JS -->
+  {% endif %}
+</body>
+
+</html>

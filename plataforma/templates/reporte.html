@@ -1,0 +1,938 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'css/datatableSD.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css">
+<!-- Opcional: Toastify para notificaciones -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<style>
+  .tab-content {
+    padding: 20px;
+    background: white;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  
+  .nav-tabs .nav-link.active {
+    font-weight: bold;
+    background: white;
+    border-bottom: 3px solid #93ba22;
+  }
+  
+  .filter-section {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+  }
+  
+  .filter-row {
+    margin-bottom: 10px;
+  }
+  
+  .export-buttons {
+    margin-bottom: 15px;
+  }
+  
+  .select2-container {
+    width: 100% !important;
+  }
+  
+  .btn-filter {
+    min-width: 100px;
+  }
+  
+  /* Mejoras para móviles */
+  @media (max-width: 768px) {
+    .filter-section {
+      padding: 10px;
+    }
+    
+    .filter-row {
+      margin-bottom: 15px;
+    }
+    
+    .btn-filter {
+      width: 100%;
+      margin-top: 10px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="fas fa-file-alt mr-2" style="color:#93ba22"></i>
+          Reporte Completo del Sistema
+        </h3>
+      </div>
+      
+      <div class="card-body">
+        <ul class="nav nav-tabs" id="reportTabs" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" id="eventos-tab" data-bs-toggle="tab" href="#eventos" role="tab" aria-controls="eventos" aria-selected="true">Eventos</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="proyectos-tab" data-bs-toggle="tab" href="#proyectos" role="tab" aria-controls="proyectos" aria-selected="false">Proyectos</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="programas-tab" data-bs-toggle="tab" href="#programas" role="tab" aria-controls="programas" aria-selected="false">Programas</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="premios-tab" data-bs-toggle="tab" href="#premios" role="tab" aria-controls="premios" aria-selected="false">Premios</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="articulos-tab" data-bs-toggle="tab" href="#articulos" role="tab" aria-controls="articulos" aria-selected="false">Artículos</a>
+          </li>
+        </ul>
+        
+        <div class="tab-content" id="reportTabsContent">
+          <!-- Eventos -->
+          <div class="tab-pane fade show active" id="eventos" role="tabpanel" aria-labelledby="eventos-tab">
+            <div class="filter-section">
+              <h5>Filtros de Eventos</h5>
+              <div class="row filter-row">
+                <div class="col-md-3">
+                  <label for="eventoModalidad" class="form-label">Modalidad</label>
+                  <select id="eventoModalidad" class="form-select select2">
+                    <option value="">Todas</option>
+                    {% for modalidad in modalidades %}
+                    <option value="{{ modalidad.modalidad }}">{{ modalidad.modalidad }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="eventoTipo" class="form-label">Tipo</label>
+                  <select id="eventoTipo" class="form-select select2">
+                    <option value="">Todos</option>
+                    {% for tipo in tipos_evento %}
+                    <option value="{{ tipo.id }}">{{ tipo.nombre }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="eventoArea" class="form-label">Área</label>
+                  <select id="eventoArea" class="form-select select2">
+                    <option value="">Todas</option>
+                    {% for area in areas %}
+                    <option value="{{ area.nombre_area }}">{{ area.nombre_area }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="eventoDepartamento" class="form-label">Departamento</label>
+                  <select id="eventoDepartamento" class="form-select select2">
+                    <option value="">Todos</option>
+                    {% for departamento in departamentos %}
+                    <option value="{{ departamento.nombre_departamento }}" data-area="{{ departamento.area.nombre_area|default:'' }}">
+                      {{ departamento.nombre_departamento }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="row filter-row">
+                <div class="col-md-9">
+                  <label for="eventoUsuario" class="form-label">Responsable</label>
+                  <select id="eventoUsuario" class="form-select select2-ajax">
+                    <option value="">Todos</option>
+                  </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                  <button id="limpiarFiltrosEventos" class="btn btn-secondary w-100">Limpiar Filtros</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="export-buttons">
+              <button class="btn btn-success btn-sm export-excel" data-table="eventosTable">Exportar a Excel</button>
+              <button class="btn btn-danger btn-sm export-pdf" data-table="eventosTable">Exportar a PDF</button>
+            </div>
+            <table id="eventosTable" class="table table-striped table-bordered" style="width:100%">
+              <thead>
+                <tr>
+                  <th>Título</th>
+                  <th>Tipo</th>
+                  <th>Estado</th>
+                  <th>Modalidad</th>
+                  <th>Fecha</th>
+                  <th>Área</th>
+                  <th>Departamento</th>
+                  <th>Responsable</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for evento in eventos %}
+                <tr>
+                  <td>{{ evento.titulo }}</td>
+                  <td>{{ evento.tipo }}</td>
+                  <td>{{ evento.get_aprobacion_display }}</td>
+                  <td>{{ evento.modalidad|default:"-" }}</td>
+                  <td>{{ evento.fecha|date:"F Y" }}</td>
+                  <td>{{ evento.area.nombre_area|default:"-" }}</td>
+                  <td>{{ evento.departamento.nombre_departamento|default:"-" }}</td>
+                  <td>{{ evento.usuario.username }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Proyectos -->
+          <div class="tab-pane fade" id="proyectos" role="tabpanel" aria-labelledby="proyectos-tab">
+            <div class="filter-section">
+              <h5>Filtros de Proyectos</h5>
+              <div class="row filter-row">
+                <div class="col-md-3">
+                  <label for="proyectoTipo" class="form-label">Tipo</label>
+                  <select id="proyectoTipo" class="form-select select2">
+                    <option value="">Todos</option>
+                    {% for tipo in tipos_proyecto %}
+                    <option value="{{ tipo.1 }}">{{ tipo.1 }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="proyectoArea" class="form-label">Área</label>
+                  <select id="proyectoArea" class="form-select select2">
+                    <option value="">Todas</option>
+                    {% for area in areas %}
+                    <option value="{{ area.nombre_area }}">{{ area.nombre_area }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="proyectoDepartamento" class="form-label">Departamento</label>
+                  <select id="proyectoDepartamento" class="form-select select2">
+                    <option value="">Todos</option>
+                    {% for departamento in departamentos %}
+                    <option value="{{ departamento.nombre_departamento }}" data-area="{{ departamento.area.nombre_area|default:'' }}">
+                      {{ departamento.nombre_departamento }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="proyectoUsuario" class="form-label">Responsable</label>
+                  <select id="proyectoUsuario" class="form-select select2-ajax">
+                    <option value="">Todos</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row filter-row">
+                <div class="col-md-12 d-flex justify-content-end">
+                  <button id="limpiarFiltrosProyectos" class="btn btn-secondary btn-filter">Limpiar Filtros</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="export-buttons">
+              <button class="btn btn-success btn-sm export-excel" data-table="proyectosTable">Exportar a Excel</button>
+              <button class="btn btn-danger btn-sm export-pdf" data-table="proyectosTable">Exportar a PDF</button>
+            </div>
+            <table id="proyectosTable" class="table table-striped table-bordered" style="width:100%">
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Nombre</th>
+                  <th>Estado</th>
+                  <th>Tipo</th>
+                  <th>Línea Investigación</th>
+                  <th>Fecha Inicio</th>
+                  <th>Fecha Cierre</th>
+                  <th>Área</th>
+                  <th>Departamento</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for proyecto in proyectos %}
+                <tr>
+                  <td>{{ proyecto.codigo_proyecto }}</td>
+                  <td>{{ proyecto.nombre_proyecto }}</td>
+                  <td>{{ proyecto.get_estado_proyecto_display }}</td>
+                  <td>{{ proyecto.get_tipo_proyecto_display }}</td>
+                  <td>{{ proyecto.get_linea_investigacion_display }}</td>
+                  <td>{{ proyecto.fecha_inicio|date:"d/m/Y" }}</td>
+                  <td>{{ proyecto.fecha_cierre|date:"d/m/Y" }}</td>
+                  <td>{{ proyecto.area.nombre_area|default:"-" }}</td>
+                  <td>{{ proyecto.departamento.nombre_departamento|default:"-" }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Programas -->
+          <div class="tab-pane fade" id="programas" role="tabpanel" aria-labelledby="programas-tab">
+            <div class="filter-section">
+              <h5>Filtros de Programas</h5>
+              <div class="row filter-row">
+                <div class="col-md-3">
+                  <label for="programaLinea" class="form-label">Línea Investigación</label>
+                  <select id="programaLinea" class="form-select select2">
+                    <option value="">Todas</option>
+                    {% for linea in lineas_investigacion %}
+                    <option value="{{ linea.1 }}">{{ linea.1 }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="programaArea" class="form-label">Área</label>
+                  <select id="programaArea" class="form-select select2">
+                    <option value="">Todas</option>
+                    {% for area in areas %}
+                    <option value="{{ area.nombre_area }}">{{ area.nombre_area }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="programaDepartamento" class="form-label">Departamento</label>
+                  <select id="programaDepartamento" class="form-select select2">
+                    <option value="">Todos</option>
+                    {% for departamento in departamentos %}
+                    <option value="{{ departamento.nombre_departamento }}" data-area="{{ departamento.area.nombre_area|default:'' }}">
+                      {{ departamento.nombre_departamento }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="programaUsuario" class="form-label">Responsable</label>
+                  <select id="programaUsuario" class="form-select select2-ajax">
+                    <option value="">Todos</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row filter-row">
+                <div class="col-md-12 d-flex justify-content-end">
+                  <button id="limpiarFiltrosProgramas" class="btn btn-secondary btn-filter">Limpiar Filtros</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="export-buttons">
+              <button class="btn btn-success btn-sm export-excel" data-table="programasTable">Exportar a Excel</button>
+              <button class="btn btn-danger btn-sm export-pdf" data-table="programasTable">Exportar a PDF</button>
+            </div>
+            <table id="programasTable" class="table table-striped table-bordered" style="width:100%">
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Nombre</th>
+                  <th>Estado</th>
+                  <th>Línea Investigación</th>
+                  <th>Proyectos</th>
+                  <th>Área</th>
+                  <th>Departamento</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for programa in programas %}
+                <tr>
+                  <td>{{ programa.codigo_programa }}</td>
+                  <td>{{ programa.nombre_programa }}</td>
+                  <td>{{ programa.get_aprobacion_display }}</td>
+                  <td>{{ programa.get_linea_investigacion_display }}</td>
+                  <td>{{ programa.cantidad_proyectos_programa }}</td>
+                  <td>{{ programa.area.nombre_area|default:"-" }}</td>
+                  <td>{{ programa.departamento.nombre_departamento|default:"-" }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Premios -->
+          <div class="tab-pane fade" id="premios" role="tabpanel" aria-labelledby="premios-tab">
+            <div class="filter-section">
+              <h5>Filtros de Premios</h5>
+              <div class="row filter-row">
+                <div class="col-md-3">
+                  <label for="premioTipo" class="form-label">Tipo</label>
+                  <select id="premioTipo" class="form-select select2">
+                    <option value="">Todos</option>
+                    {% for tipo in tipos_premio %}
+                    <option value="{{ tipo.1 }}">{{ tipo.1 }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="premioArea" class="form-label">Área</label>
+                  <select id="premioArea" class="form-select select2">
+                    <option value="">Todas</option>
+                    {% for area in areas %}
+                    <option value="{{ area.nombre_area }}">{{ area.nombre_area }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="premioDepartamento" class="form-label">Departamento</label>
+                  <select id="premioDepartamento" class="form-select select2">
+                    <option value="">Todos</option>
+                    {% for departamento in departamentos %}
+                    <option value="{{ departamento.nombre_departamento }}" data-area="{{ departamento.area.nombre_area|default:'' }}">
+                      {{ departamento.nombre_departamento }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="premioAnio" class="form-label">Año</label>
+                  <select id="premioAnio" class="form-select select2">
+                    <option value="">Todos</option>
+                    {% for anio in anios_premios %}
+                    <option value="{{ anio|date:'Y' }}">{{ anio|date:'Y' }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="row filter-row">
+                <div class="col-md-9">
+                  <label for="premioUsuario" class="form-label">Premiado</label>
+                  <select id="premioUsuario" class="form-select select2-ajax">
+                    <option value="">Todos</option>
+                  </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end justify-content-end">
+                  <button id="limpiarFiltrosPremios" class="btn btn-secondary btn-filter w-100">Limpiar Filtros</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="export-buttons">
+              <button class="btn btn-success btn-sm export-excel" data-table="premiosTable">Exportar a Excel</button>
+              <button class="btn btn-danger btn-sm export-pdf" data-table="premiosTable">Exportar a PDF</button>
+            </div>
+            <table id="premiosTable" class="table table-striped table-bordered" style="width:100%">
+              <thead>
+                <tr>
+                  <th>Título</th>
+                  <th>Tipo</th>
+                  <th>Fecha</th>
+                  <th>Área</th>
+                  <th>Departamento</th>
+                  <th>Premiados</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for premio in premios %}
+                <tr>
+                  <td>{{ premio.titulo }}</td>
+                  <td>{{ premio.get_tipo_display }}</td>
+                  <td>{{ premio.fecha|date:"d/m/Y" }}</td>
+                  <td>{{ premio.area.nombre_area|default:"-" }}</td>
+                  <td>{{ premio.departamento.nombre_departamento|default:"-" }}</td>
+                  <td>
+                    
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Artículos -->
+          <div class="tab-pane fade" id="articulos" role="tabpanel" aria-labelledby="articulos-tab">
+            <div class="filter-section">
+              <h5>Filtros de Artículos</h5>
+              <div class="row filter-row">
+                <div class="col-md-3">
+                  <label for="articuloArea" class="form-label">Área</label>
+                  <select id="articuloArea" class="form-select select2">
+                    <option value="">Todas</option>
+                    {% for area in areas %}
+                    <option value="{{ area.nombre_area }}">{{ area.nombre_area }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="articuloDepartamento" class="form-label">Departamento</label>
+                  <select id="articuloDepartamento" class="form-select select2">
+                    <option value="">Todos</option>
+                    {% for departamento in departamentos %}
+                    <option value="{{ departamento.nombre_departamento }}" data-area="{{ departamento.area.nombre_area|default:'' }}">
+                      {{ departamento.nombre_departamento }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="articuloAnio" class="form-label">Año</label>
+                  <select id="articuloAnio" class="form-select select2">
+                    <option value="">Todos</option>
+                    {% for anio in anios_articulos %}
+                    <option value="{{ anio|date:'Y' }}">{{ anio|date:'Y' }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="articuloAutor" class="form-label">Editorial</label>
+                  <select id="articuloAutor" class="form-select select2-ajax">
+                    <option value="">Todos</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row filter-row">
+                <div class="col-md-12 d-flex justify-content-end">
+                  <button id="limpiarFiltrosArticulos" class="btn btn-secondary btn-filter">Limpiar Filtros</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="export-buttons">
+              <button class="btn btn-success btn-sm export-excel" data-table="articulosTable">Exportar a Excel</button>
+              <button class="btn btn-danger btn-sm export-pdf" data-table="articulosTable">Exportar a PDF</button>
+            </div>
+            <table id="articulosTable" class="table table-striped table-bordered" style="width:100%">
+              <thead>
+                <tr>
+                  <th>Título</th>
+                  <th>Estado</th>
+                  <th>ISSN/ISBN</th>
+                  <th>Fecha</th>
+                  <th>Editorial</th>
+                  <th>Área</th>
+                  <th>Departamento</th>
+                  <th>Autores</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for articulo in articulos %}
+                <tr>
+                  <td>{{ articulo.titulo }}</td>
+                  <td>{{ articulo.get_aprobacion_display }}</td>
+                  <td>{{ articulo.issn }}</td>
+                  <td>{{ articulo.fecha_creacion|date:"d/m/Y" }}</td>
+                  <td>{{ articulo.editorial }}</td>
+                  <td>{{ articulo.area.nombre_area|default:"-" }}</td>
+                  <td>{{ articulo.departamento.nombre_departamento|default:"-" }}</td>
+                  <td>
+                    {% for autor in articulo.autores.all %}
+                      {{ autor.username }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<!-- Asegúrate de incluir Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script src="{% static 'libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.js' %}"></script>  
+<script src="{% static 'libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>  
+<script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>  
+<script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>  
+<script src="{% static 'libs/Datatable/JS/pdfmake.min.js' %}"></script>  
+<script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>  
+<script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>  
+<script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>  
+<!-- Opcional: Toastify para notificaciones -->
+<script src="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.js"></script>
+<!-- Nuestro script personalizado para reportes -->
+<script>
+/**
+ * Sistema de reportes con filtros dinámicos
+ */
+$(document).ready(function() {
+    // Variables globales para las tablas
+    let eventosTable, proyectosTable, programasTable, premiosTable, articulosTable;
+    
+    // Almacenar las opciones originales de departamentos para cada pestaña
+    let departamentosEventos, departamentosProyectos, departamentosProgramas, departamentosPremios, departamentosArticulos;
+
+    // 1. Inicialización de tablas DataTables
+    const initDataTables = () => {
+        const commonConfig = {
+            responsive: true,
+            dom: 'Bfrtip',
+            language: { url: "/static/libs/Datatable/dataTableLenguage.json" },
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ],
+            pageLength: 10,
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]]
+        };
+
+        // Inicializar cada tabla con la configuración
+        eventosTable = $("#eventosTable").DataTable(commonConfig);
+        proyectosTable = $("#proyectosTable").DataTable(commonConfig);
+        programasTable = $("#programasTable").DataTable(commonConfig);
+        premiosTable = $("#premiosTable").DataTable(commonConfig);
+        articulosTable = $("#articulosTable").DataTable(commonConfig);
+        
+        // Debug: Verificar estructura de columnas
+        console.log("Índices de columnas en tabla Eventos:");
+        $('#eventosTable thead th').each(function(index) {
+            console.log(index + ": " + $(this).text().trim());
+        });
+    };
+
+    // 2. Inicializar Select2 si está disponible
+    const initSelect2 = () => {
+        if ($.fn.select2) {
+            $(".select2").select2({
+                theme: "bootstrap-5",
+                width: "100%",
+                allowClear: true
+            });
+
+            $(".select2-ajax").select2({
+                theme: "bootstrap-5",
+                width: "100%",
+                ajax: {
+                    url: "/api/usuarios/",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return { search: params.term || '' };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: $.map(data, function(item) {
+                                return { 
+                                    id: item.username || item.id, 
+                                    text: item.name || item.username
+                                };
+                            })
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 2,
+                placeholder: "Buscar usuario...",
+                allowClear: true
+            });
+        }
+    };
+
+    // 3. Guardar las opciones originales de departamentos
+    const saveDepartamentoOptions = () => {
+        departamentosEventos = $("#eventoDepartamento").html();
+        departamentosProyectos = $("#proyectoDepartamento").html();
+        departamentosProgramas = $("#programaDepartamento").html();
+        departamentosPremios = $("#premioDepartamento").html();
+        departamentosArticulos = $("#articuloDepartamento").html();
+    };
+
+    // 4. Configurar la relación área-departamento para cada pestaña
+    const setupAreaDepartamento = () => {
+        // Para cada selector de área
+        $('[id$="Area"]').each(function() {
+            const areaSelect = $(this);
+            const prefix = areaSelect.attr('id').replace('Area', '');
+            const deptoSelect = $(`#${prefix}Departamento`);
+            
+            // Cuando cambia el área
+            areaSelect.on('change', function() {
+                const areaSeleccionada = $(this).val();
+                let departamentosOriginales;
+                
+                // Restaurar opciones originales primero
+                switch(prefix) {
+                    case 'evento':
+                        departamentosOriginales = departamentosEventos;
+                        break;
+                    case 'proyecto':
+                        departamentosOriginales = departamentosProyectos;
+                        break;
+                    case 'programa':
+                        departamentosOriginales = departamentosProgramas;
+                        break;
+                    case 'premio':
+                        departamentosOriginales = departamentosPremios;
+                        break;
+                    case 'articulo':
+                        departamentosOriginales = departamentosArticulos;
+                        break;
+                }
+                
+                // Restaurar opciones originales
+                deptoSelect.html(departamentosOriginales);
+                
+                // Si hay un área seleccionada, filtrar departamentos
+                if (areaSeleccionada) {
+                    // Crear un nuevo conjunto de opciones
+                    var opcionesVisibles = $('<option value="">Todos los departamentos</option>');
+                    
+                    // Agregar solo los departamentos que pertenecen al área seleccionada
+                    deptoSelect.find('option').each(function() {
+                        var $option = $(this);
+                        if ($option.val() !== "" && $option.data('area') === areaSeleccionada) {
+                            opcionesVisibles = opcionesVisibles.add($option.clone());
+                        }
+                    });
+                    
+                    // Reemplazar todas las opciones con las filtradas
+                    deptoSelect.html(opcionesVisibles);
+                }
+                
+                // Actualizar Select2
+                if ($.fn.select2) {
+                    deptoSelect.val('').trigger('change');
+                }
+                
+                // Debug
+                console.log(`Área ${prefix} seleccionada:`, areaSeleccionada);
+                console.log(`Departamentos ${prefix} disponibles:`, deptoSelect.find('option').map(function() {
+                    return $(this).text();
+                }).get());
+            });
+        });
+    };
+
+    // 5. Configurar filtros dinámicos para cada tabla
+    const setupDynamicFilters = () => {
+        // Función para aplicar filtros con expresiones regulares exactas
+        const aplicarFiltroExacto = (tabla, columna, valor) => {
+            if (valor) {
+                tabla.column(columna).search('^' + valor + '$', true, false).draw();
+            } else {
+                tabla.column(columna).search('').draw();
+            }
+        };
+        
+        // Eventos - Filtros
+        $('#eventoModalidad').on('change', function() {
+            aplicarFiltroExacto(eventosTable, 3, $(this).val()); // Modalidad
+        });
+        
+        $('#eventoTipo').on('change', function() {
+            aplicarFiltroExacto(eventosTable, 1, $(this).val()); // Tipo
+        });
+        
+        $('#eventoArea').on('change', function() {
+            aplicarFiltroExacto(eventosTable, 5, $(this).val()); // Área
+        });
+        
+        $('#eventoDepartamento').on('change', function() {
+            aplicarFiltroExacto(eventosTable, 6, $(this).val()); // Departamento
+        });
+        
+        $('#eventoUsuario').on('change', function() {
+            const selectedData = $(this).select2('data')[0];
+            if (selectedData && selectedData.id) {
+                aplicarFiltroExacto(eventosTable, 7, selectedData.id); // Responsable
+            } else {
+                eventosTable.column(7).search('').draw();
+            }
+        });
+        
+        // Proyectos - Filtros
+        $('#proyectoTipo').on('change', function() {
+            aplicarFiltroExacto(proyectosTable, 3, $(this).val()); // Tipo
+        });
+        
+        $('#proyectoArea').on('change', function() {
+            aplicarFiltroExacto(proyectosTable, 7, $(this).val()); // Área
+        });
+        
+        $('#proyectoDepartamento').on('change', function() {
+            aplicarFiltroExacto(proyectosTable, 8, $(this).val()); // Departamento
+        });
+        
+        $('#proyectoUsuario').on('change', function() {
+            const selectedData = $(this).select2('data')[0];
+            if (selectedData && selectedData.id) {
+                aplicarFiltroExacto(proyectosTable, 2, selectedData.id); // Estado/Responsable
+            } else {
+                proyectosTable.column(2).search('').draw();
+            }
+        });
+        
+        // Programas - Filtros
+        $('#programaLinea').on('change', function() {
+            aplicarFiltroExacto(programasTable, 3, $(this).val()); // Línea Investigación
+        });
+        
+        $('#programaArea').on('change', function() {
+            aplicarFiltroExacto(programasTable, 5, $(this).val()); // Área
+        });
+        
+        $('#programaDepartamento').on('change', function() {
+            aplicarFiltroExacto(programasTable, 6, $(this).val()); // Departamento
+        });
+        
+        $('#programaUsuario').on('change', function() {
+            const selectedData = $(this).select2('data')[0];
+            if (selectedData && selectedData.id) {
+                aplicarFiltroExacto(programasTable, 2, selectedData.id); // Estado/Responsable
+            } else {
+                programasTable.column(2).search('').draw();
+            }
+        });
+        
+        // Premios - Filtros
+        $('#premioTipo').on('change', function() {
+            aplicarFiltroExacto(premiosTable, 1, $(this).val()); // Tipo
+        });
+        
+        $('#premioArea').on('change', function() {
+            aplicarFiltroExacto(premiosTable, 3, $(this).val()); // Área
+        });
+        
+        $('#premioDepartamento').on('change', function() {
+            aplicarFiltroExacto(premiosTable, 4, $(this).val()); // Departamento
+        });
+        
+        $('#premioUsuario').on('change', function() {
+            const selectedData = $(this).select2('data')[0];
+            if (selectedData && selectedData.id) {
+                aplicarFiltroExacto(premiosTable, 5, selectedData.id); // Premiados
+            } else {
+                premiosTable.column(5).search('').draw();
+            }
+        });
+        
+        $('#premioAnio').on('change', function() {
+            const anio = $(this).val();
+            if (anio) {
+                // Buscar el año en la fecha (columna 2)
+                premiosTable.column(2).search(anio).draw();
+            } else {
+                premiosTable.column(2).search('').draw();
+            }
+        });
+        
+        // Artículos - Filtros
+        $('#articuloArea').on('change', function() {
+            aplicarFiltroExacto(articulosTable, 5, $(this).val()); // Área
+        });
+        
+        $('#articuloDepartamento').on('change', function() {
+            aplicarFiltroExacto(articulosTable, 6, $(this).val()); // Departamento
+        });
+        
+        $('#articuloAutor').on('change', function() {
+            const selectedData = $(this).select2('data')[0];
+            if (selectedData && selectedData.id) {
+                aplicarFiltroExacto(articulosTable, 7, selectedData.id); // Autores
+            } else {
+                articulosTable.column(7).search('').draw();
+            }
+        });
+        
+        $('#articuloAnio').on('change', function() {
+            const anio = $(this).val();
+            if (anio) {
+                // Buscar el año en la fecha (columna 3)
+                articulosTable.column(3).search(anio).draw();
+            } else {
+                articulosTable.column(3).search('').draw();
+            }
+        });
+    };
+
+    // 6. Configurar botones de limpieza
+    const setupClearButtons = () => {
+        // Limpiar filtros de Eventos
+        $('#limpiarFiltrosEventos').on('click', function() {
+            $('#eventoModalidad, #eventoTipo, #eventoArea, #eventoDepartamento, #eventoUsuario')
+                .val('').trigger('change');
+            eventosTable.search('').columns().search('').draw();
+            showToast('Filtros limpiados');
+        });
+
+        // Limpiar filtros de Proyectos
+        $('#limpiarFiltrosProyectos').on('click', function() {
+            $('#proyectoTipo, #proyectoArea, #proyectoDepartamento, #proyectoUsuario')
+                .val('').trigger('change');
+            proyectosTable.search('').columns().search('').draw();
+            showToast('Filtros limpiados');
+        });
+
+        // Limpiar filtros de Programas
+        $('#limpiarFiltrosProgramas').on('click', function() {
+            $('#programaLinea, #programaArea, #programaDepartamento, #programaUsuario')
+                .val('').trigger('change');
+            programasTable.search('').columns().search('').draw();
+            showToast('Filtros limpiados');
+        });
+
+        // Limpiar filtros de Premios
+        $('#limpiarFiltrosPremios').on('click', function() {
+            $('#premioTipo, #premioArea, #premioDepartamento, #premioUsuario, #premioAnio')
+                .val('').trigger('change');
+            premiosTable.search('').columns().search('').draw();
+            showToast('Filtros limpiados');
+        });
+
+        // Limpiar filtros de Artículos
+        $('#limpiarFiltrosArticulos').on('click', function() {
+            $('#articuloArea, #articuloDepartamento, #articuloAutor, #articuloAnio')
+                .val('').trigger('change');
+            articulosTable.search('').columns().search('').draw();
+            showToast('Filtros limpiados');
+        });
+    };
+
+    // 7. Configurar botones de exportación
+    const setupExportButtons = () => {
+        $('.export-excel').click(function() {
+            const tableId = $(this).data('table');
+            $(`#${tableId}`).DataTable().button('.buttons-excel').trigger();
+        });
+
+        $('.export-pdf').click(function() {
+            const tableId = $(this).data('table');
+            $(`#${tableId}`).DataTable().button('.buttons-pdf').trigger();
+        });
+    };
+
+    // 8. Función para mostrar notificaciones
+    const showToast = (message, type = 'info') => {
+        // Si existe Toastify, usarlo
+        if (typeof Toastify === 'function') {
+            Toastify({
+                text: message,
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: type === 'success' ? "#4caf50" : 
+                                type === 'warning' ? "#ff9800" : 
+                                type === 'error' ? "#f44336" : "#2196f3"
+            }).showToast();
+            return;
+        }
+        
+        // Alternativa simple si no existe Toastify
+        alert(message);
+    };
+
+    // 9. Inicialización completa
+    initDataTables();
+    initSelect2();
+    saveDepartamentoOptions();
+    setupAreaDepartamento();
+    setupDynamicFilters();
+    setupClearButtons();
+    setupExportButtons();
+
+    // 10. Ajustar tablas al cambiar de pestaña
+    $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
+        $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+    });
+});
+</script>
+{% endblock %}

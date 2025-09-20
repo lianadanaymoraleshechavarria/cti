@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+  <link rel="stylesheet" href="{% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+  <link rel="stylesheet" href="{% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+  <link rel="stylesheet" href="{% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+  <link rel="stylesheet" href="{% static 'css/datatableSD.css' %}">
+  <style>
+    .filter-row {
+      background-color: #f8f9fa;
+      border-radius: 4px;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #dee2e6;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <section class="tabla" id="Programa">
+    {% if messages %}
+      {% for message in messages %}
+        {% if message.tags == 'success' %}
+          <div style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem; z-index: 2000;"
+              class="alert alert-success alert-dismissible fade show" role="alert">
+        {% elif message.tags == 'error' %}
+          <div style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem; z-index: 2000; "
+              class="alert alert-danger alert-dismissible fade show" role="alert">
+        {% endif %}
+          {{ message }}
+            <button style="font-size: 10px; border-bottom: none; position: relative; box-shadow: none;" type="button"
+              class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+      {% endfor %}
+    {% endif %}
+    
+    <!-- Filtros -->
+    <div class="row filter-row">
+      <div class="col-12">
+        <form id="filter-form" class="row g-2">
+          <div class="col-md-4">
+            <label for="filter-tipo" class="form-label small">Tipo de Programa</label>
+            <select class="form-select form-select-sm" id="filter-tipo" name="tipo_programa">
+              <option value="">Todos los tipos</option>
+              {% for tipo in tipos_programa %}
+                <option value="{{ tipo.id }}" {% if request.GET.tipo_programa == tipo.id|stringformat:"s" %}selected{% endif %}>
+                  {{ tipo.nombre }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label for="filter-estado" class="form-label small">Estado</label>
+            <select class="form-select form-select-sm" id="filter-estado" name="estado">
+              <option value="">Todos los estados</option>
+              <option value="Aprobado" {% if request.GET.estado == "Aprobado" %}selected{% endif %}>Aprobado</option>
+              <option value="Pendiente" {% if request.GET.estado == "Pendiente" %}selected{% endif %}>Pendiente</option>
+              <option value="No Válido" {% if request.GET.estado == "No Válido" %}selected{% endif %}>No Válido</option>
+            </select>
+          </div>
+          <div class="col-md-4 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary btn-sm me-2">Filtrar</button>
+            <a href="{% url 'Programa_List_JefeArea' %}" class="btn btn-secondary btn-sm">Limpiar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <div class="card card-a p-3 h-100">
+      <div class="card-header">
+        <h5 class="card-title title-t" style="text-align: start;">
+          <i class="bi bi-file-earmark-text-fill"></i>
+            Programas
+            {% if programas_filtrados %}
+              <span class="badge bg-info ms-2">{{ programas_filtrados|length }} resultado(s)</span>
+            {% endif %}
+        </h5>
+      </div>
+      <table id="Programas" class="display table table-striped table-hover table-primary" style="width:100%; height: 100%;">
+        <thead class="encabezado">
+          <tr>
+            <th scope="col" style="color: white; text-align: center;">No</th>
+            <th scope="col" style="color: white; text-align: center;">Nombre</th>
+            <th scope="col" style="color: white; text-align: center;">Jefe</th>
+            <th scope="col" style="color: white; text-align: center;">Área</th>
+            <th scope="col" style="color: white; text-align: center;">Proyectos</th>
+            <th scope="col" style="color: white; text-align: center;">Código</th>
+            <th scope="col" style="color: white; text-align: center;">Estado</th>
+            <th scope="col" style="color: white; text-align: center;">Opciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in programas_filtrados %}
+            <tr>
+              <td style="text-align: center;">{{forloop.counter}}</td>
+              <td style="text-align: center;">{{p.nombre_programa}}</td>
+              <td style="text-align: center;">{{p.jefe_programa}}</td>
+              <td style="text-align: center;">{{p.area}}</td>
+              <td style="text-align: center;">{{p.cantidad_proyectos_programa}}</td>
+              <td style="text-align: center;">{{p.codigo_programa }}</td>
+              <td style="text-align: center;"><a class="cambiar-estado" style="text-decoration: none;" href="{% url 'Cambiar_Estado_Programa' p.id %}">{{ p.aprobacion }}</a></td>
+              <td style="text-align: center;">
+                <a href="{% url 'Programa_Detail_JefeArea' p.id %}"> <i class="ico fas fa-solid fa-info-circle"></i></a>
+                <a class="iconos" data-bs-toggle="modal" data-bs-target="#Programa{{ p.id }}"><i class="ico fas fa-solid fa-trash-can"></i></a>
+              </td>
+            </tr>
+            <!-- Modal -->
+            <div class="modal fade" id="Programa{{ p.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel" style="color:black"><i class="bi bi-exclamation-triangle"
+                      style="color:black"></i> Eliminar</h5>
+                    <button type="button" class="btn-close cerrar" data-bs-dismiss="modal" aria-label="Close" style="box-shadow: none"></button>
+                  </div>
+                  <div class="modal-body" style="color:black">
+                    ¿Desea eliminar el Programa "{{ p.nombre_programa }}"?
+                    Esta acción será permanente.
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancelar</button>
+                    <a href="{% url 'Programa_Delete_JefeArea' p.id %}" class="btn btn-primary">Aceptar</a>
+                  </div>
+                </div>
+              </div>
+            </div>     
+          {% empty %}
+            <tr>
+              <td colspan="8" class="text-center py-3">
+                <p class="text-muted">No se encontraron programas que coincidan con los filtros seleccionados.</p>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Gráficos -->
+    <div class="row mt-4">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="p-2">
+            <div id="grafProgramasPorTipo"></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="p-2">
+            <div id="grafEstadosProgramas"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="option bgs">
+      <div class="bg-active" id="bg-active"></div>
+    </div>
+  </section>
+{% endblock %}
+   
+{% block js %}
+  <script src="{% static 'libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+  <script src="{% static 'libs/Datatable/JS/dataTables.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+  <!--Botones DataTables-->  
+  <script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/pdfmake.min.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/bottons.colVis.min.js' %}"></script>  
+  <!--DataTables responsivo-->
+  <script src="{% static 'libs/Datatable/JS/dataTables.responsive.js' %}"></script>  
+  <script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>  
+  <!--Inicializar DataTables-->
+  <script src="{% static 'libs/Datatable/JS/Programas.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/highcharts.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/modules/accessibility.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/modules/exporting.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/modules/offline-exporting.js' %}"></script>
+  <script src="{% static 'libs/Highcharts/code/modules/export-data.js' %}"></script>
+  
+  <script>
+    $(document).ready(function() {
+      // Gráfico de programas por tipo
+      var tiposProgramas = {{ tipos_programa_json|safe }};
+      var dataTiposProgramas = tiposProgramas.map(function(item) {
+          return { name: item.tipo_programa__nombre || 'Sin tipo', y: item.count };
+      });
+
+      Highcharts.chart('grafProgramasPorTipo', {
+          chart: { type: 'column' },
+          title: { text: 'Programas por Tipo' },
+          xAxis: {
+              categories: tiposProgramas.map(function(item) { 
+                  return item.tipo_programa__nombre || 'Sin tipo'; 
+              })
+          },
+          yAxis: {
+              title: { text: 'Cantidad' }
+          },
+          series: [{
+              name: 'Programas',
+              data: dataTiposProgramas.map(function(item) { return item.y; }),
+              colorByPoint: true
+          }],
+          legend: { enabled: false },
+          credits: { enabled: false }
+      });
+
+      // Gráfico de estados de programas
+      var estadosProgramas = {{ estados_aprobacion_json|safe }};
+      var dataEstadosProgramas = estadosProgramas.map(function(item) {
+          return { 
+              name: item.aprobacion || 'Sin estado', 
+              y: item.count,
+              color: getColorByEstado(item.aprobacion)
+          };
+      });
+
+      Highcharts.chart('grafEstadosProgramas', {
+          chart: { type: 'pie' },
+          title: { text: 'Estados de Programas' },
+          series: [{
+              name: 'Programas',
+              data: dataEstadosProgramas
+          }],
+          credits: { enabled: false },
+          plotOptions: {
+              pie: {
+                  dataLabels: {
+                      enabled: true,
+                      format: '{point.name}: {point.percentage:.1f}%'
+                  }
+              }
+          }
+      });
+    });
+    
+    // Función para obtener color según estado
+    function getColorByEstado(estado) {
+        switch(estado) {
+            case 'Aprobado': return '#28a745';
+            case 'Pendiente': return '#ffc107';
+            case 'No Válido': return '#6c757d';
+            default: return '#6c757d';
+        }
+    }
+  </script>
+{% endblock %}

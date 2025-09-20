@@ -1,0 +1,28 @@
+[GraphicsOption]
+ScreenMode=FullScreen
+Resolution=1280x720
+FrameRate=60
+V-Sync=On
+OptionMode=Low
+ResolutionScaling=Low
+TextureQuality=512
+AmbientOcclusion=Off
+VolumeRenderingQuality=Off
+ShadowQuality=Low
+Anti-Aliasing=Off
+LODBias=Low
+MaxLODLevel=No Limit
+FoliageSway=Off
+SubSurfaceScattering=Off
+ScreenSpaceReflection=Off
+AnisotropicFiltering=Low
+WaterReflection=Off
+SHDiffuse=Low
+DynamicRange=32-bit
+MotionBlur=Off
+Vignetting-Effect=Off
+Depth of Field=Off
+Z-Prepass=Off
+[Window]
+PosX=7
+PosY=0
