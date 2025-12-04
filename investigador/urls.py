@@ -38,7 +38,7 @@ from .views_marcadores import (
     Articulo_Publicacion_Update_Investigador,
     Articulo_Revista_Update_Investigador,
     buscar_autores,
-    
+
     Curriculo_List_Investigador,
     Dashboard_Investigador,
     Evento_List,
@@ -58,7 +58,9 @@ from .views_marcadores import (
     api_crear_revista_libro,
     obtener_institucion_tipo_premio,
     tipo_premio_create_ajax, crear_caracter_premio,
-    crear_institucion_ajax, crear_colaborador_ajax, api_tipos_premio
+    crear_institucion_ajax, crear_colaborador_ajax, api_tipos_premio,
+    buscar_entidades,
+    TipoParticipacionList, crear_entidad
 )
 
 from .api_views import (api_entidades_search, api_tipos_participacion, api_usuarios_search, crear_entidad_ajax, crear_tipo_participacion_ajax, 
@@ -73,6 +75,8 @@ urlpatterns = [
     # API usuarios
     path('api_usuarios/', api_usuarios, name='api_usuarios'),
     #ApI PROGRAMS
+    path('ajax/crear-entidad/', crear_entidad, name='ajax_crear_entidad'),
+    path('api/tipo_participacion/', TipoParticipacionList.as_view(), name='api_tipo_participacion'),
     path('api_entidades_search/', api_entidades_search, name='api_entidades_search'),
     path('api_tipos_participacion/', api_usuarios_search, name='api_tipos_participacion'),
     path('api_usuarios_search/', api_tipos_participacion, name='api_usuarios_search'),  
@@ -114,7 +118,7 @@ urlpatterns = [
     path('api_crear_colaborador/', api_crear_colaborador, name='api_crear_colaborador'),
     path('api_crear_revista_libro/', api_crear_revista_libro, name='api_crear_revista_libro'),
     path('api/tipo-premio/<int:tipo_id>/', obtener_institucion_tipo_premio, name='obtener_institucion_tipo'),
-
+    path("ajax/entidades/", buscar_entidades, name="ajax_entidades"),
 
     # Proyecto 
     path('Proyecto_Create/', Proyecto_Create.as_view(), name='Proyecto_Create'),

@@ -2,23 +2,13 @@ from .forms import(
                     Perfil_Form_Vicerrector, 
                     Perfil_JefeArea_Form, 
                     Perfil_Jefedepartamento_Form)
-from investigador.models import  (Articulo, 
-                                  Evento, 
-                                  Programa, 
-                                  Proyecto, 
-                                  Premio,
-                                  Perfil, 
-                                  Area, 
-                                  Departamento,
-                                  Categoria_cientifica,
-                                  Categoria_docente,
-                                  CarcterEvento,
-                                  Cargo, Revista_Libro_Conferencia, 
-                                  Notificacion, Colaborador,
-                                   Indexacion, EventoBase, TipoEvento, TipoPremio, CaracterPremio, Modalidad, EntidadParticipante, TipoPrograma, SectorEstrategico)
+from investigador.models import  (Articulo, Evento, Programa, Proyecto, Premio, Perfil, Area, Departamento,
+                                  Categoria_cientifica, Categoria_docente, CarcterEvento, Cargo, Revista_Libro_Conferencia, 
+                                  Notificacion, Colaborador, LineaInvestigacion, TipoParticipacion,
+                                Indexacion, EventoBase, TipoEvento, TipoPremio, CaracterPremio, Modalidad, EntidadParticipante, TipoPrograma, SectorEstrategico)
 from django.views.generic import ListView, DetailView, TemplateView, CreateView, UpdateView, DeleteView
 from investigador.forms import (Area_Form, Departamento_Form, CategoriaCientificaForm, CategoriaDocenteForm, CarcterEvento_Form, CaracterPremioForm, 
-Cargo_Form, Revista_Libro_Conferencia_Form, 
+Cargo_Form, Revista_Libro_Conferencia_Form, TipoProgramaForm, SectorEstrategicoForm, LineaInvestigacionForm, TipoParticipacionForm,
 BasesDatosForm, Colaborador_Form, TipoEventoForm, TipoPremioForm, ModalidadForm, EventoBaseForm)
 from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render, redirect, get_object_or_404
@@ -46,6 +36,7 @@ import json
 from django.db.models.functions import ExtractYear
 from django.core.serializers.json import DjangoJSONEncoder
 import json
+import logging
 from datetime import datetime, date
 import datetime
 from datetime import datetime
@@ -730,28 +721,44 @@ def api_provincias(request):
 
 
 #Api de revistas 
+logger = logging.getLogger(__name__)
+
 def api_revistas(request):
     """API para buscar revistas/libros/conferencias"""
-    search = request.GET.get('search', '')
-    
-    # Buscar por título o editorial
+    search = request.GET.get('search', '').strip()
+
     resultados = Revista_Libro_Conferencia.objects.filter(
-        Q(titulo__icontains=search) | 
+        Q(titulo__icontains=search) |
         Q(editorial__icontains=search)
-    )[:10]  # Limitar a 10 resultados
-    
+    )[:10]
+
     data = []
     for item in resultados:
+        # id de la indexación (None si no tiene)
+        index_id = item.index_id
+
+        # nombre legible de la indexación sin lanzar excepción
+        index_nombre = ''
+        if item.index_id:
+            try:
+                # intenta obtener un campo 'nombre', si no existe usa str(item.index)
+                index_nombre = getattr(item.index, 'nombre', None) or str(item.index)
+            except Exception as e:
+                logger.exception("Error leyendo index para Revista id=%s: %s", item.id, e)
+                index_nombre = ''
+
         data.append({
             'id': item.id,
-            'titulo': item.titulo,
-            'editorial': item.editorial,
+            'titulo': item.titulo or '',
+            'editorial': item.editorial or '',
             'issn': item.issn or '',
             'isbn': item.isbn or '',
             'pais': item.pais or '',
-            'idioma': item.idioma or '',
+            'url': item.url or '',
+            'index': index_id,             # id (o None)
+            'index_nombre': index_nombre,  # nombre legible (cadena vacía si no hay)
         })
-    
+
     return JsonResponse(data, safe=False)
 
 
@@ -781,7 +788,6 @@ def CambiarRol(request, id):
         'available_roles': available_roles,
         'rol_actual': usuario.get_rol_display(),
     })
-
 
 class UsuarioAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
@@ -855,7 +861,6 @@ def Inicio(request):
     return render(request,"plataforma/Inicio.html")
 
 # Usuarios
-
 
 
 @login_required
@@ -1057,8 +1062,6 @@ def Articulo_Delete_JefeArea(request, id):
     return redirect(reverse_lazy('Articulo_List_JefeArea'))
 
 
-
-
 @admin_staff_required
 @login_required
 def Cambiar_Estado_Articulo(request, id):
@@ -1070,8 +1073,18 @@ def Cambiar_Estado_Articulo(request, id):
             articulo.aprobacion = nuevo_estado
             articulo.save()
             messages.success(request, f'El estado del artículo ha sido cambiado a {nuevo_estado}')
-            return redirect('Articulo_List_JefeArea')
-    
+
+            # Redirigir según rol
+            usuario = request.user
+            if usuario.rol == 'Jefe_departamento':
+                return redirect('Articulo_List_JefeDepartamento')
+            elif usuario.rol == 'Jefe_area':
+                return redirect('Articulo_List_JefeArea')
+            elif usuario.rol == 'Vicerrector':
+                return redirect('Articulo_List_Vicerrector')
+            else:
+                return redirect('Articulo_List_JefeArea')  # fallback
+
     estados = ['Pendiente', 'No Válido', 'Aprobado']
     return render(request, "JefeArea/Articulo/cambiar_estado_articulo.html", {
         'estados': estados,
@@ -1129,15 +1142,28 @@ def Premio_Delete_JefeArea(request, id):
 @admin_staff_required
 def Cambiar_Estado_Premio(request, id):
     premio = get_object_or_404(Premio, pk=id)
+
     if request.method == 'POST':
         premio.aprobacion = request.POST['estado']
         premio.save()
         messages.success(request, 'El estado del premio ha sido actualizado con éxito.')
-        return HttpResponseRedirect(reverse('Premio_List_JefeArea'))
-    else:
-        estados = [('Pendiente'), ('No Válido'), ('Aprobado')]
-        return render(request, "JefeArea/Premio/cambiar_estado_premio.html", {'estados': estados}) 
 
+        # Redirigir según rol del usuario
+        usuario = request.user
+        if usuario.rol == 'Jefe_departamento':
+            return redirect('Premio_List_JefeDepartamento')
+        elif usuario.rol == 'Jefe_area':
+            return redirect('Premio_List_JefeArea')
+        elif usuario.rol == 'Vicerrector':
+            return redirect('Premio_List_Vicerrector')
+        else:
+            # fallback por si otro tipo de usuario accede
+            return redirect('Premio_List_JefeArea')  # o cualquier default
+
+    else:
+        estados = ['Pendiente', 'No Válido', 'Aprobado']
+        return render(request, "JefeArea/Premio/cambiar_estado_premio.html", {'estados': estados})
+    
 #........................................Proyecto....................................
 @method_decorator([login_required, jefearea_required ], name='dispatch')
 class Proyecto_List_JefeArea(LoginRequiredMixin, ListView):
@@ -1310,15 +1336,26 @@ def Evento_Delete_JefeArea(request, id):
 @admin_staff_required
 def Cambiar_Estado_Evento(request, id):
     evento = get_object_or_404(Evento, pk=id)
+
     if request.method == 'POST':
         evento.aprobacion = request.POST['estado']
         evento.save()
         messages.success(request, 'El estado del evento ha sido actualizado con éxito.')
-        return HttpResponseRedirect(reverse('Evento_List_JefeArea'))
-    else:
-        estados = [('Pendiente'), ('No Válido'), ('Aprobado')]
-        return render(request, "JefeArea/Evento/cambiar_estado_evento.html", {'estados': estados}) 
 
+        # Redirigir según rol
+        usuario = request.user
+        if usuario.rol == 'Jefe_departamento':
+            return redirect('Evento_List_JefeDepartamento')
+        elif usuario.rol == 'Jefe_area':
+            return redirect('Evento_List_JefeArea')
+        elif usuario.rol == 'Vicerrector':
+            return redirect('Evento_List_Vicerrector')
+        else:
+            return redirect('Evento_List_JefeArea')  # fallback
+
+    else:
+        estados = ['Pendiente', 'No Válido', 'Aprobado']
+        return render(request, "JefeArea/Evento/cambiar_estado_evento.html", {'estados': estados})
 
 
 @method_decorator([login_required, jefearea_required], name='dispatch')
@@ -2256,6 +2293,7 @@ class ReporteCompletoView(LoginRequiredMixin, TemplateView):
         
         # Obtener caracteres de evento desde el modelo Tio
         context['tipos_evento'] = TipoEvento.objects.all().order_by('nombre')  
+        context['modalidades'] = Modalidad.objects.all().order_by('nombre')  
                 
         # Usar las tuplas de choices directamente
         context['tipos_proyecto'] = TIPO_PROYECTO_CHOICES
@@ -2264,7 +2302,7 @@ class ReporteCompletoView(LoginRequiredMixin, TemplateView):
         
         # Obtener años para filtros de manera correcta
         context['anios_premios'] = Premio.objects.filter(aprobacion='Aprobado').dates('fecha_create', 'year')
-        context['anios_articulos'] = Articulo.objects.filter(aprobacion='Aprobado').dates('fecha_creacion', 'year')
+        context['anios_articulos'] = Articulo.objects.filter(aprobacion='Aprobado').dates('fecha_create', 'year')
         
         # Filtrar datos según el rol del usuario
         if self.request.user.rol in ['Administrador', 'Vicerrector']:
@@ -2286,7 +2324,7 @@ class ReporteCompletoView(LoginRequiredMixin, TemplateView):
             
             context['articulos'] = Articulo.objects.filter(aprobacion='Aprobado').select_related(
                 'area', 'departamento', 'usuario'
-            ).prefetch_related('autores').order_by('-fecha_creacion')
+            ).prefetch_related('autores').order_by('-fecha_create')
         
         # Para jefe de área - solo su área
         elif self.request.user.rol == 'Jefe_area' and hasattr(self.request.user, 'area'):
@@ -2306,11 +2344,11 @@ class ReporteCompletoView(LoginRequiredMixin, TemplateView):
             
             context['premios'] = Premio.objects.filter(
                 area=area_usuario, aprobacion='Aprobado'
-            ).select_related('area', 'departamento', 'usuario').prefetch_related('premiados').order_by('-fecha')
+            ).select_related('area', 'departamento', 'usuario').prefetch_related('premiados').order_by('-fecha_create')
             
             context['articulos'] = Articulo.objects.filter(
                 area=area_usuario, aprobacion='Aprobado'
-            ).select_related('area', 'departamento', 'usuario').prefetch_related('autores').order_by('-fecha_creacion')
+            ).select_related('area', 'departamento', 'usuario').prefetch_related('autores').order_by('-fecha_create')
             
             # Filtrar departamentos solo de esta área
             context['departamentos'] = context['departamentos'].filter(area=area_usuario)
@@ -2337,7 +2375,7 @@ class ReporteCompletoView(LoginRequiredMixin, TemplateView):
             
             context['articulos'] = Articulo.objects.filter(
                 departamento=depto_usuario, aprobacion='Aprobado'
-            ).select_related('area', 'departamento', 'usuario').prefetch_related('autores').order_by('-fecha_creacion')
+            ).select_related('area', 'departamento', 'usuario').prefetch_related('autores').order_by('-fecha_create')
             
             # Filtrar áreas y departamentos
             context['areas'] = Area.objects.filter(id=depto_usuario.area.id)
@@ -2559,7 +2597,7 @@ class Articulo_List_Vicerrector(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return super().get_queryset().select_related(
             'area', 'departamento'
-        ).prefetch_related('autores').order_by('-fecha_create')
+        ).prefetch_related('articulos_set__usuario').order_by('-fecha_create')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -2603,8 +2641,7 @@ class Articulo_Detail_Vicerrector(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         articulo = self.get_object()
         
-        context['Articulo_Revista'] = articulo.doi and articulo.issn.strip() != ''
-        context['Articulo_Publicacion'] = articulo.volumen and articulo.capitulo.strip() != ''
+        context['Articulo_Revista'] = articulo.doi and articulo.issn_isbn.strip() != ''
         return context
 
 
@@ -3078,18 +3115,15 @@ class Colaboradores_Update(LoginRequiredMixin, UpdateView):
 @method_decorator([login_required, admin_staff_required], name='dispatch')
 def Colaboradores_Delete(request, id):
     colaborador = get_object_or_404(Colaborador, id=id)
-    
-    # Verificar permisos
-    if colaborador.usuario != request.user and not request.user.is_superuser:
-        messages.error(request, "No tienes permiso para eliminar este colaborador.")
-        return redirect('Colaboradores_List')
-    
-    if request.method == 'POST':
+
+    if request.method == "POST":
+        if colaborador.usuario != request.user and not request.user.is_superuser:
+            return JsonResponse({"success": False, "error": "No tienes permiso para eliminar este colaborador."}, status=403)
+
         colaborador.delete()
-        messages.success(request, "Colaborador eliminado exitosamente.")
-        return redirect('Colaboradores_List')
-    
-    return render(request, 'Colaboradores/Colaboradores_confirm_delete.html', {'colaborador': colaborador})
+        return JsonResponse({"success": True})
+
+    return JsonResponse({"success": False, "error": "Método no permitido"}, status=405)
 
 
 # Vistas para TipoPremio
@@ -3818,6 +3852,220 @@ def TipoEvento_Delete(request, id):
         return redirect('TipoEvento_List')
     
     return render(request, 'TipoEvento/TipoEvento_confirm_delete.html', {'tipo_evento': tipo_evento})
+
+
+# Vistas para TipoPrograma
+@method_decorator([login_required, admin_staff_required], name='dispatch')
+class TipoPrograma_Create(LoginRequiredMixin, CreateView):
+    model = TipoPrograma
+    form_class = TipoProgramaForm
+    template_name = "TipoPrograma/TipoPrograma_create.html"
+    success_url = reverse_lazy('TipoPrograma_List')
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Hubo un error al crear el tipo de evento. Por favor, verifica los datos.")
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        messages.success(self.request, "Tipo de evento creado exitosamente.")
+        return super().form_valid(form)
+
+@method_decorator([login_required, admin_staff_required], name='dispatch')
+class TipoPrograma_List(LoginRequiredMixin, ListView):
+    model = TipoPrograma
+    template_name = "TipoPrograma/TipoPrograma_list.html"
+    context_object_name = 'tipos_programa'
+    ordering = ['nombre']
+    paginate_by = 10
+
+@method_decorator([login_required, admin_staff_required], name='dispatch')
+class TipoPrograma_Detail(LoginRequiredMixin, DetailView):
+    model = TipoPrograma
+    template_name = "TipoPrograma/TipoPrograma_detail.html"
+    context_object_name = 'tipo_programa'
+
+@method_decorator([login_required, admin_staff_required], name='dispatch')
+class TipoPrograma_Update(LoginRequiredMixin, UpdateView):
+    model = TipoPrograma
+    form_class = TipoProgramaForm
+    template_name = "TipoPrograma/TipoPrograma_update.html"
+    success_url = reverse_lazy('TipoPrograma_List')
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Hubo un error al actualizar el tipo de evento. Por favor, verifica los datos.")
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        messages.success(self.request, "Tipo de evento actualizado exitosamente.")
+        return super().form_valid(form)
+
+@login_required
+@admin_staff_required
+def TipoPrograma_Delete(request, id):
+    tipo_programa = get_object_or_404(TipoPrograma, id=id)
+    if request.method == 'POST':
+        tipo_programa.delete()
+        messages.success(request, "Tipo de programa eliminado exitosamente.")
+        return redirect('TipoPrograma_List')
+    
+    return render(request, 'TipoPrograma/TipoPrograma_confirm_delete.html', {'tipo_programa': tipo_programa})
+
+
+# Vistas para SectorEstratégico
+@method_decorator([login_required, admin_staff_required], name='dispatch')
+class SectorEstrategico_Create(LoginRequiredMixin, CreateView):
+    model = SectorEstrategico
+    form_class = SectorEstrategicoForm
+    template_name = "SectorEstrategico/SectorEstrategico_create.html"
+    success_url = reverse_lazy('SectorEstrategico_List')
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Hubo un error al crear el sector estratégico. Por favor, verifica los datos.")
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        messages.success(self.request, "Sector estratégico creado exitosamente.")
+        return super().form_valid(form)
+
+@method_decorator([login_required, admin_staff_required], name='dispatch')
+class SectorEstrategico_List(LoginRequiredMixin, ListView):
+    model = SectorEstrategico
+    template_name = "SectorEstrategico/SectorEstrategico_list.html"
+    context_object_name = 'sectores_estrategicos'
+    ordering = ['nombre']
+    paginate_by = 10
+
+@method_decorator([login_required, admin_staff_required], name='dispatch')
+class SectorEstrategico_Update(LoginRequiredMixin, UpdateView):
+    model = SectorEstrategico
+    form_class = SectorEstrategicoForm
+    template_name = "SectorEstrategico/SectorEstrategico_update.html"
+    success_url = reverse_lazy('SectorEstrategico_List')
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Hubo un error al actualizar el sector estratégico. Por favor, verifica los datos.")
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        messages.success(self.request, "Sector estratégico actualizado exitosamente.")
+        return super().form_valid(form)
+
+@login_required
+@admin_staff_required
+def SectorEstrategico_Delete(request, id):
+    sector_estrategico = get_object_or_404(SectorEstrategico, id=id)
+    if request.method == 'POST':
+        sector_estrategico.delete()
+        messages.success(request, "Sector estratégico eliminado exitosamente.")
+        return redirect('SectorEstrategico_List')
+    
+    return render(request, 'SectorEstrategico/SectorEstrategico_confirm_delete.html', {'sector_estrategico': sector_estrategico})
+
+
+# Vistas para TipoParticipacion
+@method_decorator([login_required, admin_staff_required], name='dispatch')
+class TipoParticipacion_Create(LoginRequiredMixin, CreateView):
+    model = TipoParticipacion
+    form_class = TipoParticipacionForm
+    template_name = "TipoParticipacion/TipoParticipacion_create.html"
+    success_url = reverse_lazy('TipoParticipacion_List')
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Hubo un error al crear el tipo de participación. Por favor, verifica los datos.")
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        messages.success(self.request, "Tipo de participación creado exitosamente.")
+        return super().form_valid(form)
+
+
+@method_decorator([login_required, admin_staff_required], name='dispatch')
+class TipoParticipacion_List(LoginRequiredMixin, ListView):
+    model = TipoParticipacion
+    template_name = "TipoParticipacion/TipoParticipacion_list.html"
+    context_object_name = 'tipo_participacion'
+    ordering = ['nombre']
+    paginate_by = 10
+
+
+@method_decorator([login_required, admin_staff_required], name='dispatch')
+class TipoParticipacion_Update(LoginRequiredMixin, UpdateView):
+    model = TipoParticipacion
+    form_class = TipoParticipacionForm
+    template_name = "TipoParticipacion/TipoParticipacion_update.html"
+    success_url = reverse_lazy('TipoParticipacion_List')
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Hubo un error al actualizar el tipo de participación. Por favor, verifica los datos.")
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        messages.success(self.request, "Tipo de participación actualizada exitosamente.")
+        return super().form_valid(form)
+
+@login_required
+@admin_staff_required
+def TipoParticipacion_Delete(request, id):
+    tipo_participacion = get_object_or_404(TipoParticipacion, id=id)
+    if request.method == 'POST':
+        tipo_participacion.delete()
+        messages.success(request, "Tipo de participación eliminada exitosamente.")
+        return redirect('TipoParticipacion_List')
+    
+    return render(request, 'TipoParticipacion/TipoParticipacion_confirm_delete.html', {'tipo_participacion': tipo_participacion})
+
+
+# Vistas para LineaInvestigacion
+@method_decorator([login_required, admin_staff_required], name='dispatch')
+class LineaInvestigacion_Create(LoginRequiredMixin, CreateView):
+    model = LineaInvestigacion
+    form_class = LineaInvestigacionForm
+    template_name = "LineaInvestigacion/LineaInvestigacion_create.html"
+    success_url = reverse_lazy('LineaInvestigacion_List')
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Hubo un error al crear la línea de investigación. Por favor, verifica los datos.")
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        messages.success(self.request, "Línea de Investigación creada exitosamente.")
+        return super().form_valid(form)
+
+@method_decorator([login_required, admin_staff_required], name='dispatch')
+class LineaInvestigacion_List(LoginRequiredMixin, ListView):
+    model = LineaInvestigacion
+    template_name = "LineaInvestigacion/LineaInvestigacion_list.html"
+    context_object_name = 'linea_investigacion'
+    ordering = ['nombre']
+    paginate_by = 10
+
+@method_decorator([login_required, admin_staff_required], name='dispatch')
+class LineaInvestigacion_Update(LoginRequiredMixin, UpdateView):
+    model = LineaInvestigacion
+    form_class = LineaInvestigacionForm
+    template_name = "LineaInvestigacion/LineaInvestigacion_update.html"
+    success_url = reverse_lazy('LineaInvestigacion_List')
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Hubo un error al actualizar la línea de invenstigación. Por favor, verifica los datos.")
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        messages.success(self.request, "Línea de investigación actualizada exitosamente.")
+        return super().form_valid(form)
+
+@login_required
+@admin_staff_required
+def LineaInvestigacion_Delete(request, id):
+    linea_investigacion = get_object_or_404(LineaInvestigacion, id=id)
+    if request.method == 'POST':
+        linea_investigacion.delete()
+        messages.success(request, "Línea de Investigación eliminada exitosamente.")
+        return redirect('LineaInvestigacion_List')
+    
+    return render(request, 'LineaInvestigacion/LineaInvestigacion_confirm_delete.html', {'linea_investigacion': linea_investigacion})
+
+
 
 @method_decorator([login_required, pure_admin_required], name='dispatch')
 class Articulo_List_Admin(LoginRequiredMixin, ListView):

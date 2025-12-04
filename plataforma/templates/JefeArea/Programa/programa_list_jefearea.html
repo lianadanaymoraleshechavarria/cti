@@ -19,22 +19,6 @@
 
 {% block content %}
   <section class="tabla" id="Programa">
-    {% if messages %}
-      {% for message in messages %}
-        {% if message.tags == 'success' %}
-          <div style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem; z-index: 2000;"
-              class="alert alert-success alert-dismissible fade show" role="alert">
-        {% elif message.tags == 'error' %}
-          <div style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem; z-index: 2000; "
-              class="alert alert-danger alert-dismissible fade show" role="alert">
-        {% endif %}
-          {{ message }}
-            <button style="font-size: 10px; border-bottom: none; position: relative; box-shadow: none;" type="button"
-              class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-      {% endfor %}
-    {% endif %}
-    
     <!-- Filtros -->
     <div class="row filter-row">
       <div class="col-12">

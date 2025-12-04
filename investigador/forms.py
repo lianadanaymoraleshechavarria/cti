@@ -3,7 +3,7 @@ from .models import (
                      Area, Departamento, Categoria_docente, Categoria_cientifica, Institucion,
                      CarcterEvento, Cargo, Revista_Libro_Conferencia, Colaborador,
                      Indexacion, TipoEvento, Modalidad, EventoBase, SectorEstrategico, 
-                     LineaInvestigacion, EntidadParticipante, TipoParticipacion, TipoPrograma
+                     LineaInvestigacion, EntidadParticipante, TipoParticipacion, TipoPrograma, ParticipacionPrograma
     )
 from django import forms
 from dal import autocomplete
@@ -15,17 +15,15 @@ class Revista_Libro_Conferencia_Form(forms.ModelForm):
     
     class Meta:
         model = Revista_Libro_Conferencia
-        fields = ('titulo', 'editorial', 'issn', 'isbn', 'pais', 'idioma', 'index', 'cita', 'url') 
+        fields = ('titulo', 'editorial', 'issn', 'isbn', 'pais', 'index', 'url') 
 
         widgets = {
             'titulo': forms.TextInput(attrs={'type':'text','name':'titulo','id':'titulo','class':'form-control', 'placeholder':'Introduzca el Título'}),
             'editorial': forms.TextInput(attrs={'type':'text','name':'editorial','id':'editorial','class':'form-control', 'placeholder': 'Coloque el nombre de la editorial'}),
             'issn': forms.NumberInput(attrs={'type':'text','name':'issn','id':'issn','class':'form-control','placeholder':'Introduzca el ISSN'}),
             'isbn': forms.TextInput(attrs={'type':'text','name':'isbn','id':'isbn','class':'form-control','placeholder':'Introduzca el ISBN'}),
-            'idioma': forms.Select(attrs={'class': 'form-control','placeholder':'Introduzca el Idioma en que se ecnuentra'}),
             'pais': forms.Select(attrs={'class': 'form-control','placeholder':'Introduzca el pais de origen'}),
             'index': forms.Select(attrs={'class': 'form-control','placeholder':'Index'}),
-            'cita': forms.Select(attrs={'class': 'form-control','placeholder':'Forma de citar'}),
             'url': forms.URLInput(attrs={'name':'url','id':'url','class':'form-control', 'placeholder':'Introduzca la url'}),
         }
 
@@ -35,9 +33,7 @@ class Revista_Libro_Conferencia_Form(forms.ModelForm):
             'issn': 'Introduzca el número ISSN válido, si aplica.',
             'isbn': 'Introduzca el número ISBN válido, si aplica.',
             'pais': 'Seleccione el país de publicación.',
-            'idioma': 'Seleccione el idioma principal de la obra.',
-            'index': 'Seleccione el idioma principal de la obra.',
-            'cita': 'Seleccione el idioma principal de la obra.',
+            'index': 'Seleccione la indexación de la revista',
         }
 
 
@@ -199,8 +195,45 @@ class TipoEventoForm(forms.ModelForm):
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
+        
+        
+class TipoProgramaForm(forms.ModelForm):
+    class Meta:
+        model = TipoPrograma
+        fields = ['nombre', 'sigla']
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'sigla': forms.TextInput(attrs={'class': 'form-control'}),
+        }
 
 
+class SectorEstrategicoForm(forms.ModelForm):
+    class Meta:
+        model = SectorEstrategico
+        fields = ['nombre']
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+        
+        
+class LineaInvestigacionForm(forms.ModelForm):
+    class Meta:
+        model = LineaInvestigacion
+        fields = ['nombre']
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+        
+        
+class TipoParticipacionForm(forms.ModelForm):
+    class Meta:
+        model = TipoParticipacion
+        fields = ['nombre']
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+        
+        
 class ModalidadForm(forms.ModelForm):
     class Meta:
         model = Modalidad
@@ -210,10 +243,12 @@ class ModalidadForm(forms.ModelForm):
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
 
+
 class AnyValueMultipleChoiceField(forms.MultipleChoiceField):
     def validate(self, value):
         # saltar validación de choices
         return
+
 
 class Evento_Form(forms.ModelForm):
     evento_base = forms.ModelChoiceField(
@@ -427,20 +462,26 @@ class Programa_Form(forms.ModelForm):
         super().__init__(*args, **kwargs)
         
         # Configurar querysets
-        self.fields['tipo_programa'].queryset = TipoPrograma.objects.filter(activo=True)
-        self.fields['sector_estrategico'].queryset = SectorEstrategico.objects.filter(activo=True)
-        self.fields['linea_investigacion'].queryset = LineaInvestigacion.objects.filter(activo=True)
-        
-        # Configurar opciones vacías con placeholders personalizados
-        self.fields['tipo_programa'].empty_label = "Escoger tipo programa (CRUD)"
-        self.fields['sector_estrategico'].empty_label = "Escoger el sector estratégico (CRUD)"
-        self.fields['linea_investigacion'].empty_label = "Escoger línea (CRUD)"
+        self.fields['tipo_programa'].queryset = TipoPrograma.objects.all()
+        self.fields['sector_estrategico'].queryset = SectorEstrategico.objects.all()
+        self.fields['linea_investigacion'].queryset = LineaInvestigacion.objects.all()
         
         # Preparar datos para autocompletado
         self._prepare_autocomplete_data()
     
     def _prepare_autocomplete_data(self):
         """Preparar datos para campos de autocompletado"""
+        usuarios = list(
+            Usuario.objects.all().values_list('first_name', 'last_name')
+        )
+        usuarios_nombres = [f"{n or ''} {a or ''}".strip() for n, a in usuarios if n or a]
+
+        instituciones = list(
+            Institucion.objects.exclude(nombre__exact='')
+            .values_list('nombre', flat=True)
+            .distinct()
+        )
+        
         # Organismos existentes
         organismos = list(
             Programa.objects.exclude(organismo__exact='')
@@ -455,29 +496,52 @@ class Programa_Form(forms.ModelForm):
             .distinct()
         )
         
-        # Jefes de programa existentes
-        jefes = list(
+        entidades_total = sorted(set(entidades + instituciones))
+        
+        # Jefes de programa existentes (texto)
+        jefes_guardados = list(
             Programa.objects.exclude(jefe_programa__exact='')
             .values_list('jefe_programa', flat=True)
-            .distinct()
         )
-        
+        jefes_sugerencias = sorted(set(usuarios_nombres + jefes_guardados))
+
+
+        self.fields['jefe_programa'].widget.attrs['data-suggestions'] = json.dumps(jefes_sugerencias)
+
         # Agregar datos como atributos del widget
         self.fields['organismo'].widget.attrs['data-suggestions'] = json.dumps(organismos)
-        self.fields['entidad_ejecutora'].widget.attrs['data-suggestions'] = json.dumps(entidades)
-        self.fields['jefe_programa'].widget.attrs['data-suggestions'] = json.dumps(jefes)
+        self.fields['entidad_ejecutora'].widget.attrs['data-suggestions'] = json.dumps(entidades_total)
+        self.fields['jefe_programa'].widget.attrs['data-suggestions'] = json.dumps(jefes_sugerencias)
 
-    def clean_codigo(self):
-        """Validar formato del código"""
-        codigo = self.cleaned_data.get('codigo', '').strip().upper()
+    def clean_codigo_programa(self):
+        codigo = self.cleaned_data.get('codigo_programa', '').strip().upper()
         if not codigo:
             raise forms.ValidationError("El código es requerido")
         
-        # Verificar unicidad
-        if Programa.objects.filter(codigo=codigo).exclude(pk=self.instance.pk if self.instance else None).exists():
+        if Programa.objects.filter(codigo_programa=codigo).exclude(pk=self.instance.pk if self.instance else None).exists():
             raise forms.ValidationError("Ya existe un programa con este código")
         
         return codigo
+
+    
+    def clean_jefe_programa(self):
+        jefe = self.cleaned_data.get('jefe_programa', '').strip()
+        if not jefe:
+            raise forms.ValidationError("Debe indicar un Jefe de Programa")
+
+        # Buscar si coincide con un nombre de usuario
+        usuario = Usuario.objects.filter(
+            first_name__iexact=jefe.split(" ")[0],
+            last_name__iexact=" ".join(jefe.split(" ")[1:])
+        ).first()
+
+        # Si coincide, puedes normalizar el nombre:
+        if usuario:
+            return usuario.get_full_name()
+
+        # Si NO coincide → devolver texto libre
+        return jefe
+
 
     def clean_participantes_data(self):
         """Validar datos de participantes"""
@@ -518,41 +582,84 @@ class Programa_Form(forms.ModelForm):
 
     def save(self, commit=True):
         programa = super().save(commit=False)
-        
+
+        # --- 1) CREAR INSTITUCIÓN NUEVA SI NO EXISTE (NO TOCAR) ---
+        entidad = programa.entidad_ejecutora.strip()
+        if entidad:
+            Institucion.objects.get_or_create(nombre=entidad)
+
+        # --- 2) PROCESAR ENTIDADES PARTICIPANTES (crear nuevas si hace falta) ---
+        nuevas_entidades_ids = []
+        seleccion = self.data.getlist("entidades_participantes")
+        for valor in seleccion:
+            if valor.startswith("new-"):
+                nombre_nuevo = valor.replace("new-", "").strip()
+                entidad_obj, creada = EntidadParticipante.objects.get_or_create(
+                    nombre=nombre_nuevo, defaults={"activo": True}
+                )
+                nuevas_entidades_ids.append(entidad_obj.id)
+
+        # --- 3) GUARDAR PROGRAMA ---
         if commit:
             programa.save()
-            
-            # Guardar relaciones many-to-many
-            self.save_m2m()
-            
-            # Procesar participantes UHO
+            self.save_m2m()  # guarda relaciones M2M existentes
+            if nuevas_entidades_ids:
+                programa.entidades_participantes.add(*nuevas_entidades_ids)
+
+            # --- 4) PROCESAR PARTICIPANTES UHO ---
             participantes_data = self.cleaned_data.get('participantes_data', [])
             if participantes_data:
                 self._save_participantes(programa, participantes_data)
-        
+
         return programa
-    
+
+
     def _save_participantes(self, programa, participantes_data):
-        """Guardar participantes UHO"""
-        # Limpiar participaciones existentes
+        """
+        Guardar/actualizar participantes de la UHO para el programa.
+        participantes_data debe ser lista de dicts con:
+        { 'usuario_id': int|str, 'tipo_participacion_id': int }
+        usuario_id puede ser 'new-NOMBRE' para participantes externos no existentes
+        """
+        # Eliminar participaciones existentes
         ParticipacionPrograma.objects.filter(programa=programa).delete()
-        
-        # Crear nuevas participaciones
-        for participante_info in participantes_data:
-            try:
-                usuario = Usuario.objects.get(id=participante_info['usuario_id'])
-                tipo_participacion = TipoParticipacion.objects.get(id=participante_info['tipo_participacion_id'])
-                
-                ParticipacionPrograma.objects.create(
-                    programa=programa,
-                    usuario=usuario,
-                    tipo_participacion=tipo_participacion
-                )
-            except (Usuario.DoesNotExist, TipoParticipacion.DoesNotExist):
+
+        for p_info in participantes_data:
+            usuario_id = p_info.get('usuario_id')
+            tipo_id = p_info.get('tipo_participacion_id')
+
+            if not tipo_id:
+                continue  # ignorar si no hay tipo
+
+            tipo = TipoParticipacion.objects.filter(id=tipo_id).first()
+            if not tipo:
                 continue
 
+            if str(usuario_id).startswith("new-"):
+                # participante externo → crear usuario temporal o dejar solo el nombre
+                nombre_externo = usuario_id.replace("new-", "").strip()
+                # Se puede decidir crear un Usuario temporal o guardarlo en un modelo específico
+                # Por simplicidad, creamos un Usuario con un flag temporal
+                usuario, created = Usuario.objects.get_or_create(
+                    username=f"externo-{nombre_externo.replace(' ', '_')}",
+                    defaults={"first_name": nombre_externo, "last_name": "", "is_active": False}
+                )
+            else:
+                # participante existente
+                usuario = Usuario.objects.filter(id=usuario_id).first()
+                if not usuario:
+                    continue
 
-# Formulario para crear nuevas entidades participantes
+            # Crear la participación
+            ParticipacionPrograma.objects.create(
+                programa=programa,
+                usuario=usuario,
+                tipo_participacion=tipo
+            )
+
+
+    # Formulario para crear nuevas entidades participantes
+
 class EntidadParticipanteForm(forms.ModelForm):
     class Meta:
         model = EntidadParticipante
@@ -581,17 +688,12 @@ class EntidadParticipanteForm(forms.ModelForm):
 class TipoParticipacionForm(forms.ModelForm):
     class Meta:
         model = TipoParticipacion
-        fields = ['nombre', 'descripcion']
+        fields = ['nombre']
         widgets = {
             'nombre': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Nombre del tipo de participación',
                 'required': True
-            }),
-            'descripcion': forms.Textarea(attrs={
-                'class': 'form-control',
-                'rows': 3,
-                'placeholder': 'Descripción (opcional)'
             })
         }
 

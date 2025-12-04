@@ -81,12 +81,12 @@
                     Areas
                 </a>
             </li>
-
-            <a class="nav-link text-white " data-bs-toggle="collapse" aria-expanded="false"
-                data-bs-target="#Opciones-collapse" aria-controls="contents-collapse">
-                <i class="fas fa-edit text-white"></i> Editar Opciones
-                <i class="fas fa-angle-down text-white"></i></b>
-            </a>
+            <li class="nav-item mb-1">
+                <a data-bs-toggle="collapse" aria-expanded="false" data-bs-target="#Opciones-collapse"
+                    aria-controls="contents-collapse">
+                    <i class="fas fa-edit text-white"></i> Editar Opciones
+                    <i class="fas fa-angle-down text-white"></i></b>
+                </a>
             </li>
             <ul class="list-unstyled ps-3 collapse" id="Opciones-collapse">
 
@@ -412,12 +412,12 @@
                     Areas
                 </a>
             </li>
-
-            <a class="nav-link text-white " data-bs-toggle="collapse" aria-expanded="false"
-                data-bs-target="#Opciones-collapse" aria-controls="contents-collapse">
-                <i class="fas fa-edit text-white"></i> Editar Opciones
-                <i class="fas fa-angle-down text-white"></i></b>
-            </a>
+            <li class="nav-item mb-1" aria-label="Area_List">
+                <a data-bs-toggle="collapse" aria-expanded="false"
+                    data-bs-target="#Opciones-collapse" aria-controls="contents-collapse">
+                    <i class="fas fa-edit text-white"></i> Editar Opciones
+                    <i class="fas fa-angle-down text-white"></i></b>
+                </a>
             </li>
             <ul class="list-unstyled ps-3 collapse" id="Opciones-collapse">
 
@@ -446,38 +446,84 @@
                         Bases de datos
                     </a>
                 </li>
-                <li class="nav-item mb-1" aria-label="TipoEvento_List">
-                    <a href="{% url 'TipoEvento_List' %}" class="">
-                        Tipos de Eventos
+                <li class="nav-item mb-1">
+                    <a data-bs-toggle="collapse" aria-expanded="false" data-bs-target="#Eventos-collapse"
+                        aria-controls="contents-collapse">
+                        <i class="fas fa-calendar"></i> Eventos
+                        <i class="fas fa-angle-down text-white"></i></b>
                     </a>
                 </li>
-                <li class="nav-item mb-1" aria-label="CarcterEvento_List">
-                    <a href="{% url 'CarcterEvento_List' %}" class="">
-                        Carácteres de Eventos
-                    </a>
-                </li>
+                <ul class="list-unstyled ps-3 collapse" id="Eventos-collapse">
+                    <li class="nav-item mb-1" aria-label="TipoEvento_List">
+                        <a href="{% url 'TipoEvento_List' %}" class="">
+                            Tipos de Eventos
+                        </a>
+                    </li>
+                    <li class="nav-item mb-1" aria-label="CarcterEvento_List">
+                        <a href="{% url 'CarcterEvento_List' %}" class="">
+                            Carácteres de Eventos
+                        </a>
+                    </li>
 
-                <li class="nav-item mb-1" aria-label="Modalidad_List">
-                    <a href="{% url 'Modalidad_List' %}" class="">
-                        Modalidades de Eventos
+                    <li class="nav-item mb-1" aria-label="Modalidad_List">
+                        <a href="{% url 'Modalidad_List' %}" class="">
+                            Modalidades de Eventos
+                        </a>
+                    </li>
+                </ul>
+                <li class="nav-item mb-1">
+                    <a data-bs-toggle="collapse" aria-expanded="false" data-bs-target="#Premios-collapse"
+                        aria-controls="contents-collapse">
+                        <i class="fas  fa-award"></i> Premios
+                        <i class="fas fa-angle-down text-white"></i></b>
                     </a>
                 </li>
-
-                <li class="nav-item mb-1" aria-label="TipoPremio_List">
-                    <a href="{% url 'TipoPremio_List' %}" class="">
-                        Tipos de Premios
-                    </a>
-                </li>
-                <li class="nav-item mb-1" aria-label="CaracterPremio_List">
-                    <a href="{% url 'CaracterPremio_List' %}" class="">
-                        Carácteres de Premios
-                    </a>
-                </li>
+                <ul class="list-unstyled ps-3 collapse" id="Premios-collapse">
+                    <li class="nav-item mb-1" aria-label="TipoPremio_List">
+                        <a href="{% url 'TipoPremio_List' %}" class="">
+                            Tipos de Premios
+                        </a>
+                    </li>
+                    <li class="nav-item mb-1" aria-label="CaracterPremio_List">
+                        <a href="{% url 'CaracterPremio_List' %}" class="">
+                            Carácteres de Premios
+                        </a>
+                    </li>
+                </ul>
                 <li class="nav-item mb-1" aria-label="Revista_Libro_Conferencia_List">
                     <a href="{% url 'Revista_Libro_Conferencia_List' %}" class="">
                         Crear Revistas, Libro u otros.
                     </a>
                 </li>
+                <li class="nav-item mb-1">
+                    <a data-bs-toggle="collapse" aria-expanded="false" data-bs-target="#Programas-collapse"
+                        aria-controls="contents-collapse">
+                        <i class="fas fa-check-circle"></i> Programas
+                        <i class="fas fa-angle-down text-white"></i></b>
+                    </a>
+                </li>
+                <ul class="list-unstyled ps-3 collapse" id="Programas-collapse">
+                    <li class="nav-item mb-1" aria-label="TipoPrograma_List">
+                        <a href="{% url 'TipoPrograma_List' %}" class="">
+                            Tipos de Programas
+                        </a>
+                    </li>
+                    <li class="nav-item mb-1" aria-label="SectorEstrategico_List">
+                        <a href="{% url 'SectorEstrategico_List' %}" class="">
+                            Sector Estratégico
+                        </a>
+                    </li>
+                    <li class="nav-item mb-1" aria-label="LineaInvestigacion_List">
+                        <a href="{% url 'LineaInvestigacion_List' %}" class="">
+                            Líneas de Investigación
+                        </a>
+                    </li>
+                    <li class="nav-item mb-1" aria-label="TipoParticipacion_List">
+                        <a href="{% url 'TipoParticipacion_List' %}" class="">
+                            Tipos de Participación
+                        </a>
+                    </li>
+                </ul>
             </ul>
         </ul>
         <li class="nav-item mb-1" aria-label="InfoPersonal">
@@ -769,11 +815,12 @@
                     Areas
                 </a>
             </li>
-            <a class="nav-link text-white " data-bs-toggle="collapse" aria-expanded="false"
-                data-bs-target="#Opciones-collapse" aria-controls="contents-collapse">
-                <i class="fas fa-edit text-white"></i> Editar Opciones
-                <i class="fas fa-angle-down text-white"></i></b>
-            </a>
+            <li class="nav-item mb-1">
+                <a data-bs-toggle="collapse" aria-expanded="false" data-bs-target="#Opciones-collapse"
+                    aria-controls="contents-collapse">
+                    <i class="fas fa-edit text-white"></i> Editar Opciones
+                    <i class="fas fa-angle-down text-white"></i></b>
+                </a>
             </li>
             <ul class="list-unstyled ps-3 collapse" id="Opciones-collapse">
 

@@ -2,11 +2,12 @@ from django.contrib import admin
 from .models import (
 	Evento,Perfil,Articulo,Proyecto,Premio,Programa, Area, Departamento, Categoria_docente, Categoria_cientifica, CarcterEvento, PremioPremiado,
 	Cargo, Revista_Libro_Conferencia, Colaborador, EventoBase, TipoEvento, Modalidad, Indexacion, ParticipacionPrograma, Institucion, EventoAutor,
-	TipoParticipacion, EntidadParticipante, LineaInvestigacion, ProgramaEntidad, TipoPrograma, SectorEstrategico, TipoPremio, CaracterPremio
+	TipoParticipacion, EntidadParticipante, LineaInvestigacion, ProgramaEntidad, TipoPrograma, SectorEstrategico, TipoPremio, CaracterPremio, ArticuloAutor
 )
 # Register your models here.
 
 admin.site.register(Evento)
+admin.site.register(ArticuloAutor)
 admin.site.register(Perfil)
 admin.site.register(PremioPremiado)
 admin.site.register(Institucion)

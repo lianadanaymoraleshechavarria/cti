@@ -4,7 +4,8 @@ from django.contrib.auth.decorators import login_required
 from rest_framework import routers
 from usuarios.api import UsuarioViewSet
 
-from .views import ( Perfil_Create_JefeArea, Perfil_Detail_JefeArea, Perfil_Update_JefeArea,
+from .views import ( Perfil_Create_JefeArea, Perfil_Detail_JefeArea, Perfil_Update_JefeArea, LineaInvestigacion_Create,
+                    LineaInvestigacion_Delete, LineaInvestigacion_List, LineaInvestigacion_Update,
 
                     Articulo_List_JefeArea, Articulo_Delete_JefeArea, Articulo_Detail_JefeArea, Cambiar_Estado_Articulo,
                     
@@ -71,10 +72,6 @@ from .views import ( Perfil_Create_JefeArea, Perfil_Detail_JefeArea, Perfil_Upda
                     Articulo_List_JefeDepartamento,
                     Evento_List_JefeDepartamento,
                     Premio_List_JefeDepartamento, 
-
-    
-                   
-
                     Proyecto_List_Vicerrector,  Articulo_List_Vicerrector, CambiarRolVicerrector, Premio_List_Vicerrector, 
                     Evento_List_Vicerrector,
                     Programa_List_Vicerrector,
@@ -133,10 +130,6 @@ from .views import ( Perfil_Create_JefeArea, Perfil_Detail_JefeArea, Perfil_Upda
                     Cargo_Create, Cargo_List, Cargo_Detail, Cargo_Delete, Cargo_Update, ReporteCompletoView, api_revistas,
                     BasesDatosCreate, BasesDatosList, BasesDatosDetail, BasesDatosUpdate, BasesDatosDelete, Colaboradores_Delete, 
                     Colaboradores_Update, Colaboradores_Detail, Colaboradores_List, Colaboradores_Create, api_dashboard_data
-      
-
-
-                    
 )
 
 router = routers.DefaultRouter()
@@ -192,6 +185,27 @@ path('tipo_evento/create/', views.TipoEvento_Create.as_view(), name='TipoEvento_
 path('tipo_evento/update/<int:pk>/', views.TipoEvento_Update.as_view(), name='TipoEvento_Update'),
 path('tipo_evento/detail/<int:pk>/', views.TipoEvento_Detail.as_view(), name='TipoEvento_Detail'),
 path('tipo_evento/delete/<int:id>/', views.TipoEvento_Delete, name='TipoEvento_Delete'),
+
+path('tipo_programa/list/', views.TipoPrograma_List.as_view(), name='TipoPrograma_List'),
+path('tipo_programa/create/', views.TipoPrograma_Create.as_view(), name='TipoPrograma_Create'),
+path('tipo_programa/update/<int:pk>/', views.TipoPrograma_Update.as_view(), name='TipoPrograma_Update'),
+path('tipo_programa/detail/<int:pk>/', views.TipoPrograma_Detail.as_view(), name='TipoPrograma_Detail'),
+path('tipo_programa/delete/<int:id>/', views.TipoPrograma_Delete, name='TipoPrograma_Delete'),
+
+path('sector_estrategico/list/', views.SectorEstrategico_List.as_view(), name='SectorEstrategico_List'),
+path('sector_estrategico/create/', views.SectorEstrategico_Create.as_view(), name='SectorEstrategico_Create'),
+path('sector_estrategico/update/<int:pk>/', views.SectorEstrategico_Update.as_view(), name='SectorEstrategico_Update'),
+path('sector_estrategico/delete/<int:id>/', views.SectorEstrategico_Delete, name='SectorEstrategico_Delete'),
+
+path('linea_investigacion/list/', views.LineaInvestigacion_List.as_view(), name='LineaInvestigacion_List'),
+path('linea_investigacion/create/', views.LineaInvestigacion_Create.as_view(), name='LineaInvestigacion_Create'),
+path('linea_investigacion/update/<int:pk>/', views.LineaInvestigacion_Update.as_view(), name='LineaInvestigacion_Update'),
+path('linea_investigacion/delete/<int:id>/', views.LineaInvestigacion_Delete, name='LineaInvestigacion_Delete'),
+
+path('tipo_participacion/list/', views.TipoParticipacion_List.as_view(), name='TipoParticipacion_List'),
+path('tipo_participacion/create/', views.TipoParticipacion_Create.as_view(), name='TipoParticipacion_Create'),
+path('tipo_participacion/update/<int:pk>/', views.TipoParticipacion_Update.as_view(), name='TipoParticipacion_Update'),
+path('tipo_participacion/delete/<int:id>/', views.TipoParticipacion_Delete, name='TipoParticipacion_Delete'),
 
 path('tipo_premio/list/', views.TipoPremio_List.as_view(), name='TipoPremio_List'),
 path('tipo_premio/create/', views.TipoPremio_Create.as_view(), name='TipoPremio_Create'),

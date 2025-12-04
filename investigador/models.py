@@ -4,9 +4,6 @@ from plataforma.models import Usuario
 from django.core.exceptions import ValidationError
 from datetime import date
 from plataforma.choices import (
-    TIPO, 
-    CARACTER, 
-    PRESENCIALIDAD, 
     TIPO_PROYECTO_CHOICES, 
     SUBTIPO_PROYECTO_CHOICES,
     APROBACION, 
@@ -14,11 +11,6 @@ from plataforma.choices import (
     LINEA_INVESTIGACION_CHOICES, 
     ESTADO_PROYECTO_CHOICES, 
     APROBACION,
-    CARACTER_EVENTO,
-    PAIS,
-    CATEGORIAS_CIENTIFICAS,
-    CATEGORIAS_DOCENTES,
-    ROLES_BASE,
     IDIOMA, GRUPO, PROVINCIAS_CUBA
 )
 from django.core.exceptions import ValidationError
@@ -201,13 +193,10 @@ class Proyecto(models.Model):
 
 class TipoPrograma(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
-    codigo = models.CharField(max_length=10, unique=True, null=True, blank=True)
-    descripcion = models.TextField(blank=True)
-    activo = models.BooleanField(default=True)
-    
+    sigla = models.CharField(max_length=10, unique=True, null=True, blank=True)
     class Meta:
         verbose_name = "Tipo de Programa"
-        verbose_name_plural = "Tipos de Programa"
+        verbose_name_plural = "Tipos de Programas"
         ordering = ['nombre']
     
     def __str__(self):
@@ -216,9 +205,6 @@ class TipoPrograma(models.Model):
 
 class SectorEstrategico(models.Model):
     nombre = models.CharField(max_length=150, unique=True)
-    codigo = models.CharField(max_length=10, unique=True, null=True, blank=True)
-    descripcion = models.TextField(blank=True)
-    activo = models.BooleanField(default=True)
     
     class Meta:
         verbose_name = "Sector Estratégico"
@@ -231,9 +217,6 @@ class SectorEstrategico(models.Model):
 
 class LineaInvestigacion(models.Model):
     nombre = models.CharField(max_length=200, unique=True)
-    codigo = models.CharField(max_length=15, unique=True, null=True, blank=True)
-    descripcion = models.TextField(blank=True)
-    activo = models.BooleanField(default=True)
     
     class Meta:
         verbose_name = "Línea de Investigación"
@@ -256,7 +239,6 @@ class EntidadParticipante(models.Model):
         ('Internacional', 'Organización Internacional'),
         ('Otro', 'Otro'),
     ]
-    
     nombre = models.CharField(max_length=250, unique=True)
     sigla = models.CharField(max_length=20, blank=True, null=True)
     tipo_entidad = models.CharField(max_length=20, choices=TIPOS_ENTIDAD, default='Otro')
@@ -284,8 +266,6 @@ class EntidadParticipante(models.Model):
 
 class TipoParticipacion(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
-    descripcion = models.TextField(blank=True)
-    activo = models.BooleanField(default=True)
     
     class Meta:
         verbose_name = "Tipo de Participación"
@@ -297,51 +277,23 @@ class TipoParticipacion(models.Model):
 
 
 class Programa(models.Model):
-    # Campos básicos del programa
     nombre_programa = models.CharField(max_length=300, verbose_name="Nombre del Programa")
-    codigo_programa = models.CharField(
-        max_length=50, 
-        unique=True, 
-        verbose_name="Código",
+    tipo_programa = models.ForeignKey(TipoPrograma, on_delete=models.PROTECT, verbose_name="Tipo de Programa")
+    organismo = models.CharField(max_length=200, verbose_name="Organismo")
+    codigo_programa = models.CharField(max_length=50, unique=True, verbose_name="Código",
         validators=[RegexValidator(
             regex=r'^[A-Z0-9\-]+$',
             message='El código debe contener solo letras mayúsculas, números y guiones'
         )]
     )
-    tipo_programa = models.ForeignKey(
-        TipoPrograma, 
-        on_delete=models.PROTECT,
-        verbose_name="Tipo de Programa"
-    )
-    
-    # Organización y ejecución
-    organismo = models.CharField(max_length=200, verbose_name="Organismo")
     entidad_ejecutora = models.CharField(max_length=200, verbose_name="Entidad Ejecutora")
-    jefe_programa = models.CharField(max_length=200, verbose_name="Jefe del Programa")
-    
-    # Fechas
+    # Plazo de ejecución
     fecha_inicio = models.DateField(verbose_name="Fecha de Inicio")
     fecha_fin = models.DateField(verbose_name="Fecha de Finalización")
-    
-    # Clasificación
-    sector_estrategico = models.ForeignKey(
-        SectorEstrategico,
-        on_delete=models.PROTECT,
-        verbose_name="Sector Estratégico"
-    )
-    linea_investigacion = models.ForeignKey(
-        LineaInvestigacion,
-        on_delete=models.PROTECT,
-        verbose_name="Línea de Investigación de la UHO"
-    )
-    
-    # Relaciones
-    entidades_participantes = models.ManyToManyField(
-        EntidadParticipante,
-        through='ProgramaEntidad',
-        blank=True,
-        verbose_name="Entidades Participantes"
-    )
+    jefe_programa = models.CharField(max_length=200, verbose_name="Jefe del Programa")
+    sector_estrategico = models.ForeignKey(SectorEstrategico, on_delete=models.PROTECT, verbose_name="Sector Estratégico")
+    linea_investigacion = models.ForeignKey(LineaInvestigacion, on_delete=models.PROTECT, verbose_name="Línea de Investigación de la UHO")
+    entidades_participantes = models.ManyToManyField(EntidadParticipante, through='ProgramaEntidad', blank=True,verbose_name="Entidades Participantes")
     
     # Metadatos
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, verbose_name="Creado por")
@@ -360,6 +312,10 @@ class Programa(models.Model):
     def __str__(self):
         return f"{self.codigo_programa} - {self.nombre_programa}"
     
+    def participantes_uho(self):
+        return ParticipacionPrograma.objects.filter(programa=self)
+
+    
     @property
     def duracion_meses(self):
         """Calcula la duración del programa en meses"""
@@ -376,17 +332,20 @@ class ProgramaEntidad(models.Model):
     fecha_incorporacion = models.DateTimeField(auto_now_add=True)
     activo = models.BooleanField(default=True)
     
+    def __str__(self):
+        return f"{self.programa.nombre_programa} - {self.entidad.nombre}"
+
     class Meta:
         unique_together = ['programa', 'entidad']
         verbose_name = "Programa-Entidad"
-        verbose_name_plural = "Programa-Entidades"
+        verbose_name_plural = "Programas-Entidades"
 
 
 class ParticipacionPrograma(models.Model):
     """Participantes de la UHO en el programa"""
     programa = models.ForeignKey(Programa, on_delete=models.CASCADE, related_name='participaciones')
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    tipo_participacion = models.ForeignKey(TipoParticipacion, on_delete=models.PROTECT,verbose_name="Tipo de Participación")
+    tipo_participacion = models.ForeignKey(TipoParticipacion, on_delete=models.PROTECT, verbose_name="Tipo de Participación")
     fecha_incorporacion = models.DateTimeField(auto_now_add=True)
     activo = models.BooleanField(default=True)
     
@@ -607,17 +566,16 @@ class Perfil(models.Model):
     def __str__(self):
         return self.nombre
 
+issn_validator = RegexValidator(regex=r'^[0-9A-Za-z-]*$', message="ISSN solo puede contener letras, números y guiones")
 
 class Revista_Libro_Conferencia(models.Model):
     titulo = models.CharField(max_length=200, blank=False, null=False)
     editorial = models.CharField(max_length=200, blank=False, null=False)
-    issn = models.CharField(max_length=9, blank=True, null=True)
-    isbn = models.CharField(max_length=13, blank=True, null=True)
-    pais = models.CharField(max_length=50, blank=True, null=True, choices=PAIS)
-    idioma = models.CharField(max_length=50, blank=True, null=True, choices=IDIOMA)
+    issn = models.CharField(max_length=9, blank=True, null=True, validators=[issn_validator])
+    isbn = models.CharField(max_length=13, blank=True, null=True, validators=[issn_validator])
+    pais = models.CharField(max_length=50, blank=True, null=True)
     url = models.URLField(max_length=200, blank=True, null=True)
     index = models.ForeignKey(Indexacion, on_delete=models.SET_NULL, null=True, blank=True, default=None)
-    cita = models.CharField(max_length=100, blank=True, null=True)
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, null=True, blank=True,  related_name='revistas_creados')
     class Meta:
         verbose_name = "Revista/Libro/Conferencia"
@@ -626,13 +584,12 @@ class Revista_Libro_Conferencia(models.Model):
     def __str__(self):
         return f"{self.titulo} ({self.editorial})"
 
-
 class Articulo(models.Model):
     marcador = 'Articulo'
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='articulos_creados')
     titulo = models.CharField(max_length=200, blank=False, null=False)
     doi = models.CharField(max_length=50, blank=False, null=False) 
-    issn_isbn = models.CharField(max_length=9, blank=False, null=False)
+    issn_isbn = models.CharField(max_length=9, blank=False, null=False, validators=[issn_validator])
     fecha_create = models.DateField(blank=False, null=False)
     idioma = models.CharField(max_length=50, blank=True, null=True, choices=IDIOMA, default='Seleccione...')
     revista = models.ForeignKey(Revista_Libro_Conferencia, on_delete=models.CASCADE, blank=True, null=True)
@@ -687,7 +644,6 @@ class ArticuloAutor(models.Model):
         if self.colaborador:
             return f"{self.colaborador.nombre} {self.colaborador.apellidos}".strip()
         return "Desconocido"
-
     
     def __str__(self):
         if self.usuario:

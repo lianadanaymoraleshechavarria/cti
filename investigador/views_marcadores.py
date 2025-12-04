@@ -1,8 +1,10 @@
 from .forms import (Evento_Form, TipoPremioForm, CaracterPremioForm, Proyecto_Form, InstitucionForm, Programa_Form, Premio_Form, 
                     Perfil_Form, EventoBaseForm, Colaborador_Form, ArticuloForm)
-from .models import (Evento, Proyecto, Programa, Premio, Perfil, Articulo, TipoEvento, Modalidad, TipoPremio, CaracterPremio,
-                     Area, Colaborador, EventoBase, TipoPrograma, PremioPremiado, Institucion, EventoAutor)
+from .models import (Evento, Proyecto, Programa, Premio, Perfil, Articulo, TipoEvento, Modalidad, TipoPremio, TipoParticipacion, ArticuloAutor,
+                     Area, EntidadParticipante, Colaborador, EventoBase, PremioPremiado, Institucion, EventoAutor, Revista_Libro_Conferencia)
+from .serializers import TipoParticipacionSerializer
 from django.db.models import Count
+import json
 from django.views.generic import ListView, DetailView, TemplateView, UpdateView, DeleteView
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -42,9 +44,72 @@ from django.shortcuts import render
 from django.contrib.auth import get_user_model
 from plataforma.choices import PROVINCIAS_CUBA, PAIS, IDIOMA 
 from django.http import HttpRequest, HttpResponseRedirect
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError
+from django.conf import settings
+import re
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
 # Configurar logging
 logger = logging.getLogger(__name__)
 Usuario = get_user_model()
+
+
+@csrf_exempt  # si usas CSRF desde JS, no necesitas esto
+def crear_entidad(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            nombre = data.get("nombre")
+            if not nombre:
+                return JsonResponse({"error": "El nombre es requerido"}, status=400)
+            entidad, created = EntidadParticipante.objects.get_or_create(
+                nombre=nombre.strip().title(),
+                defaults={
+                    "sigla": data.get("sigla","").strip().upper(),
+                    "tipo_entidad": data.get("tipo","Otro"),
+                    "pais": data.get("pais","Cuba")
+                }
+            )
+            return JsonResponse({"id": entidad.id, "nombre": str(entidad)})
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+    return JsonResponse({"error": "Método no permitido"}, status=405)
+
+class TipoParticipacionList(APIView):
+    def get(self, request):
+        term = request.GET.get('term', '').strip()
+        qs = TipoParticipacion.objects.all()
+        if term:
+            qs = qs.filter(nombre__icontains=term)
+        serializer = TipoParticipacionSerializer(qs, many=True)
+        # Formato compatible con Select2
+        data = [{'id': t['id'], 'text': t['nombre']} for t in serializer.data]
+        return Response({'results': data})
+    
+    
+def buscar_entidades(request):
+    term = request.GET.get("term", "").strip()
+
+    entidades = EntidadParticipante.objects.filter(
+        nombre__icontains=term,
+        activo=True
+    ).order_by("nombre")
+
+    resultados = [
+        {"id": e.id, "text": e.nombre}
+        for e in entidades
+    ]
+
+    # Si no existe → ofrecer crear nueva
+    if term and not entidades.exists():
+        resultados.append({
+            "id": f"new-{term}",
+            "text": f"➕ Crear '{term}'"
+        })
+
+    return JsonResponse({"results": resultados})
 
 
 @login_required
@@ -1270,25 +1335,23 @@ def api_crear_revista_libro(request):
         'revista_libro': None
     }
 
-    # Extract and clean data
+    # Extraer y limpiar datos
     data = {k: v.strip() if isinstance(v, str) else v for k, v in request.POST.items()}
-    
-    # Required fields validation
+
+    # Validar campos obligatorios
     required_fields = ['titulo', 'editorial']
     for field in required_fields:
         if not data.get(field):
             response_data['errors'][field] = "Este campo es obligatorio"
 
-    # Field length validation
+    # Validar longitud de campos
     field_constraints = {
         'titulo': 200,
         'editorial': 200,
         'issn': 9,
         'isbn': 13,
         'pais': 50,
-        'idioma': 50,
-        'url': 200,
-        'cita': 100
+        'url': 200
     }
 
     for field, max_length in field_constraints.items():
@@ -1296,14 +1359,15 @@ def api_crear_revista_libro(request):
         if value and len(value) > max_length:
             response_data['errors'][field] = f"Máximo {max_length} caracteres permitidos"
 
-    # Format validation
+    # Validar formato ISSN
     issn = data.get('issn', '')
     if issn:
         if len(issn) != 9:
-            response_data['errors']['issn'] = "ISSN debe tener exactamente 9 caracteres"
-        elif not issn.isalnum():
-            response_data['errors']['issn'] = "ISSN solo puede contener letras y números"
-
+            response_data['errors']['issn'] = "ISSN debe tener exactamente 9 caracteres (incluyendo guión si aplica)"
+        elif not re.match(r'^[0-9A-Za-z-]+$', issn):
+            response_data['errors']['issn'] = "ISSN solo puede contener letras, números y guiones"
+        
+    # Validar formato ISBN
     isbn = data.get('isbn', '')
     if isbn:
         if not isbn.isdigit():
@@ -1311,37 +1375,28 @@ def api_crear_revista_libro(request):
         elif len(isbn) not in [10, 13]:
             response_data['errors']['isbn'] = "ISBN debe tener 10 o 13 dígitos"
 
+    # Validar URL
     url = data.get('url', '')
     if url and not url.startswith(('http://', 'https://')):
         response_data['errors']['url'] = "URL debe comenzar con http:// o https://"
 
-    # Choices validation using imported PAIS and IDIOMA
-    PAIS_CHOICES = [choice[0] for choice in PAIS]
-    if 'pais' in data and data['pais'] and data['pais'] not in PAIS_CHOICES:
-        response_data['errors']['pais'] = "País no válido"
-
-    IDIOMA_CHOICES = [choice[0] for choice in IDIOMA]
-    if 'idioma' in data and data['idioma'] and data['idioma'] not in IDIOMA_CHOICES:
-        response_data['errors']['idioma'] = "Idioma no válido"
-
+    # Retornar errores si existen
     if response_data['errors']:
         return JsonResponse(response_data, status=400)
 
     try:
-        # Create record
+        # Crear registro
         revista_libro = Revista_Libro_Conferencia(
             titulo=data['titulo'],
             editorial=data['editorial'],
             issn=issn or None,
             isbn=isbn or None,
             pais=data.get('pais') or None,
-            idioma=data.get('idioma') or None,
             url=url or None,
-            cita=data.get('cita') or None,
             usuario=request.user
         )
 
-        revista_libro.full_clean()
+        revista_libro.full_clean()  # Validación Django
         revista_libro.save()
 
         response_data.update({
@@ -1353,7 +1408,6 @@ def api_crear_revista_libro(request):
                 'issn': revista_libro.issn,
                 'isbn': revista_libro.isbn,
                 'pais': revista_libro.pais,
-                'idioma': revista_libro.idioma,
                 'url': revista_libro.url
             }
         })
@@ -1363,17 +1417,16 @@ def api_crear_revista_libro(request):
     except ValidationError as e:
         response_data['errors'] = e.message_dict
         return JsonResponse(response_data, status=400)
-        
-    except IntegrityError as e:
+
+    except IntegrityError:
         response_data['errors']['non_field'] = "Error de base de datos. Posible duplicado."
         return JsonResponse(response_data, status=400)
-        
+
     except Exception as e:
         response_data['errors']['non_field'] = "Error interno del servidor"
-        if settings.DEBUG:
+        if getattr(settings, 'DEBUG', False):
             response_data['debug'] = str(e)
         return JsonResponse(response_data, status=500)
-
 
 class Evento_Create(LoginRequiredMixin, CreateView):
     model = Evento
@@ -1619,22 +1672,28 @@ class Programa_Create(LoginRequiredMixin, CreateView):
     model = Programa
     form_class = Programa_Form
     template_name = "Programa/programa_create.html"
-    success_url = reverse_lazy('Programa_Create')
+    success_url = reverse_lazy('Programa_List_Vicerrector')
 
     def form_invalid(self, form):
-        messages.error(self.request, "Hubo un error al crear el Programa. Por favor, intenta de nuevo.")
+    # Agregar errores de campos individuales
+        for field, errors in form.errors.items():
+            for error in errors:
+                if field == "__all__":
+                    messages.error(self.request, error)  # Error general
+                else:
+                    # Error de campo específico
+                    messages.error(self.request, f"{form.fields[field].label}: {error}")
         return super().form_invalid(form)
         
 
     def form_valid(self, form):
         form.instance.usuario = self.request.user
-        form.instance.codigo_programa = generar_codigo_unico()
         messages.success(self.request, "Programa creado exitosamente.")
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Asegurarse de que request esté disponible en el contexto
+        context["TIPOS_ENTIDAD"] = EntidadParticipante.TIPOS_ENTIDAD
         context['request'] = self.request
         # Agregar los proyectos aprobados al contexto
         context['proyectos'] = Proyecto.objects.filter(aprobacion='Aprobado')
@@ -1991,34 +2050,83 @@ class ArticuloCreate(LoginRequiredMixin, CreateView):
     model = Articulo
     form_class = ArticuloForm
     template_name = "Articulo/articulo_revista_create.html"
-    success_url = reverse_lazy('Articulo_Revista_Create')
+    success_url = reverse_lazy('Articulo_List_Investigador')
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
+        kwargs['user'] = self.request.user  
+
+        # Procesar los autores del POST si existen
+        if self.request.method == 'POST':
+            autores_ids = self.request.POST.getlist('autores')
+            if autores_ids:
+                usuario_ids = [
+                    aid.split('-')[1]
+                    for aid in autores_ids
+                    if aid.startswith('usuario-')
+                ]
+                usuarios_extra = Usuario.objects.filter(id__in=usuario_ids)
+                kwargs['extra_usuarios'] = usuarios_extra
+
         return kwargs
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['request'] = self.request
-        context['proyectos'] = Proyecto.objects.filter(aprobacion='Aprobado')
-        
-        context['PAIS'] = PAIS
-        context['IDIOMA'] = IDIOMA
-        
-        return context
-    
+
+
     def form_valid(self, form):
-        form.instance.usuario = self.request.user
-        messages.success(self.request, "Solicitud artículo creada exitosamente.")
-        return super().form_valid(form)
+        user = self.request.user
+        form.instance.usuario = user
+        form.instance.area = user.area
+        form.instance.departamento = user.departamento
+
+        # Guardar artículo
+        response = super().form_valid(form)
+        articulo = self.object
+
+        # Agregar el autor principal (usuario autenticado)
+        ArticuloAutor.objects.create(articulo=articulo, usuario=user)
+
+        # Agregar otros autores si los hay
+        autores = form.cleaned_data.get('autores', [])
+        print("Autores seleccionados en POST:", autores)
+        for seleccionado in autores:
+            tipo, id_str = seleccionado.split('-')
+            if tipo == 'usuario':
+                usuario = Usuario.objects.get(id=int(id_str))
+                if usuario.id != user.id:  # evitar duplicar al creador
+                    ArticuloAutor.objects.get_or_create(articulo=articulo, usuario=usuario)
+            elif tipo == 'colaborador':
+                colaborador = Colaborador.objects.get(id=int(id_str))
+                ArticuloAutor.objects.get_or_create(articulo=articulo, colaborador=colaborador)
+
+        messages.success(self.request, "Artículo creado exitosamente.")
+        return response
+
 
     def form_invalid(self, form):
-       messages.error(self.request, "Hubo un error al crear la Solicitud de Revista. Por favor, intenta de nuevo.")
-       print(form.errors)  # Esto imprimirá los errores en la consola del servidor
-       return super().form_invalid(form)  
-       proyectos = Proyecto.objects.filter(aprobacion='Aprobado')
+        errores = []
+        for field, field_errors in form.errors.items():
+            if field == '__all__':
+                errores.extend(field_errors)
+            else:
+                field_label = form.fields.get(field).label or field.replace('_', ' ').capitalize()
+                for error in field_errors:
+                    errores.append(f"{field_label}: {error}")
 
+        mensaje_error = "Hubo un error al crear el Artículo. Corrige los siguientes campos: "
+        mensaje_error += " ".join(f"• {e}" for e in errores)
+
+        messages.error(self.request, mensaje_error)
+        print("Errores de formulario:", form.errors)
+
+        return super().form_invalid(form)
+
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['proyectos'] = Proyecto.objects.filter(aprobacion='Aprobado')
+        context['PAIS'] = PAIS
+        context['IDIOMA'] = IDIOMA
+        return context
+    
 
 class Articulo_List_Investigador(LoginRequiredMixin, ListView):
     model = Articulo
@@ -2137,7 +2245,7 @@ class Curriculo_List_Investigador(LoginRequiredMixin, View):
             'Evento': {
                 'model': Evento,
                 'nombre_field': 'titulo',
-                'filters': Q(usuario=user) | Q(autores=user)
+                'filters': Q(usuario=user) | Q(eventos_set__usuario=user)
             },
             'Proyecto': {
                 'model': Proyecto,
@@ -2157,7 +2265,7 @@ class Curriculo_List_Investigador(LoginRequiredMixin, View):
             'Articulo': {
                 'model': Articulo,
                 'nombre_field': 'titulo',
-                'filters': Q(usuario=user) | Q(autores=user)
+                'filters': Q(usuario=user) | Q(articulos_set__usuario=user)
             }
         }
         
@@ -2194,22 +2302,22 @@ class Curriculo_List_Investigador(LoginRequiredMixin, View):
             if filtro_departamento:
                 additional_filters &= Q(departamento__nombre_departamento=filtro_departamento)
             
-            #Aplicar todos los filtros
-            # queryset = config['model'].objects.filter(
-            #    base_filters & additional_filters
-            # ).distinct().order_by('-fecha_create').annotate(
-            #    es_creador=Case(
-            #         When(usuario=user, then=Value(True)),
-            #         default=Value(False),
-            #         output_field=BooleanField()
-            #     ),
-            #     tipo_resultado=Value(tipo, output_field=CharField()),
-            #     nombre=F(config['nombre_field']),
-            #     autor_principal=F('usuario'),
-            #     anio=ExtractYear('fecha_create')
-            # )
+            # Aplicar todos los filtros
+            queryset = config['model'].objects.filter(
+               base_filters & additional_filters
+            ).distinct().order_by('-fecha_create').annotate(
+               es_creador=Case(
+                    When(usuario=user, then=Value(True)),
+                    default=Value(False),
+                    output_field=BooleanField()
+                ),
+                tipo_resultado=Value(tipo, output_field=CharField()),
+                nombre=F(config['nombre_field']),
+                autor_principal=F('usuario'),
+                anio=ExtractYear('fecha_create')
+            )
             
-            # resultados.extend(list(queryset))
+            resultados.extend(list(queryset))
         
         # Ordenar todos los resultados por fecha (más reciente primero)
         resultados = sorted(resultados, key=lambda x: x.fecha_create, reverse=True)

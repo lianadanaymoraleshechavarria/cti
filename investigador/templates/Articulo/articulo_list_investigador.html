@@ -39,7 +39,7 @@
       <tr class="{% if not a.es_creador %}row-colaborador{% endif %}">
         <td style=" text-align: center;">{{forloop.counter}}</td>
         <td style=" text-align: start;">{{a.titulo}}</td>
-        <td style=" text-align: start;">{{a.fecha_creacion|date:"d/m/Y"}}</td>
+        <td style=" text-align: start;">{{a.fecha_create|date:"d/m/Y"}}</td>
         <td style=" text-align: start;">
           {% if a.autores %}
           <div class="participantes-tooltip">

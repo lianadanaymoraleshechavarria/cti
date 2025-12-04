@@ -152,7 +152,9 @@
 .boton-add.btn:hover,
 .boton-add.btn:focus,
 .boton-form.btn:hover,
-.boton-form.btn:focus {
+.boton-form.btn:focus,
+.btn-excel.btn:hover,
+.btn-excel.btn:focus {
     background: linear-gradient(to right, #7FC957, #49842A) !important;
     transform: translateY(-1px) !important;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
@@ -176,6 +178,50 @@
     margin-left: 5px;
     transition: all 0.2s ease-in-out;
 }
+
+.btn-excel {
+    padding: 6px 10px;
+    font-size: 1rem;
+    background: linear-gradient(to right, #7FC957, #49842A);
+    border: none;
+    border-radius: 35px;
+    min-width: 140px;
+    width: auto;
+    height: 40px;
+    font-weight: 400;
+    color: white;
+    line-height: 30px;
+    text-align: center;
+    cursor: pointer;
+    margin-left: 5px;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-pdf {
+    padding: 6px 10px;
+    font-size: 1rem;
+    background: linear-gradient(to right, #ba8d8d, #B03A3A);
+    border: none;
+    border-radius: 35px;
+    min-width: 140px;
+    width: auto;
+    height: 40px;
+    font-weight: 400;
+    color: white;
+    line-height: 30px;
+    text-align: center;
+    cursor: pointer;
+    margin-left: 5px;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-pdf.btn:hover,
+.btn-pdf.btn:focus {
+    background: linear-gradient(to right, #ba8d8d, #B03A3A) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+    color: white !important;
+} 
 
 .btn-cancelar {
     padding: 5px 10px;
@@ -226,4 +272,106 @@
     border-color: var(--borders);
     outline: 0;
     box-shadow: 0px 0px 0px 3.2px rgba(114, 190, 68, 0.4);
+}
+
+.select-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 200px; /* o el ancho que necesites */
+}
+
+.select-wrapper select {
+  width: 100%;
+  padding-right: 2.5rem; /* espacio para el icono */
+  -webkit-appearance: none; /* eliminar flecha nativa en Chrome/Safari */
+  -moz-appearance: none; /* eliminar flecha nativa en Firefox */
+  appearance: none;
+}
+
+.select-wrapper .select-icon {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #343a40;
+  font-size: 0.9rem;
+}
+.custom-select-with-icon {
+  padding-right: 2.5rem;   /* espacio para el icono */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.select-icon {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #343a40;
+  font-size: 0.9rem;
+}
+
+.tab-content {
+    padding: 20px;
+    background: white;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .nav-tabs .nav-link {
+    color: var(--text) !important;
+  }
+
+  .nav-tabs .nav-link.active {
+    font-weight: bold;
+    background: white;
+    color: var(--text) !important;
+    border-bottom: 3px solid #7FC957;
+  }
+
+  .filter-section {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+  }
+
+  .filter-row {
+    margin-bottom: 10px;
+  }
+
+  .export-buttons {
+    margin-bottom: 15px;
+  }
+
+  .select2-container {
+    width: 100% !important;
+  }
+
+  .btn-filter {
+    min-width: 100px;
+  }
+
+  /* Mejoras para móviles */
+  @media (max-width: 768px) {
+    .filter-section {
+      padding: 10px;
+    }
+
+    .filter-row {
+      margin-bottom: 15px;
+    }
+
+    .btn-filter {
+      width: 100%;
+      margin-top: 10px;
+    }
+  }
+
+td a {
+    text-decoration: none !important;
+    border-bottom: none !important;
 }

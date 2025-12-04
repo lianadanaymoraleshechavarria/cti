@@ -8,115 +8,53 @@
 <link rel="stylesheet" href=" {% static 'Plataforma/libs/Datatable/CSS/buttons.bootstrap5.css' %}">
 <link rel="stylesheet" href=" {% static 'Plataforma/libs/Datatable/CSS/responsive.bootstrap5.css' %}">
 <link rel="stylesheet" href=" {% static 'Plataforma/css/datatable.css' %}">
-<style>
-  .filtros-container {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-  }
-  
-  .filtro-grupo {
-    flex: 1;
-    min-width: 200px;
-  }
-  
-  .filtro-grupo label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-  }
-  
-  .filtro-grupo select {
-    width: 100%;
-    padding: 8px;
-    border-radius: 4px;
-    border: 1px solid #ced4da;
-  }
-  
-  .btn-filtrar {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  
-  .btn-filtrar:hover {
-    background-color: #0069d9;
-  }
-  
-  .btn-limpiar {
-    background-color: #6c757d;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  
-  .btn-limpiar:hover {
-    background-color: #5a6268;
-  }
-  
-  .filtros-acciones {
-    display: flex;
-    align-items: flex-end;
-    gap: 10px;
-  }
-</style>
+<link rel="stylesheet" href="{% static 'css/datatableSD.css' %}">
+<link rel="stylesheet" href="{% static 'css/styless.css' %}">
 {% endblock %}
 <!-- End Container CSS -->
 
 {% block content %}
 <main class="content-inside px-3 py-2 mx-2">
-    <div class="row">
-        <nav class="pt-2">
-            <div class="card-header grupo">
-                <h5 class="card-title">
-                    Administración
-                </h5>
-                <a href="{% url 'Registrar' %}" class="btn btn-primary btn-sm ">Crear</a>
-            </div>
-            <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
-                <button class="nav-link active text-primary" style="color:black;" id="nav-general-tab" data-bs-toggle="tab" data-bs-target="#nav-general" type="button" role="tab" aria-controls="nav-general" aria-selected="true"><i class=""></i><b>Usuarios</b></button>
-            </div>
-        </nav>
-        
+  <section class="tabla" id="Usuario">
+    <div class="card-header">
+      <h5 class="card-title title-t" style=" text-align:center;">
+        Usuarios
+      </h5>
+    </div>
+    <div class="boot d-flex flex-wrap justify-content-start align-items-center" style="margin-bottom: 20px;">
+      <a href="{% url 'Registrar' %}" style="width: auto;" class="btn boton-form">
+        <i class="fas fa-plus"></i> Nuevo</a>
+    </div>
+    <div class="table-responsive">
+      <p><strong>Total:</strong>  usuarios</p>
         <!-- Filtros -->
-        <div class="filtros-container">
-          <div class="filtro-grupo">
-            <label for="filtro-area">Filtrar por Área:</label>
-            <select id="filtro-area" class="form-select">
-              <option value="">Todas las áreas</option>
-              {% for area in areas %}
-                <option value="{{ area.nombre_area }}">{{ area.nombre_area }}</option>
-              {% endfor %}
-            </select>
+         <form method="get" id="filters-form">
+          <div class="filters-container">
+            <div class="filter-group">
+              <label for="filtro-area">Filtrar por Área:</label>
+              <select id="filtro-area" class="form-select">
+                <option value="">Todas las áreas</option>
+                {% for area in areas %}
+                  <option value="{{ area.nombre_area }}">{{ area.nombre_area }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            
+            <div class="filter-group">
+              <label for="filtro-departamento">Filtrar por Departamento:</label>
+              <select id="filtro-departamento" class="form-select">
+                <option value="">Todos los departamentos</option>
+                {% for departamento in departamentos %}
+                  <option value="{{ departamento.nombre_departamento }}" 
+                          data-area="{{ departamento.area.nombre_area|default_if_none:'' }}">
+                    {{ departamento.nombre_departamento }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+          <button id="btn-limpiar-filtros" class="btn btn-cancelar">Limpiar filtros</button>
           </div>
-          
-          <div class="filtro-grupo">
-            <label for="filtro-departamento">Filtrar por Departamento:</label>
-            <select id="filtro-departamento" class="form-select">
-              <option value="">Todos los departamentos</option>
-              {% for departamento in departamentos %}
-                <option value="{{ departamento.nombre_departamento }}" 
-                        data-area="{{ departamento.area.nombre_area|default_if_none:'' }}">
-                  {{ departamento.nombre_departamento }}
-                </option>
-              {% endfor %}
-            </select>
-          </div>
-        
-          
-          <div class="filtros-acciones">
-            <button id="btn-limpiar-filtros" class="btn-limpiar">Limpiar filtros</button>
-          </div>
-        </div>
-        
+        </form>
     <section class="tab-content" id="nav-tabContent" >
      <div class="tab-pane fade show active" id="nav-general" role="tabpanel" aria-labelledby="nav-general-tab"> 
         <div class="card">
@@ -203,6 +141,7 @@
         </div>
      </div>
     </section>
+  </section>  
 </main>
 {% endblock %}
 

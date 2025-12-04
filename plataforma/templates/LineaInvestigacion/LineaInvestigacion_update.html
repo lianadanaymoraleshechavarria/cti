@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="content">
+    <div class="col">
+        <div class="container-form">
+            <div class="form">
+                <div class="container-fluid py-4">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="title">
+                                    <h3 class="title-text p-3">Editar Línea de Investigación</h3>
+                                </div>
+                                <form action="." method="POST" id="linea-investigacion-form">
+                                    {% csrf_token %}
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="seccion-formulario">
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="form-group icon-input">
+                                                                <label
+                                                                    class="form-control-label required-field">Nombre</label>
+                                                                <div class="input-container">
+                                                                    <div class="input-wrapper">
+                                                                        {{form.nombre}}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-4">
+                                            <div class="col-md-12 text-center">
+                                                <a href="{% url 'LineaInvestigacion_List' %}"
+                                                    class="btn btn-cancelar ml-3">Cancelar</a>
+                                                <button type="submit" class="btn boton-form"><i
+                                                        class="fas fa-check"></i> Guardar</button>
+                                            </div>
+                                        </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- Container JS -->
+{% block js %}
+<script src="{% static 'Plataforma/js/FormularioSelect.js' %}"></script>
+<script>
+    $(document).ready(function () {
+        // Form validation
+        $('#linea-investigacion-form').on('submit', function (e) {
+            let isValid = true;
+            const nombre = $('#id_nombre').val().trim();
+
+            // Clear previous errors
+            $('.error-message').text('');
+
+            // Validate nombre
+            if (nombre === '') {
+                $('#nombre-error').text('Este campo es obligatorio');
+                isValid = false;
+            } else if (nombre.length > 100) {
+                $('#nombre-error').text('El nombre no puede exceder los 100 caracteres');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+
+        // Input animation
+        const inputs = document.querySelectorAll(".input");
+
+        function focusFunc() {
+            let parent = this.parentNode;
+            parent.classList.add("focus");
+        }
+
+        function blurFunc() {
+            let parent = this.parentNode;
+            if (this.value == "") {
+                parent.classList.remove("focus");
+            }
+        }
+
+        inputs.forEach((input) => {
+            input.addEventListener("focus", focusFunc);
+            input.addEventListener("blur", blurFunc);
+
+            // Initialize floating labels if field has value
+            if (input.value !== '') {
+                input.parentNode.classList.add('focus');
+            }
+        });
+
+        // Cerrar automáticamente los mensajes después de 5 segundos
+        setTimeout(function () {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function (alert) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    });
+</script>
+{% endblock %}

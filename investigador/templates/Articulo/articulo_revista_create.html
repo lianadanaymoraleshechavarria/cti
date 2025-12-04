@@ -58,7 +58,7 @@
                             <div class="col-md-6">
                               <div class="form-group">
                                   <label class="form-control-label required-field">ISSN o ISBN</label>
-                                  <input type="text" class="form-control" id="revista-issn" name="issn" required maxlength="9" pattern="[a-zA-Z0-9]{0,9}" title="Máximo 9 caracteres alfanuméricos" placeholder="Introduzca el ISSN">
+                                  <input type="text" class="form-control" id="issn_isbn" name="issn_isbn" required placeholder="Introduzca el ISSN">
                                   <div class="invalid-feedback">Máximo 9 caracteres alfanuméricos</div>
                               </div>
                             </div>
@@ -97,7 +97,7 @@
                             <div class="col-md-6">
                               <div class="form-group">
                                   <label class="form-control-label required-field">Editorial</label>
-                                  <input type="text" class="form-control" id="revista-editorial" name="editorial" required maxlength="200" placeholder="Introduzca la editorial">
+                                  <input type="text" class="form-control" id="id_editorial" name="editorial" required maxlength="200" placeholder="Introduzca la editorial">
                                   <div class="invalid-feedback">La editorial es requerida (3-200 caracteres)</div>
                               </div>
                             </div>
@@ -195,10 +195,9 @@
   </div>
 </div>
 </div>
-
   <!-- Modal para crear nueva revista/libro -->
   <div class="modal fade" id="modal-revista" tabindex="-1" aria-labelledby="modalRevistaLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="modalRevistaLabel">Crear Nueva Revista/Libro</h5>
@@ -206,34 +205,35 @@
         </div>
         <div class="modal-body">
           <form id="revista-form">
+            {% csrf_token %}
             <div class="mb-3">
               <label for="revista-titulo" class="form-label required-field">Nombre</label>
-              <input type="text" class="form-control" id="revista-titulo" required>
+              <input type="text" name="titulo" class="form-control" id="revista-titulo" required>
             </div>
             
             <div class="mb-3">
               <label for="revista-editorial" class="form-label required-field">Editorial</label>
-              <input type="text" class="form-control" id="revista-editorial" required>
+              <input type="text" name="editorial" class="form-control" id="revista-editorial" required>
             </div>
 
             <div class="mb-3">
               <label for="revista-issn" class="form-label">ISSN</label>
-              <input type="text" class="form-control" id="revista-issn">
+              <input type="text" name="issn" class="form-control" id="revista-issn" required placeholder="Introduzca el ISSN">
             </div>
             
             <div class="mb-3">
               <label for="revista-url" class="form-label">URL</label>
-              <input type="url" class="form-control" id="revista-url">
+              <input type="url" name="url" class="form-control" id="revista-url">
             </div>
 
             <div class="mb-3">
               <label for="revista-pais" class="form-label">País</label>
-              <input type="text" class="form-control" id="revista-pais">
+              <input type="text" name="pais" class="form-control" id="revista-pais">
             </div>
 
             <div class="mb-3">
               <label for="revista-indexacion" class="form-label">Indexación</label>
-              <select class="form-select" id="revista-indexacion" name="indexacion">
+              <select class="form-select" name="indexacion" id="revista-indexacion" name="indexacion">
                 {% for value, text in form.fields.indexacion.choices %}
                 <option value="{{ value }}">{{ text }}</option>
                 {% endfor %}
@@ -243,7 +243,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-cancelar" data-bs-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn boton-form"><i class="fas fa-check"></i> Guardar</button>
+          <button type="submit" class="btn boton-form" id="guardar-revista"><i class="fas fa-check"></i> Guardar</button>
         </div>
       </div>
     </div>
@@ -359,17 +359,12 @@ document.addEventListener('DOMContentLoaded', () => {
 <script src="{% static 'js/validations.js' %}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  
-  // =============================================
   // FUNCIONES DE DEBUG Y LOGGING (igual que eventos)
-  // =============================================
   function debugLog(message, data = null) {
     console.log(`[ARTICULO FORM DEBUG] ${message}`, data);
   }
 
-  // =============================================
   // 1. SELECTOR DE REVISTAS (igual que eventos)
-  // =============================================
   const revistaSearchInput = document.getElementById('revista-search');
   const revistaDropdown = document.getElementById('revista-dropdown');
   const selectedRevistaContainer = document.getElementById('selected-revista');
@@ -416,107 +411,77 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  function clearRevistaFields() {
-    // Limpiar campos de display readonly
-    if (revistaTituloDisplay) revistaTituloDisplay.value = '';
-    if (revistaEditorialDisplay) revistaEditorialDisplay.value = '';
-    if (revistaIssnDisplay) revistaIssnDisplay.value = '';
-    if (revistaUrlDisplay) revistaUrlDisplay.value = '';
-    
-    // Limpiar campos del formulario principal
-    const fieldsToClean = [
-      'id_editorial', 'id_issn', 'id_isbn', 'id_pais', 
-      'id_idioma', 'id_url', 'id_cita', 'id_index'
-    ];
-    
-    fieldsToClean.forEach(fieldId => {
-      const field = document.getElementById(fieldId);
-      if (field) {
-        if (field.tagName.toLowerCase() === 'select') {
-          field.selectedIndex = 0; // Seleccionar primera opción (vacía)
-        } else {
-          field.value = '';
-        }
-        field.dispatchEvent(new Event('change', { bubbles: true }));
-      }
-    });
-    
-    debugLog('Todos los campos de revista limpiados');
+function autocompleteRevistaFields(revista) {
+  // Editorial
+  const editorialField = document.getElementById('id_editorial');
+  if (editorialField && revista.editorial) {
+    editorialField.value = revista.editorial;
+    editorialField.dispatchEvent(new Event('input', { bubbles: true }));
   }
 
-  function autocompleteRevistaFields(revista) {
-    debugLog('Autocompletando campos de revista:', revista);
-    
-    // Campos de display readonly
-    if (revistaTituloDisplay) revistaTituloDisplay.value = revista.titulo || '';
-    if (revistaEditorialDisplay) revistaEditorialDisplay.value = revista.editorial || '';
-    if (revistaIssnDisplay) revistaIssnDisplay.value = revista.issn || '';
-    if (revistaUrlDisplay) revistaUrlDisplay.value = revista.url || '';
-    
-    // Campos del formulario principal que se pueden autocompletar
-    const formFields = {
-      // Editorial - campo común
-      'id_editorial': revista.editorial,
-      
-      // ISSN - campo común  
-      'id_issn': revista.issn,
-      
-      // ISBN - campo común
-      'id_isbn': revista.isbn,
-      
-      // País - campo común (select)
-      'id_pais': revista.pais,
-      
-      // Idioma - campo común (select)
-      'id_idioma': revista.idioma,
-      
-      // URL - campo común
-      'id_url': revista.url,
-      
-      // Cita - campo común
-      'id_cita': revista.cita
-    };
-    
-    // Autocompletar campos de texto e inputs
-    Object.entries(formFields).forEach(([fieldId, value]) => {
-      const field = document.getElementById(fieldId);
-      if (field && value) {
-        if (field.tagName.toLowerCase() === 'select') {
-          // Para campos select, buscar la opción que coincida
-          const option = Array.from(field.options).find(opt => 
-            opt.value === value || opt.textContent.toLowerCase() === value.toLowerCase()
-          );
-          if (option) {
-            field.value = option.value;
-            field.dispatchEvent(new Event('change', { bubbles: true }));
-            debugLog(`Campo select ${fieldId} actualizado:`, option.textContent);
-          } else {
-            debugLog(`ADVERTENCIA: Opción no encontrada para ${fieldId}:`, value);
-          }
-        } else {
-          // Para campos de texto normales
-          field.value = value;
-          field.dispatchEvent(new Event('input', { bubbles: true }));
-          debugLog(`Campo ${fieldId} actualizado:`, value);
-        }
+  // ISSN/ISBN → usa tu input personalizado
+  const issnIsbnField = document.getElementById('issn_isbn');
+  if (issnIsbnField) {
+    issnIsbnField.value = revista.issn || revista.isbn || '';
+    issnIsbnField.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  // País
+  const paisField = document.getElementById('id_pais');
+  if (paisField) {
+    paisField.value = revista.pais || '';
+    paisField.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  // URL
+  const urlField = document.getElementById('id_url');
+  if (urlField) {
+    urlField.value = revista.url || '';
+    urlField.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  // Indexación (select)
+  const indexField = document.getElementById('id_indexacion');
+  if (indexField) {
+    if (revista.index) {
+      // Coincidencia directa por value
+      const option = Array.from(indexField.options).find(opt =>
+        opt.value === String(revista.index)
+      );
+      if (option) {
+        indexField.value = option.value;
+        indexField.dispatchEvent(new Event('change', { bubbles: true }));
       }
-    });
-    
-    // Autocompletar campo Index si existe (ForeignKey)
-    if (revista.index && revista.index.id) {
-      const indexField = document.getElementById('id_index');
-      if (indexField) {
-        const indexOption = Array.from(indexField.options).find(opt => 
-          opt.value === revista.index.id.toString()
-        );
-        if (indexOption) {
-          indexField.value = indexOption.value;
-          indexField.dispatchEvent(new Event('change', { bubbles: true }));
-          debugLog('Campo index actualizado:', indexOption.textContent);
-        }
+    } else if (revista.index_nombre) {
+      // Coincidencia por texto visible
+      const option = Array.from(indexField.options).find(opt =>
+        opt.textContent.trim().toLowerCase() === revista.index_nombre.toLowerCase()
+      );
+      if (option) {
+        indexField.value = option.value;
+        indexField.dispatchEvent(new Event('change', { bubbles: true }));
       }
     }
   }
+}
+
+function clearRevistaFields() {
+  const editorialField = document.getElementById('revista-editorial');
+  if (editorialField) editorialField.value = '';
+
+  const issnField = document.getElementById('revista-issn');
+  if (issnField) issnField.value = '';
+
+  const paisField = document.getElementById('revista-pais');
+  if (paisField) paisField.value = '';
+
+  const urlField = document.getElementById('id_url');
+  if (urlField) urlField.value = '';
+
+  const indexField = document.getElementById('revista-indexacion');
+  if (indexField) indexField.selectedIndex = 0;
+}
+
 
   async function searchRevistas(query) {
     try {
@@ -595,10 +560,8 @@ document.addEventListener('DOMContentLoaded', function() {
             issn: revista.issn,
             isbn: revista.isbn,
             pais: revista.pais,
-            idioma: revista.idioma,
             url: revista.url,
             index: revista.index,
-            cita: revista.cita
           };
 
           debugLog('selectedRevista establecida:', selectedRevista);
@@ -644,9 +607,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  // =============================================
   // 2. MANEJO DEL MODAL PARA REVISTA (igual que eventos)
-  // =============================================
   const addRevistaBtn = document.getElementById('add-revista-btn');
   const guardarRevistaBtn = document.getElementById('guardar-revista');
   const modalRevista = document.getElementById('modal-revista');
@@ -692,12 +653,11 @@ document.addEventListener('DOMContentLoaded', function() {
       const formData = {
         titulo: document.getElementById('revista-titulo')?.value || '',
         editorial: document.getElementById('revista-editorial')?.value || '',
-        pais: document.getElementById('revista-pais')?.value || '',
         issn: document.getElementById('revista-issn')?.value || '',
-        isbn: document.getElementById('revista-isbn')?.value || '',
-        idioma: document.getElementById('revista-idioma')?.value || '',
         url: document.getElementById('revista-url')?.value || '',
-        cita: document.getElementById('revista-cita')?.value || ''
+        pais: document.getElementById('revista-pais')?.value || '',
+        idioma: document.getElementById('revista-idioma')?.value || '',  
+        indexacion: document.getElementById('revista-indexacion')?.value || ''
       };
 
       debugLog('Datos del formulario modal revista:', formData);
@@ -729,7 +689,7 @@ document.addEventListener('DOMContentLoaded', function() {
       debugLog('Enviando datos al servidor:', Object.fromEntries(postData));
 
       // Enviar al servidor (igual que eventos)
-      fetch('/Plataforma/api_crear_revista_libro/', {
+      fetch('/Investigador/api_crear_revista_libro/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -791,10 +751,12 @@ document.addEventListener('DOMContentLoaded', function() {
           updateSelectedRevista();
           autocompleteRevistaFields(selectedRevista);
           
-          // Limpiar formulario
+          // Limpiar formulario del modal
           document.getElementById('revista-form')?.reset();
-          
-          alert('Revista creada correctamente.');
+
+          // El modal ya se cierra arriba, no mostrar alertas
+          debugLog('Revista creada correctamente y modal cerrado.');
+
         } else {
           let errorMsg = 'Error al crear la revista:';
           if (data.errors) {
@@ -815,9 +777,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-   // =============================================
   // 3. SELECTOR DE COLABORADORES CON MODALES
-  // =============================================
   const searchInput = document.getElementById('user-search');
   const dropdown = document.getElementById('user-dropdown');
   const selectedUsersContainer = document.getElementById('selected-users');
@@ -993,9 +953,7 @@ document.addEventListener('DOMContentLoaded', function() {
   updateSelectedUsers();
   updateHiddenSelect();
 
-  // =============================================
   // 4. MANEJO DEL MODAL PARA COLABORADOR
-  // =============================================
   const addColaboradorBtn = document.getElementById('add-colaborador-btn');
   const guardarColaboradorBtn = document.getElementById('guardar-colaborador');
   const modalColaborador = document.getElementById('modal-colaborador');
@@ -1154,11 +1112,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // =============================================
-  // 5. OTROS SCRIPTS EXISTENTES
-  // =============================================
-  
-  // Script para mostrar el nombre del archivo seleccionado
+  // 5. Script para mostrar el nombre del archivo seleccionado
   document.getElementById('id_archivo')?.addEventListener('change', function(e) {
     var fileName = e.target.files[0] ? e.target.files[0].name : 'Seleccionar archivo...';
     const fileNameElement = document.getElementById('file-name');
@@ -1167,9 +1121,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // =============================================
   // 6. MANEJO DEL SWITCH DE PROYECTO
-  // =============================================
   const proyectoSwitch = document.getElementById('proyecto-switch');
   const proyectoContainer = document.getElementById('proyecto-select-container');
   const proyectoStatus = document.getElementById('proyecto-status');
@@ -1203,7 +1155,6 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
-
   debugLog('Inicialización completada');
 });
 </script>

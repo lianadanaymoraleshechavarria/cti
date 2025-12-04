@@ -4,47 +4,50 @@
 <!-- Conatiner CSS -->
 {% block css %}
 <link rel="stylesheet" href=" {% static 'Plataforma/css/estilobeta.css' %}">
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.min.css">
 {% endblock %}
 <!-- End Conatiner CSS -->
 
 {% block content %}
-<div class="container-form">
-    <div class="form-rol">
-        <div class="contact-form">
-            <span class="circle one"></span>
-            <span class="circle two"></span>
-            <form  method="POST">
-                {% csrf_token %}
-                <h3 class="title">Cambiar</h3>  
-    <!-- Mostrar mensajes aquí -->
-    {% if messages %}
-        {% for message in messages %}
-        <div class="alert alert-success alert-dismissible fade show" role="alert"
-             style="position: fixed; right: 20px; top: 50px; z-index: 1000;">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        {% endfor %}
-    {% endif %}
-                <div class="input-container select-rol">
-                    <input type="hidden" name="estado">
-                    <div class="input selector">
+<div class="content">
+    <div class="col">
+        <div class="container-form">
+            <div class="form">
+                <div class="container-fluid py-4">
+                    <div class="card">
+                        <div class="col-md-12">
+                            <div class="title">
+                                <h3 class="title-text p-3">Solicitud de Artículo</h3>
+                            </div>
+                            <form method="POST">
+                                {% csrf_token %}
+                                <div class="input-container select-rol">
+                                    <input type="hidden" name="estado">
+                                    <div class="input selector">
+                                    </div>
+                                    <label for="">Estado del Artículo</label>
+                                    <span>Estado del Artículo</span>
+                                </div>
+                                <div class="select-options" name="role">
+                                    {% for estado in estados %}
+                                    <div aria-valuetext="{{estado}}" value="{{estado}}" class="element">{{estado}}</div>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="row mt-4">
+                                    <div class="col-md-12 text-center">
+                                        <a href="javascript:history.back()"
+                                            class="btn btn-cancelar ml-3">Cancelar</a>
+                                        <button type="submit" class="btn boton-form"><i class="fas fa-check"></i>
+                                            Guardar</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                    <label for="">Estado del Artículo</label>
-                    <span>Estado del Artículo</span>
-                  </div>
-                  <div class="select-options" name="role">
-                    {% for estado in estados %}
-                    <div aria-valuetext="{{estado}}" value="{{estado}}" class="element">{{estado}}</div>
-                    {% endfor %}
-                  </div>
-                
-                  <div class="btn">
-                    <input type="submit" value="Aceptar" class="btn2">
-                    <a href="{% url 'Articulo_List_JefeArea' %}" class="btn2">Cancelar</a>
-                   
-                  </div>
-            </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>

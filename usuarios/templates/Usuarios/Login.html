@@ -12,21 +12,22 @@
     <link rel="stylesheet" href="{% static 'libs/Bootstrap/icon/bootstrap-icons.min.css' %}">
     <link rel="icon" type="image/png" sizes="50x50" href="{% static 'Usuarios/img/Id UHo-03.png' %}">
     <!-- End Conatiner CSS -->
-    <title>Sistema de gestión de resultados e indicadores de Ciencia, Tecnología e 
+    <title>Sistema de gestión de resultados e indicadores de Ciencia, Tecnología e
         Innovación de la Universidad de Holguín</title>
 </head>
+
 <body>
     <div class="container">
         {% if messages %}
-            {% for message in messages  %}
-            <div style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem;  z-index: 2000"
+        {% for message in messages %}
+        <div style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem;  z-index: 2000"
             class="alert alert-success alert-dismissible fade show" role="alert">
             {{ message }}
             <button style="font-size: 10px; border-bottom: none; position: relative; box-shadow: none;" type="button"
                 class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </button>
-            </div>
-            {% endfor %}
+        </div>
+        {% endfor %}
         {% endif %}
         {% if response %}
         {% if response == 'incorrecto' %}
@@ -42,18 +43,18 @@
         <div class="login-container">
             <form action="" method="POST">
                 {% csrf_token %}
-                <img class="logo" style="margin-left:50px;"  src="{% static 'Usuarios/img/Id UHo-01.png' %}" alt="">
+                <img class="logo" style="margin-left:50px;" src="{% static 'Usuarios/img/Id UHo-01.png' %}" alt="">
                 <h2 style="color:#222e58;">Bienvenido</h2>
                 <div class="input-container {% if form %}focus{% endif %}">
                     <input type="text" name="username" class="input" id="username" value="{{ form.username }}" required>
                     <label for="">Usuario</label>
                     <span>Usuario</span>
-                  </div>
-                  <div class="input-container">
+                </div>
+                <div class="input-container">
                     <input type="password" name="password" class="input" id="password" required>
                     <label for="">Contraseña</label>
                     <span>Contraseña</span>
-                  </div>
+                </div>
                 <a class="a" href="{% url 'password_reset' %}" class="link">¿Has olvidado la contraseña?</a>
                 <a class="a" href="{% url 'Registrar' %}" class="link">¿No tienes cuenta todavía? Registrate </a>
                 <input type="submit" class="btn1" id="boton" value="Iniciar Sesión">

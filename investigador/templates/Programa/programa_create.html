@@ -3,223 +3,6 @@
 
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/forms.css' %}">
-<link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}">
-<style>
-  /* Estilos para el componente de selección */
-  .select-container {
-    position: relative;
-    width: 100%;
-  }
-
-  .select-input {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid #E0DFE2;
-    border-radius: 4px;
-    font-size: 1rem;
-    line-height: 1.5;
-    color: #424045;
-    background-color: #fff;
-  }
-
-  .select-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    z-index: 1000;
-    width: 100%;
-    max-height: 200px;
-    overflow-y: auto;
-    background-color: #fff;
-    border: 1px solid #E0DFE2;
-    border-radius: 4px;
-    box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.3);
-  }
-
-  .select-item {
-    padding: 0.5rem;
-    cursor: pointer;
-    border-bottom: 1px solid #E0DFE2;
-  }
-
-  .select-item:hover {
-    background-color: #f8f9fa;
-  }
-
-  .select-item .item-title {
-    font-weight: 500;
-  }
-
-  .select-item .item-info {
-    font-size: 0.85rem;
-    color: #6c757d;
-  }
-
-  .select-selected {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
-  }
-
-  .item-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    line-height: 1;
-    color: #fff;
-    background-color: #007bff;
-    border-radius: 0.25rem;
-  }
-
-  .item-badge button {
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 1.25rem;
-    line-height: 1;
-    padding: 0 0 0 0.25rem;
-    cursor: pointer;
-    opacity: 0.7;
-  }
-
-  .item-badge button:hover {
-    opacity: 1;
-  }
-
-  /* Estilos para el modal */
-  .required-field::after {
-    content: "*";
-    color: red;
-    margin-left: 4px;
-  }
-
-  .dashed-rounded-border {
-    border: 1px dashed #64748b;
-    border-radius: 1.5rem;
-    padding: 1.5rem;
-    margin-top: 1.5rem;
-    position: relative;
-  }
-
-
-
-  .readonly-input {
-    background-color: #3b82f6;
-  }
-
-  .required-field::after {
-    content: "*";
-    color: #ef4444;
-    margin-left: 4px;
-  }
-
-  /* Estilos para el switch de proyecto */
-  .switch-container {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1rem;
-  }
-
-  .switch {
-    position: relative;
-    display: inline-block;
-    width: 50px;
-    height: 24px;
-    margin-right: 10px;
-  }
-
-  .switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-    border-radius: 24px;
-  }
-
-  .slider:before {
-    position: absolute;
-    content: "";
-    height: 16px;
-    width: 16px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%;
-  }
-
-  input:checked+.slider {
-    background-color: #2196F3;
-  }
-
-  input:focus+.slider {
-    box-shadow: 0 0 1px #2196F3;
-  }
-
-  input:checked+.slider:before {
-    transform: translateX(26px);
-  }
-
-  .proyecto-select-container {
-    display: none;
-    transition: all 0.3s ease;
-  }
-
-  .proyecto-select-container.visible {
-    display: block;
-  }
-
-  /* Estilos para secciones con borde discontinuo */
-  .dashed-section {
-    border: 1px dashed #6b7280;
-    border-radius: 0.5rem;
-    padding: 1.5rem;
-    position: relative;
-    margin-bottom: 2rem;
-  }
-
-  /* Estilos para user select */
-  .user-select-wrapper {
-    position: relative;
-  }
-
-  .user-select-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    z-index: 1000;
-    width: 100%;
-    max-height: 200px;
-    overflow-y: auto;
-    background-color: #fff;
-    border: 1px solid rgba(0, 0, 0, 0.15);
-    border-radius: 0.25rem;
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175);
-  }
-
-  .user-select-item {
-    padding: 0.5rem;
-    cursor: pointer;
-    border-bottom: 1px solid #f0f0f0;
-  }
-
-  .user-select-item:hover {
-    background-color: #f8f9fa;
-  }
-</style>
 {% endblock %}
 
 {% block content %}
@@ -229,152 +12,158 @@
       <div class="form">
         <div class="container-fluid py-4">
           <div class="row">
-            <div id="error-container"></div>
             <div class="col-md-12">
               <div class="card">
-                <!-- Messages display -->
-                {% if messages %}
-                {% for message in messages %}
-                {% if message.tags == 'success' %}
-                <div
-                  style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem; z-index: 2000;"
-                  class="alert alert-success alert-dismissible fade show" role="alert">
-                  {% elif message.tags == 'error' %}
-                  <div
-                    style="position: absolute; right: 20px; top: 40px; display: flex; align-items: center; padding-right: 0rem; z-index: 2000; "
-                    class="alert alert-danger alert-dismissible fade show" role="alert">
-                    {% endif %}
-                    {{ message }}
-                    <button style="font-size: 10px; border-bottom: none; position: relative; box-shadow: none;"
-                      type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                  </div>
-                  {% endfor %}
-                  {% endif %}
-
-                  <div class="card-header pb-0">
-                    <div class="title">
-                      <h3 class="title-text p-3">Solicitud de Programa</h3>
-                    </div>
-                  </div>
-
-                  <form id="formu" method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-
-                    <div class="card-body">
-                      <div class="row">
-                        <div class="col-md-12">
-                          <!-- Datos del Programa -->
-                          <div class="dashed-rounded-border">
-                            <div class="section-label">Datos del Programa</div>
-
-                            <div class="row">
-                              <!-- Nombre del Programa -->
-                              <div class="col-md-6">
-                                <div class="form-group">
-                                  <label class="form-control-label required-field">Nombre del Programa</label>
+                <div class="title">
+                  <h3 class="title-text p-3">Solicitud de Programa</h3>
+                </div>
+                <form id="formu" method="POST" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <!-- Datos del Programa -->
+                        <div class="seccion-formulario">
+                          <h5>Datos del Programa</h5>
+                          <div class="row">
+                            <!-- Nombre del Programa -->
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label required-field">Nombre del Programa</label>
+                                <div class="input-wrapper">
                                   {{form.nombre_programa}}
                                 </div>
                               </div>
-
-                              <!-- Código del Programa -->
-                              <div class="col-md-6">
-                                <div class="form-group">
-                                  <label class="form-control-label required-field">Código del Programa</label>
-                                  {{form.codigo_programa}}
-                                  <small class="form-text text-muted">Solo letras mayúsculas, números y guiones</small>
-                                </div>
-                              </div>
-
-                              <!-- Tipo de Programa -->
-                              <div class="col-md-6">
-                                <div class="form-group">
-                                  <label class="form-control-label required-field">Tipo de Programa</label>
+                            </div>
+                            <!-- Tipo de Programa -->
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label required-field">Tipo de Programa</label>
+                                <div class="input-wrapper">
                                   {{form.tipo_programa}}
                                 </div>
                               </div>
-
-                              <!-- Organismo -->
-                              <div class="col-md-6">
-                                <div class="form-group">
-                                  <label class="form-control-label required-field">Organismo</label>
+                            </div>
+                            <!-- Organismo -->
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label required-field">Organismo</label>
+                                <div class="input-wrapper">
                                   {{form.organismo}}
                                 </div>
                               </div>
-
-                              <!-- Entidad Ejecutora -->
-                              <div class="col-md-6">
-                                <div class="form-group">
-                                  <label class="form-control-label required-field">Entidad Ejecutora</label>
-                                  {{form.entidad_ejecutora}}
-                                </div>
+                            </div>
+                            <!-- Código del Programa -->
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label required-field">Código del Programa</label>
+                                {{form.codigo_programa}}
                               </div>
-
-                              <!-- Jefe del Programa -->
-                              <div class="col-md-6">
-                                <div class="form-group">
-                                  <label class="form-control-label required-field">Jefe del Programa</label>
-                                  {{form.jefe_programa}}
-                                </div>
+                            </div>
+                            <!-- Entidad Ejecutora -->
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label required-field">Entidad Ejecutora</label>
+                                {{form.entidad_ejecutora}}
                               </div>
+                            </div>
 
-                              <!-- Fechas -->
-                              <div class="col-md-6">
-                                <div class="form-group">
-                                  <label class="form-control-label required-field">Fecha de Inicio</label>
-                                  {{form.fecha_inicio}}
-                                </div>
+                            <!-- Jefe del Programa -->
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label required-field">Jefe del Programa</label>
+                                {{form.jefe_programa}}
                               </div>
+                            </div>
 
-                              <div class="col-md-6">
-                                <div class="form-group">
-                                  <label class="form-control-label required-field">Fecha de Finalización</label>
-                                  {{form.fecha_fin}}
-                                </div>
+                            <!-- Fechas -->
+                            <h5>Plazo de Ejecución</h5>
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label required-field">Fecha de Inicio</label>
+                                {{form.fecha_inicio}}
                               </div>
+                            </div>
 
-                              <!-- Sector Estratégico -->
-                              <div class="col-md-6">
-                                <div class="form-group">
-                                  <label class="form-control-label required-field">Sector Estratégico</label>
-                                  {{form.sector_estrategico}}
-                                </div>
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label required-field">Fecha de Finalización</label>
+                                {{form.fecha_fin}}
                               </div>
+                            </div>
 
-                              <!-- Línea de Investigación -->
-                              <div class="col-md-6">
-                                <div class="form-group">
-                                  <label class="form-control-label required-field">Línea de Investigación</label>
-                                  {{form.linea_investigacion}}
-                                </div>
+                            <!-- Sector Estratégico -->
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label required-field">Sector Estratégico</label>
+                                {{form.sector_estrategico}}
+                              </div>
+                            </div>
+
+                            <!-- Línea de Investigación -->
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                <label class="form-control-label required-field">Línea de Investigación</label>
+                                {{form.linea_investigacion}}
                               </div>
                             </div>
                           </div>
-
-                          <!-- Entidades Participantes -->
-                          <div class="dashed-rounded-border mt-4">
-                            <div class="section-label">Entidades Participantes</div>
-                            <div class="row">
-                              <div class="col-md-12">
-                                <div class="form-group">
-                                  <label class="form-control-label">Entidades Participantes</label>
-                                  {{form.entidades_participantes}}
+                        </div>
+                        <!-- Entidades Participantes -->
+                        <div class="seccion-formulario">
+                          <h5>Entidades Participantes</h5>
+                          <div class="row">
+                            <div class="col-md-12">
+                              <div class="form-group select">
+                                <label class="form-control-label required-field">Entidades Participantes</label>
+                                <div class="d-flex align-items-start gap-2">
+                                  <div class="flex-grow-1 position-relative" id="entity-select-container">
+                                    <input type="text" id="entity-search" class="form-control"
+                                      placeholder="Buscar o agregar entidades...">
+                                    <div id="entity-dropdown" class="select-dropdown" style="display: none;"></div>
+                                    <div id="selected-entities" class="select-selected mt-2"></div>
+                                  </div>
+                                  <button type="button" class="btn boton-add mt-0" id="add-entity-btn"
+                                    data-bs-toggle="modal" data-bs-target="#modal-entidad">
+                                    <i class="fa fa-plus"></i>
+                                  </button>
                                 </div>
+                                <div style="display: none;">{{ form.entidades_participantes }}</div>
+                              </div>
+                            </div>
+
+                            <div class="col-md-12">
+                              <div class="form-group select">
+                                <label class="form-control-label required-field">Participantes de la UHO</label>
+                                <div class="d-flex align-items-start gap-2">
+                                  <div class="flex-grow-1 position-relative" id="participant-select-container">
+                                    <input type="text" id="participant-search" class="form-control"
+                                      placeholder="Buscar usuarios...">
+                                    <div id="participant-dropdown" class="select-dropdown" style="display: none;"></div>
+                                    <div id="selected-participants" class="select-selected mt-2"></div>
+                                  </div>
+                                  <button type="button" class="btn boton-add" id="add-user-btn" data-bs-toggle="modal"
+                                    data-bs-target="#nuevoUsuarioModal">
+                                    <i class="fa fa-plus"></i>
+                                  </button>
+                                </div>
+                                <input type="hidden" name="participantes_data" id="participantes_data">
                               </div>
                             </div>
                           </div>
+                        </div>
 
-                          <!-- Botones -->
-                          <div class="row mt-4">
-                            <div class="col-md-12 text-center">
-                              <button type="submit" class="btn btn-success">Guardar</button>
-                              <a href="{% url 'Programa_List_Investigador' %}" class="btn btn-primary ml-3">Cancelar</a>
-                            </div>
+                        <!-- Botones -->
+                        <div class="row mt-4">
+                          <div class="col-md-12 text-center">
+                            <a href="{% url 'Programa_List_Vicerrector' %}" class="btn btn-cancelar ml-3">Cancelar</a>
+                            <button type="submit" class="btn boton-form"><i class="fas fa-check"></i> Guardar</button>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </form>
-                </div>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
@@ -382,209 +171,702 @@
       </div>
     </div>
   </div>
-  {% endblock %}
+</div>
 
-  {% block js %}
-  <script src="{% static 'js/validations.js' %}"></script>
+<!-- Modal: Crear Entidad Participante -->
+<div class="modal fade" id="modal-entidad" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Crear Nueva Entidad Participante</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="entidad-form">
+          <div class="mb-3">
+            <label class="form-label required-field">Nombre</label>
+            <input type="text" class="form-control" id="entidad-nombre" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Sigla</label>
+            <input type="text" class="form-control" id="entidad-sigla">
+          </div>
+          <div class="mb-3">
+            <label class="form-label required-field">Tipo de entidad</label>
+            <select class="form-select" id="entidad-tipo" required>
+              {% for value, text in TIPOS_ENTIDAD %}
+              <option value="{{ value }}">{{ text }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label required-field">País</label>
+            <input type="text" class="form-control" id="entidad-pais" value="Cuba" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-cancelar" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn boton-form" id="guardar-entidad-btn">
+          <i class="fas fa-check"></i> Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const container = document.getElementById('user-select-container');
-      const hiddenSelect = document.querySelector('select[name="participantes_uho"]');
+<!-- Modal para agregar colaborador personalizado -->
+<div class="modal fade" id="nuevoUsuarioModal" tabindex="-1" aria-labelledby="nuevoUsuarioModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="nuevo-usuario-form">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title">Crear nuevo premiado</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label required-field">Nombre</label>
+            <input type="text" class="form-control" name="nombre" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label required-field">Apellidos</label>
+            <input type="text" class="form-control" name="apellidos" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">ORCID</label>
+            <input type="text" class="form-control" name="orci">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-cancelar" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn boton-form"><i class="fas fa-check"></i> Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
 
-      if (container && hiddenSelect) {
-        // Crear el componente de selección de usuarios
-        createUserSelect(container, hiddenSelect);
+{% block js %}
+<script src="{% static 'js/validations.js' %}"></script>
+
+<!-- Autocompletar Organismo -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".autocomplete-field").forEach(input => {
+      const rawData = input.getAttribute("data-suggestions");
+
+      if (!rawData) return;
+
+      let suggestions = [];
+      try {
+        suggestions = JSON.parse(rawData);
+      } catch { }
+
+      let datalistId = input.name + "-datalist";
+
+      // Crear datalist si no existe
+      let datalist = document.getElementById(datalistId);
+      if (!datalist) {
+        datalist = document.createElement("datalist");
+        datalist.id = datalistId;
+        document.body.appendChild(datalist);
       }
+
+      // Llenar sugerencias
+      datalist.innerHTML = "";
+      suggestions.forEach(s => {
+        let opt = document.createElement("option");
+        opt.value = s;
+        datalist.appendChild(opt);
+      });
+
+      // Vincular input ↔ datalist
+      input.setAttribute("list", datalistId);
     });
+  });
+</script>
 
-    // Configuración del switch de proyecto
-    const proyectoSwitch = document.getElementById('proyecto-switch');
-    const proyectoContainer = document.getElementById('proyecto-select-container');
-    const proyectoStatus = document.getElementById('proyecto-status');
+<!-- Listar entidades Participantes -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('entity-search');
+    const dropdown = document.getElementById('entity-dropdown');
+    const selectedContainer = document.getElementById('selected-entities');
+    const hiddenSelect = document.querySelector('select[name="entidades_participantes"]');
+    const selectedEntities = new Map();
 
-    if (proyectoSwitch) {
-      proyectoSwitch.addEventListener('change', function () {
-        if (this.checked) {
-          proyectoContainer.classList.add('visible');
-          proyectoStatus.textContent = 'Sí';
-        } else {
-          proyectoContainer.classList.remove('visible');
-          proyectoStatus.textContent = 'No';
-          document.getElementById('id_proyecto_asociado').value = '';
-        }
+    // Inicializar con entidades ya seleccionadas
+    if (hiddenSelect) {
+      Array.from(hiddenSelect.selectedOptions).forEach(opt => {
+        selectedEntities.set(opt.value, opt.textContent);
       });
     }
 
-    function createUserSelect(container, hiddenSelect) {
-      // Crear elementos del componente
-      const wrapper = document.createElement('div');
-      wrapper.className = 'user-select-wrapper';
+    function updateSelectedEntities() {
+      selectedContainer.innerHTML = '';
+      selectedEntities.forEach((name, id) => {
+        const badge = document.createElement('span');
+        badge.className = 'item-badge';
+        badge.textContent = name;
 
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.placeholder = 'Buscar participantes...';
-      input.className = 'user-select-input form-control';
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.textContent = '×';
+        removeBtn.onclick = e => {
+          e.preventDefault();
+          e.stopPropagation();
+          selectedEntities.delete(id);
+          updateSelectedEntities();
+          updateHiddenSelectEntities();
+        };
+        badge.appendChild(removeBtn);
+        selectedContainer.appendChild(badge);
+      });
+    }
 
-      const dropdown = document.createElement('div');
-      dropdown.className = 'user-select-dropdown';
+    function updateHiddenSelectEntities() {
+      if (!hiddenSelect) return;
+      Array.from(hiddenSelect.options).forEach(opt => opt.selected = false);
+      selectedEntities.forEach((name, id) => {
+        let opt = hiddenSelect.querySelector(`option[value="${id}"]`);
+        if (!opt) {
+          opt = new Option(name, id, true, true);
+          hiddenSelect.appendChild(opt);
+        }
+        opt.selected = true;
+      });
+      hiddenSelect.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    async function searchEntities(query) {
+      try {
+        dropdown.innerHTML = '<div class="p-2 text-center">Buscando entidades...</div>';
+        dropdown.style.display = 'block';
+
+        let url = '/Investigador/ajax/entidades/';
+        if (query) {
+          url += `?search=${encodeURIComponent(query)}`;
+        }
+        const response = await fetch(url);
+
+        if (!response.ok) throw new Error('Error en la respuesta del servidor');
+
+        const data = await response.json();
+        dropdown.innerHTML = '';
+
+        if (!data.results || data.results.length === 0) {
+          const noResults = document.createElement('div');
+          noResults.className = 'p-2 text-center';
+          noResults.textContent = 'No se encontraron entidades';
+          dropdown.appendChild(noResults);
+          return;
+        }
+
+        data.results.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'select-item';
+          div.textContent = item.text;
+
+          if (selectedEntities.has(item.id)) {
+            div.classList.add('selected');
+            div.style.backgroundColor = '#e9ecef';
+          }
+
+          div.onclick = () => {
+            if (!selectedEntities.has(item.id)) {
+              selectedEntities.set(item.id, item.text);
+              updateSelectedEntities();
+              updateHiddenSelectEntities();
+            }
+          };
+
+          dropdown.appendChild(div);
+        });
+      } catch (error) {
+        console.error('Error al buscar entidades:', error);
+        dropdown.innerHTML = '<div class="p-2 text-center text-danger">Error al buscar entidades</div>';
+      }
+    }
+
+    // Permitir crear entidad nueva con botón
+    const addBtn = document.getElementById('add-entity-btn');
+    addBtn.addEventListener('click', () => {
+      const value = searchInput.value.trim();
+      if (!value) return;
+      // Marcar con id "new-" para distinguir
+      const newId = `new-${value}`;
+      if (!selectedEntities.has(newId)) {
+        selectedEntities.set(newId, value);
+        updateSelectedEntities();
+        updateHiddenSelectEntities();
+      }
+      searchInput.value = '';
       dropdown.style.display = 'none';
+    });
 
-      const selectedList = document.createElement('div');
-      selectedList.className = 'user-select-selected';
+    // Eventos input
+    searchInput.addEventListener('input', () => {
+      const query = searchInput.value.trim();
+      if (query) searchEntities(query);
+      else dropdown.style.display = 'none';
+    });
 
-      // Construir el componente
-      wrapper.appendChild(input);
-      wrapper.appendChild(dropdown);
-      container.appendChild(wrapper);
-      container.appendChild(selectedList);
+    searchInput.addEventListener('focus', () => {
+      searchEntities('');
+    });
 
-      // Almacenar usuarios seleccionados
-      const selectedUsers = new Set();
+    searchInput.addEventListener('blur', () => {
+      setTimeout(() => { dropdown.style.display = 'none'; }, 200);
+    });
 
-      // Cargar usuarios seleccionados inicialmente
+    dropdown.addEventListener('mousedown', e => e.preventDefault());
+
+    // Inicializar
+    updateSelectedEntities();
+    updateHiddenSelectEntities();
+  });
+</script>
+
+<!-- Participantes -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('participant-search');
+    const dropdown = document.getElementById('participant-dropdown');
+    const selectedContainer = document.getElementById('selected-participants');
+    const hiddenInput = document.getElementById('participantes_data');
+    const selectedParticipants = new Map();
+
+    // Función para actualizar badges
+    function updateSelectedParticipants() {
+      selectedContainer.innerHTML = '';
+      selectedParticipants.forEach((p, key) => {
+        const badge = document.createElement('span');
+        badge.className = 'item-badge';
+        badge.textContent = p.name + " - ";
+
+        // Select tipo participación
+        const selectTipo = document.createElement('select');
+        selectTipo.className = 'form-control form-select form-select-sm d-inline-block ms-1';
+        selectTipo.style.width = 'auto';
+        p.tipos.forEach(t => {
+          const opt = document.createElement('option');
+          opt.value = t.id;
+          opt.textContent = t.text;
+          if (p.tipoSeleccionado == t.id) opt.selected = true;
+          selectTipo.appendChild(opt);
+        });
+
+        selectTipo.onchange = () => {
+          selectedParticipants.get(key).tipoSeleccionado = selectTipo.value;
+          updateHiddenInput();
+        };
+
+        badge.appendChild(selectTipo);
+
+        // Botón eliminar
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.textContent = '×';
+        removeBtn.onclick = () => {
+          selectedParticipants.delete(key);
+          updateSelectedParticipants();
+          updateHiddenInput();
+        };
+
+        badge.appendChild(removeBtn);
+        selectedContainer.appendChild(badge);
+      });
+      updateHiddenInput();
+    }
+
+    // Actualizar input oculto
+    function updateHiddenInput() {
+      const data = Array.from(selectedParticipants.values()).map(p => ({
+        usuario_id: p.id,
+        tipo_participacion_id: p.tipoSeleccionado || (p.tipos[0]?.id || null)
+      }));
+      hiddenInput.value = JSON.stringify(data);
+    }
+
+    // Buscar usuarios
+    async function searchUsers(query) {
+      let url = '/Investigador/api_usuarios/';
+      if (query) {
+        url += `?search=${encodeURIComponent(query)}`;
+      }
+      const resp = await fetch(url);
+      const users = await resp.json();
+
+      dropdown.innerHTML = '<div class="p-2 text-center">Buscando usuarios...</div>';
+      dropdown.style.display = 'block';
+      try {
+        if (!resp.ok) throw new Error('Error en la API de usuarios');
+        dropdown.innerHTML = '';
+        if (!users.length) {
+          dropdown.innerHTML = '<div class="p-2 text-center">No se encontraron usuarios</div>';
+          return;
+        }
+
+        users.forEach(u => {
+          const key = u.id.toString();
+          const div = document.createElement('div');
+          div.className = 'select-item';
+          div.textContent = u.name;
+
+          if (selectedParticipants.has(key)) {
+            div.classList.add('selected');
+            div.style.backgroundColor = '#e9ecef';
+          }
+
+          div.onclick = async () => {
+            if (!selectedParticipants.has(key)) {
+              const respTipos = await fetch('/Investigador/api/tipo_participacion/');
+              const tiposData = await respTipos.json();
+              const tipos = tiposData.results; // <-- aquí accedes al array real
+
+              selectedParticipants.set(key, { id: key, name: u.name, tipos, tipoSeleccionado: tipos[0]?.id });
+              updateSelectedParticipants();
+            }
+            searchInput.value = '';
+            dropdown.style.display = 'none';
+          };
+          dropdown.appendChild(div);
+        });
+      } catch (err) {
+        console.error(err);
+        dropdown.innerHTML = '<div class="p-2 text-center text-danger">Error al buscar usuarios</div>';
+      }
+    }
+
+    searchInput.addEventListener('focus', async () => {
+      const query = searchInput.value.trim();
+      if (!query) {
+        // Si no hay texto, mostramos todos los usuarios
+        await searchUsers(''); // tu función searchUsers puede interpretarlo como "traer todos"
+      } else {
+        await searchUsers(query);
+      }
+    });
+
+
+    searchInput.addEventListener('focus', () => {
+      if (searchInput.value.trim()) searchUsers(searchInput.value.trim());
+    });
+
+    searchInput.addEventListener('blur', () => setTimeout(() => dropdown.style.display = 'none', 200));
+    dropdown.addEventListener('mousedown', e => e.preventDefault());
+
+    // Botón agregar manual
+    document.getElementById('add-participant-btn').addEventListener('click', async () => {
+      const name = searchInput.value.trim();
+      if (!name) return;
+      const respTipos = await fetch('/Investigador/api/tipo_participacion/');
+      const tiposData = await respTipos.json();
+      const tipos = tiposData.results; // <-- aquí accedes al array real
+
+      const newKey = `new-${name}`;
+      selectedParticipants.set(newKey, { id: newKey, name, tipos, tipoSeleccionado: tipos[0]?.id });
+      updateSelectedParticipants();
+      searchInput.value = '';
+    });
+
+    // Inicializar
+    updateSelectedParticipants();
+  });
+</script>
+
+<!-- activar el modal para agregar entidades participantes -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const addEntityBtn = document.getElementById("add-entity-btn");
+    const guardarEntidadBtn = document.getElementById("guardar-entidad-btn");
+    const modalEntidadEl = document.getElementById("modal-entidad");
+    const entidadForm = document.getElementById("entidad-form");
+    const searchInput = document.getElementById("entity-search");
+    const selectedEntitiesContainer = document.getElementById("selected-entities");
+    const hiddenSelect = document.querySelector('select[name="entidades_participantes"]');
+    const selectedEntities = new Map();
+
+    // CSRF Token
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    // Inicializar Bootstrap Modal
+    const modalEntidad = new bootstrap.Modal(modalEntidadEl);
+
+    // Mostrar modal al hacer click en el botón
+    addEntityBtn.addEventListener("click", () => {
+      modalEntidad.show();
+    });
+
+    // Funciones para actualizar select y badges
+    function updateSelectedEntities() {
+      selectedEntitiesContainer.innerHTML = "";
+      selectedEntities.forEach((name, id) => {
+        const badge = document.createElement("span");
+        badge.className = "item-badge";
+        badge.textContent = name;
+
+        const removeBtn = document.createElement("button");
+        removeBtn.type = "button";
+        removeBtn.textContent = "×";
+        removeBtn.onclick = e => {
+          e.preventDefault();
+          e.stopPropagation();
+          selectedEntities.delete(id);
+          updateSelectedEntities();
+          updateHiddenSelectEntities();
+        };
+
+        badge.appendChild(removeBtn);
+        selectedEntitiesContainer.appendChild(badge);
+      });
+    }
+
+    function updateHiddenSelectEntities() {
+      if (!hiddenSelect) return;
+      Array.from(hiddenSelect.options).forEach(opt => opt.selected = false);
+      selectedEntities.forEach((name, id) => {
+        let opt = hiddenSelect.querySelector(`option[value="${id}"]`);
+        if (!opt) {
+          opt = new Option(name, id, true, true);
+          hiddenSelect.appendChild(opt);
+        }
+        opt.selected = true;
+      });
+      hiddenSelect.dispatchEvent(new Event("change"));
+    }
+
+    // Guardar nueva entidad
+    guardarEntidadBtn.addEventListener("click", async () => {
+      const nombre = document.getElementById("entidad-nombre").value.trim();
+      const sigla = document.getElementById("entidad-sigla").value.trim();
+      const tipo = document.getElementById("entidad-tipo").value;
+      const pais = document.getElementById("entidad-pais").value.trim();
+
+      if (!nombre) {
+        alert("El nombre es obligatorio");
+        return;
+      }
+
+      try {
+        const response = await fetch("/Investigador/ajax/crear-entidad/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken
+          },
+          body: JSON.stringify({ nombre, sigla, tipo, pais })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          // Agregar al select oculto y a los badges
+          selectedEntities.set(String(data.id), data.nombre);
+          updateSelectedEntities();
+          updateHiddenSelectEntities();
+
+          // Cerrar modal y resetear formulario
+          modalEntidad.hide();
+          entidadForm.reset();
+
+          // Limpiar backdrop si queda residual
+          const backdrop = document.querySelector(".modal-backdrop");
+          if (backdrop) backdrop.remove();
+
+        } else {
+          alert("Error: " + (data.error || "No se pudo crear la entidad"));
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Error de conexión al intentar crear la entidad");
+      }
+    });
+  });
+</script>
+
+<!-- Participantes -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('user-search');
+    const dropdown = document.getElementById('user-dropdown');
+    const selectedUsersContainer = document.getElementById('selected-users');
+    const hiddenSelect = document.querySelector('select[name="autores"]');
+    const selectedUsers = new Map();
+    const currentUserId = '{{ user.id }}';
+    const currentUserName = '{{ user.get_full_name|default:user.username }}';
+
+    // Cargar usuarios seleccionados inicialmente
+    if (hiddenSelect) {
       Array.from(hiddenSelect.selectedOptions).forEach(option => {
-        selectedUsers.add({
+        selectedUsers.set(option.value, {
           id: option.value,
           name: option.textContent
         });
       });
+    }
 
-      // Actualizar la lista de usuarios seleccionados
-      function updateSelectedUsers() {
-        selectedList.innerHTML = '';
-        selectedUsers.forEach(user => {
-          const badge = document.createElement('span');
-          badge.className = 'user-badge';
-          badge.textContent = user.name;
+    // Añadir usuario actual si no está seleccionado
+    if (currentUserId && !selectedUsers.has(currentUserId)) {
+      selectedUsers.set(currentUserId, {
+        id: currentUserId,
+        name: currentUserName
+      });
+    }
 
+    function updateSelectedUsers() {
+      selectedUsersContainer.innerHTML = '';
+      selectedUsers.forEach(user => {
+        const badge = document.createElement('span');
+        badge.className = 'item-badge';
+        const displayName = (user.id === currentUserId) ? `${user.name} (Tú)` : user.name;
+        badge.textContent = displayName;
+
+        if (user.id !== currentUserId) {
           const removeBtn = document.createElement('button');
           removeBtn.type = 'button';
           removeBtn.textContent = '×';
-          removeBtn.onclick = () => {
-            selectedUsers.delete(user);
+          removeBtn.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            selectedUsers.delete(user.id);
+            updateSelectedUsers();
+            updateHiddenSelect();
+          };
+          badge.appendChild(removeBtn);
+        }
+
+        selectedUsersContainer.appendChild(badge);
+      });
+    }
+
+    function updateHiddenSelect() {
+      if (!hiddenSelect) return;
+
+      Array.from(hiddenSelect.options).forEach(option => option.selected = false);
+
+      selectedUsers.forEach(user => {
+        let opt = hiddenSelect.querySelector(`option[value="${user.id}"]`);
+        if (!opt) {
+          opt = new Option(user.name, user.id, true, true);
+          if (user.is_colaborador) opt.dataset.tipo = "colaborador";
+          hiddenSelect.appendChild(opt);
+        }
+        opt.selected = true;
+      });
+
+      hiddenSelect.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    // Buscar usuarios
+    async function searchUsers(query) {
+      try {
+        dropdown.innerHTML = '<div class="p-2 text-center">Buscando usuarios...</div>';
+        dropdown.style.display = 'block';
+
+        const response = await fetch(`/Investigador/api_usuarios/?search=${encodeURIComponent(query)}`);
+        if (!response.ok) throw new Error('Error en la respuesta del servidor');
+
+        const users = await response.json();
+        dropdown.innerHTML = '';
+
+        if (users.length === 0) {
+          const noResults = document.createElement('div');
+          noResults.className = 'p-2 text-center';
+          noResults.textContent = 'No se encontraron usuarios';
+          dropdown.appendChild(noResults);
+          return;
+        }
+
+        users.forEach(user => {
+          const item = document.createElement('div');
+          item.className = 'select-item';
+
+          const nameDiv = document.createElement('div');
+          nameDiv.className = 'item-title';
+          nameDiv.textContent = user.name;
+
+          const infoDiv = document.createElement('div');
+          infoDiv.className = 'item-info';
+
+          const infoTexts = [];
+          if (user.carnet) infoTexts.push(`Carnet: ${user.carnet}`);
+          if (user.area) infoTexts.push(`Área: ${user.area}`);
+          if (user.departamento) infoTexts.push(`Depto: ${user.departamento}`);
+
+          infoDiv.textContent = infoTexts.join(' | ');
+          item.appendChild(nameDiv);
+          if (infoTexts.length > 0) item.appendChild(infoDiv);
+
+          const tipo = user.tipo || "usuario"; // tu API debería devolver "usuario" o "colaborador"
+          const userKey = `${tipo}-${user.id}`;
+
+          if (selectedUsers.has(user.id.toString())) {
+            item.classList.add('selected');
+            item.style.backgroundColor = '#e9ecef';
+          }
+
+          const isCurrentUser = user.id.toString() === currentUserId;
+          if (isCurrentUser) {
+            item.classList.add('disabled');
+            item.style.opacity = '0.7';
+            item.style.cursor = 'not-allowed';
+          }
+
+          item.onclick = () => {
+            if (isCurrentUser) {
+              alert('No puedes eliminarte a ti mismo como autor.');
+              return;
+            }
+
+            if (selectedUsers.has(userKey)) {
+              selectedUsers.delete(userKey);
+            } else {
+              selectedUsers.set(userKey, {
+                id: userKey,
+                name: user.full_name || user.name,
+                is_colaborador: tipo === "colaborador"
+              });
+            }
+
             updateSelectedUsers();
             updateHiddenSelect();
           };
 
-          badge.appendChild(removeBtn);
-          selectedList.appendChild(badge);
+          dropdown.appendChild(item);
         });
+      } catch (error) {
+        console.error('Error al buscar usuarios:', error);
+        dropdown.innerHTML = '<div class="p-2 text-center text-danger">Error al buscar usuarios</div>';
       }
+    }
 
-      // Actualizar el select oculto
-      function updateHiddenSelect() {
-        // Deseleccionar todas las opciones
-        Array.from(hiddenSelect.options).forEach(option => {
-          option.selected = false;
-        });
-
-        // Seleccionar las opciones correspondientes
-        selectedUsers.forEach(user => {
-          const option = hiddenSelect.querySelector(`option[value="${user.id}"]`);
-          if (option) {
-            option.selected = true;
-          }
-        });
-      }
-
-      // Buscar usuarios
-      async function searchUsers(query) {
-        try {
-          const response = await fetch(`/Investigador/api_usuarios/?search=${encodeURIComponent(query)}`, {
-            headers: {
-              'X-Requested-With': 'XMLHttpRequest'
-            }
-          });
-
-          if (!response.ok) throw new Error('Error en la respuesta del servidor');
-
-          const users = await response.json();
-
-          // Limpiar el dropdown
-          dropdown.innerHTML = '';
-
-          if (users.length === 0) {
-            const noResults = document.createElement('div');
-            noResults.className = 'p-2 text-center';
-            noResults.textContent = 'No se encontraron usuarios';
-            dropdown.appendChild(noResults);
-            return;
-          }
-
-          // Añadir los usuarios al dropdown
-          users.forEach(user => {
-            const item = document.createElement('div');
-            item.className = 'user-select-item';
-
-            const nameDiv = document.createElement('div');
-            nameDiv.className = 'item-title';
-            nameDiv.textContent = user.name;
-
-            const infoDiv = document.createElement('div');
-            infoDiv.className = 'item-info';
-
-            const infoTexts = [];
-            if (user.carnet) infoTexts.push(`Carnet: ${user.carnet}`);
-            if (user.area) infoTexts.push(`Área: ${user.area}`);
-            if (user.departamento) infoTexts.push(`Depto: ${user.departamento}`);
-
-            infoDiv.textContent = infoTexts.join(' | ');
-            item.appendChild(nameDiv);
-            if (infoTexts.length > 0) item.appendChild(infoDiv);
-
-            // Verificar si el usuario ya está seleccionado
-            const isSelected = Array.from(selectedUsers).some(u => u.id === user.id.toString());
-            if (isSelected) {
-              item.classList.add('selected');
-              item.style.backgroundColor = '#e9ecef';
-            }
-
-            item.onclick = () => {
-              const existingUser = Array.from(selectedUsers).find(u => u.id === user.id.toString());
-              if (existingUser) {
-                selectedUsers.delete(existingUser);
-              } else {
-                selectedUsers.add({
-                  id: user.id.toString(),
-                  name: user.full_name || user.name
-                });
-              }
-              updateSelectedUsers();
-              updateHiddenSelect();
-            };
-
-            dropdown.appendChild(item);
-          });
-        } catch (error) {
-          console.error('Error al buscar usuarios:', error);
-          dropdown.innerHTML = '<div class="p-2 text-center text-danger">Error al buscar usuarios</div>';
-        }
-      }
-
-      // Eventos
-      input.addEventListener('focus', () => {
-        dropdown.style.display = 'block';
-        if (input.value.trim() === '') {
-          // Cargar usuarios iniciales
-          searchUsers('');
-        }
+    // Event listeners para selector de participantes
+    if (searchInput) {
+      searchInput.addEventListener('focus', () => {
+        if (searchInput.value.trim() === '') searchUsers('');
+        else dropdown.style.display = 'block';
       });
 
-      input.addEventListener('blur', () => {
-        // Pequeño retraso para permitir clics en el dropdown
-        setTimeout(() => {
-          dropdown.style.display = 'none';
-        }, 200);
-      });
-
-      input.addEventListener('input', () => {
-        const query = input.value.trim();
+      searchInput.addEventListener('input', () => {
+        const query = searchInput.value.trim();
         searchUsers(query);
       });
 
-      // Inicializar con los usuarios seleccionados
-      updateSelectedUsers();
+      searchInput.addEventListener('blur', () => {
+        setTimeout(() => { dropdown.style.display = 'none'; }, 200);
+      });
+
+      dropdown.addEventListener('mousedown', (e) => e.preventDefault());
     }
-  </script>
-  {% endblock %}
+
+    // Inicializar
+    updateSelectedUsers();
+    updateHiddenSelect();
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="content">
+    <div class="col">
+        <div class="container-form">
+            <div class="form">
+                <div class="container-fluid py-4">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="title">
+                                    <h3 class="title-text p-3">Detalles del Tipo de Programa</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="seccion-formulario">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label">Nombre</label>
+                                                            <input type="text" class="form-control readonly-input"
+                                                                value="{{ tipo_programa.nombre }}" readonly>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label">Sigla</label>
+                                                            <input type="text" class="form-control readonly-input"
+                                                                value="{{ tipo_programa.sigla }}" readonly>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-md-12 text-center">
+                                            <a href="{% url 'TipoPrograma_List' %}"
+                                                class="btn btn-cancelar ml-3">
+                                                <i class="fas fa-arrow-left me-2"></i>Volver
+                                            </a>
+                                            <a href="{% url 'TipoPrograma_Update' tipo_programa.id %}"
+                                                class="btn boton-form">
+                                                <i class="fas fa-edit me-1"></i> Editar
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal de Eliminación -->
+<div class="modal fade" id="deleteTipoEvento" tabindex="-1" aria-labelledby="deleteTipoEventoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteTipoEventoLabel">Confirmar eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ¿Está seguro de que desea eliminar el tipo de evento "{{ tipo_evento.nombre }}"?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form action="{% url 'TipoEvento_Delete' tipo_programa.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

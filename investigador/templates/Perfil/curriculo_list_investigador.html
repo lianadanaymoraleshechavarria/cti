@@ -18,43 +18,56 @@
   </div>
 
   <div class="boot d-flex flex-wrap justify-content-start align-items-center" style="margin-bottom: 20px;">
-    <a href="{% url 'Evento_Create' %}" class="btn boton-form m-2">Añadir Evento</a>
-    <a href="{% url 'Articulo_Revista_Create' %}" class="btn boton-form m-2">Añadir Articulo</a>
-    <a href="{% url 'Articulo_Publicacion_Create' %}" class="btn boton-form m-2">Añadir
+    <a href="{% url 'Evento_Create' %}" class="btn boton-form m-2"><i class="fas fa-plus"></i> Evento</a>
+    <a href="{% url 'Articulo_Revista_Create' %}" class="btn boton-form m-2"><i class="fas fa-plus"></i> Articulo</a>
+    <a href="{% url 'Articulo_Publicacion_Create' %}" class="btn boton-form m-2"><i class="fas fa-plus"></i>
       Publicación</a>
-    <a href="{% url 'Premio_Create' %}" class="btn boton-form m-2">Añadir Premio</a>
-    <a href="{% url 'Programa_Create' %}" class="btn boton-form m-2">Añadir Programa</a>
-    <a href="{% url 'Proyecto_Create' %}" class="btn boton-form m-2">Añadir Proyecto</a>
+    <a href="{% url 'Premio_Create' %}" class="btn boton-form m-2"><i class="fas fa-plus"></i> Premio</a>
+    <a href="{% url 'Programa_Create' %}" class="btn boton-form m-2"><i class="fas fa-plus"></i> Programa</a>
+    <a href="{% url 'Proyecto_Create' %}" class="btn boton-form m-2"><i class="fas fa-plus"></i> Proyecto</a>
   </div>
 
   <!-- Contenedor de filtros personalizados -->
-  <div class="filters-container" style="margin-bottom: 20px;">
+  <form method="get" id="filters-form">
+  <div class="filters-container">
     <div class="filter-group">
       <label for="filter-tipo">Marcador:</label>
-      <select id="filter-tipo" class="filter-select">
+      <select id="filter-tipo" name="tipo" class="form-control custom-select-with-icon">
         <option value="">Todos</option>
+        <option value="Articulo">Artículo</option>
+        <option value="Evento">Evento</option>
+        <option value="Premio">Premio</option>
+        <option value="Proyecto">Proyecto</option>
+        <option value="Programa">Programa</option>
+        <i class="fas fa-caret-down"></i>
       </select>
     </div>
 
     <div class="filter-group">
       <label for="filter-rol">Rol:</label>
-      <select id="filter-rol" class="filter-select">
+      <select id="filter-rol" name="rol" class="form-control">
         <option value="">Todos</option>
         <option value="Creador">Creador</option>
         <option value="Colaborador">Colaborador</option>
       </select>
+      <i class="fas fa-caret-down"></i>
     </div>
 
     <div class="filter-group">
       <label for="filter-estado">Estado:</label>
-      <select id="filter-estado" class="filter-select">
+      <select id="filter-estado" name="estado" class="form-control">
         <option value="">Todos</option>
         <option value="Aprobado">Aprobado</option>
         <option value="Pendiente">Pendiente</option>
-        <option value="Rechazado">Rechazado</option>
+        <option value="No Válido">No Válido</option>
       </select>
+      <i class="fas fa-caret-down"></i>
     </div>
+
+    <button type="submit" class="btn btn-cancelar">Aplicar filtros</button>
   </div>
+</form>
+
 <div class="table-responsive">
   <table id="Curriculos" class="table table-striped text-light">
     <thead class="encabezado">
@@ -71,7 +84,7 @@
       {% for resultado in resultados %}
       <tr class="{% if not resultado.es_creador %}row-colaborador{% endif %}">
         <td style="text-align:start;">{{ forloop.counter }}</td>
-        <td style="text-align:start;">{{ resultado.nombre|truncatechars:40 }}</td>
+        <td style="text-align:start;">{{ resultado.nombre|truncatechars:100 }}</td>
         <td style="text-align:start;">{{ resultado.fecha_create|date:"Y" }}</td>
         <td style="text-align:start;">
           <span class="badge-tipo badge-{{ resultado.tipo_resultado|lower }}">

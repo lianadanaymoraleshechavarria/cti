@@ -92,12 +92,18 @@ def crear_notificacion_cambio_estado(modelo, instance, estado_anterior):
             destinatarios.append(instance.usuario)
         
         # Añadir colaboradores según el tipo
-        if hasattr(instance, 'autores') and instance.autores.exists():
-            destinatarios.extend(instance.autores.all())
-        elif hasattr(instance, 'premiados') and instance.premiados.exists():
-            destinatarios.extend(instance.premiados.all())
-        elif hasattr(instance, 'participantes') and instance.participantes.exists():
-            destinatarios.extend(instance.participantes.all())
+        if hasattr(instance, 'autores') and callable(instance.autores):
+            if instance.autores().exists():
+                destinatarios.extend(instance.autores())
+
+        elif hasattr(instance, 'premiados') and callable(instance.premiados):
+            if instance.premiados().exists():
+                destinatarios.extend(instance.premiados())
+
+        elif hasattr(instance, 'participantes') and callable(instance.participantes):
+            if instance.participantes().exists():
+                destinatarios.extend(instance.participantes())
+
         
         # Eliminar duplicados
         destinatarios = list(set(destinatarios))
@@ -123,12 +129,36 @@ def crear_notificacion_cambio_estado(modelo, instance, estado_anterior):
         
         # Crear notificaciones evitando duplicados
         for usuario in destinatarios:
+            # 👇 Validar que sea instancia de Usuario
+            if not isinstance(usuario, Usuario):
+                try:
+                    usuario = Usuario.objects.get(username=usuario)
+                except Usuario.DoesNotExist:
+                    logger.warning(f"Usuario {usuario} no existe, se omite la notificación")
+                    continue  # pasa al siguiente destinatario
+            
             notificacion_existente = Notificacion.objects.filter(
                 usuario=usuario,
                 tipo_contenido=modelo,
                 id_contenido=instance.id,
                 titulo__exact=titulo
             ).exists()
+
+            if not notificacion_existente:
+                try:
+                    Notificacion.objects.create(
+                        usuario=usuario,
+                        titulo=titulo,
+                        mensaje=mensaje,
+                        tipo_contenido=modelo,
+                        id_contenido=instance.id
+                    )
+                    logger.info(f"Notificación de cambio de estado creada para {usuario.username}")
+                except Exception as e:
+                    logger.error(f"Error creando notificación de cambio de estado: {e}")
+            else:
+                logger.info(f"Notificación de cambio de estado duplicada evitada para {usuario.username}")
+
             
             if not notificacion_existente:
                 try:

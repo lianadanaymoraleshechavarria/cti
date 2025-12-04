@@ -71,27 +71,24 @@
             aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel" style="color:black">
-                            <i class="bi bi-exclamation-triangle" style="color:black"></i> Advertencia
-                        </h5>
-                        <button type="button" class="btn-close cerrar" data-bs-dismiss="modal" aria-label="Close"
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel" style="color:black">
+                    <i class="bi bi-exclamation-triangle" style="color:black"></i> Advertencia
+                    </h5>
+                    <button type="button" class="btn-close cerrar" data-bs-dismiss="modal" aria-label="Close"
                             style="box-shadow: none"></button>
-                    </div>
-                    <div class="modal-body" style="color:black">
-                        ¿Desea eliminar al colaborador "{{ colaborador.apellidos }}, {{ colaborador.nombre }}"?
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancelar</button>
-                        <form method="post" action="{% url 'Colaboradores_Delete' colaborador.id %}"
-                            style="display: inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-primary">Confirmar</button>
-                        </form>
-                    </div>
+                </div>
+                <div class="modal-body" style="color:black">
+                    ¿Desea eliminar al colaborador "{{ colaborador.apellidos }}, {{ colaborador.nombre }}"?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger btn-eliminar" 
+                            data-id="{{ colaborador.id }}">Confirmar</button>
+                </div>
                 </div>
             </div>
-        </div>
+            </div>
         {% endfor %}
     </div>
 </section>
@@ -189,5 +186,49 @@
         }
     });
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("Script cargado ✅");
+  // Tomar el CSRF token desde la meta tag
+  const csrftoken = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
+
+  document.querySelectorAll(".btn-eliminar").forEach(boton => {
+    boton.addEventListener("click", function () {
+      let id = this.getAttribute("data-id");
+
+      fetch(`/Plataforma/Colaboradores_Delete/${id}/`, {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": csrftoken,
+          "X-Requested-With": "XMLHttpRequest"
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Cierra el modal
+          let modalEl = document.getElementById("Colaborador" + id);
+          let modal = bootstrap.Modal.getInstance(modalEl);
+          modal.hide();
+
+          // Elimina la fila de la tabla
+          modalEl.closest("tr")?.remove();
+        } else {
+          alert(data.error || "Error al eliminar colaborador");
+        }
+      })
+      .catch(err => console.error("Error:", err));
+    });
+  });
+  document.querySelectorAll(".btn-eliminar").forEach(boton => {
+    boton.addEventListener("click", function () {
+      console.log("Click detectado en ID:", this.getAttribute("data-id"));
+    });
+  });
+});
+</script>
+
+
 {% endblock %}
 <!-- End Container JS -->

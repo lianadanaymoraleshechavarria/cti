@@ -1,120 +1,205 @@
-  {% extends "base.html" %}
-  {% load static %}
-  
-    {% block css %}
-      <link rel="stylesheet" href="{% static 'css/forms.css' %}">
-    {% endblock %}
-  
-  
-    {% block content %}
-      <div class="content" >
-        <div class="col">
-          <div class="container-form">
-            <div class="form">
-              <div class="container-fluid py-4">
-                <div class="row">
-                  <div class="col-md-12">
-                    <div class="card">
-                      <div class="card-header pb-0">
-                        <div class="title">
-                          <h3 class="title-text p-3">Detalles del Evento</h3>
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="content">
+  <div class="col">
+    <div class="container-form">
+      <div class="form">
+        <div class="container-fluid py-4">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="title">
+                  <h3 class="title-text p-3">Detalles del Evento</h3>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div class="seccion-formulario">
+                        <h5>Datos del Evento</h5>
+                        <!-- Datos del Evento -->
+                        <div class="row">
+                          <div class="col-md-12">
+                            <div class="form-group">
+                              <label class="form-control-label">Título</label>
+                              <input type="text" class="form-control readonly-input" value="{{ evento.titulo }}"
+                                readonly>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label class="form-control-label">Tipo de evento</label>
+                              <input type="text" class="form-control readonly-input" value="{{ evento.tipo }}" readonly>
+                            </div>
+                          </div>
+
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label class="form-control-label">Modalidad</label>
+                              <input type="text" class="form-control readonly-input" value="{{ evento.modalidad }}"
+                                readonly>
+                            </div>
+                          </div>
+
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label class="form-control-label">Institución</label>
+                              <input type="text" class="form-control readonly-input" value="{{ evento.institucion }}"
+                                readonly>
+                            </div>
+                          </div>
+
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label class="form-control-label">ISBN</label>
+                              <input type="text" class="form-control readonly-input"
+                                value="{{ evento.isbn|default:'No especificado' }}" readonly>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Fecha y lugar -->
+                        <h5 style="margin-top: 20px;">Fecha y lugar</h5>
+                        <div class="row">
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label class="form-control-label">Fecha</label>
+                              <input type="text" class="form-control readonly-input" value="{{ evento.fecha_create }}"
+                                readonly>
+                            </div>
+                          </div>
+
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label class="form-control-label">País</label>
+                              <input type="text" class="form-control readonly-input"
+                                value="{{ evento.pais|default:'No especificado' }}" readonly>
+                            </div>
+                          </div>
+
+                          {% if evento.provincia %}
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label class="form-control-label">Provincia</label>
+                              <input type="text" class="form-control readonly-input" value="{{ evento.provincia }}"
+                                readonly>
+                            </div>
+                          </div>
+                          {% endif %}
                         </div>
                       </div>
-                      <form  id="formu" method="POST" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <div class="card-body">
-                          <div class="row">
-                            <div class="col-md-12">
-                              <div class="form-group">
-                                <label for="text-input" class="form-control-label">Participantes</label>
-                                <input type="text" name="autores" id="autores" class="form-control" required value="{{ evento.autores }}" required disabled>
-                              </div>
+                      <!-- Información sobre la participación -->
+                      <div class="seccion-formulario">
+                        <h5>Información sobre la participación</h5>
+                        <div class="row">
+                          <div class="col-md-12">
+                            <div class="form-group">
+                              <label class="form-control-label">Nombre de la ponencia/conferencia</label>
+                              <input type="text" class="form-control readonly-input"
+                                value="{{ evento.nombre_ponencia|default:'No especificado' }}" readonly>
                             </div>
-                            
-                            <div class="col-md-6 col-lg-4">
-                              <div class="form-group">
-                                <label for="example-text-input" class="form-control-label">Título</label>
-                                <input type="text" name="titulo" id="titulo" class="form-control" required value="{{ evento.titulo }}" required disabled>
-                              </div>
-                            </div>
-                            <div class="col-md-6 col-lg-4">
-                              <div class="form-group">
-                                <label for="example-text-input" class="form-control-label">Fecha</label>
-                                <input type="fecha" name="autores" id="fecha" class="form-control" required value="{{ evento.fecha }}" required disabled>
-                              </div>
-                            </div>
-                            <div class="col-md-6 col-lg-4">
-                              <div class="form-group select">
-                                <label for="text-input" class="form-control-label">Caracter</label>
-                                <input type="text" name="caracter" id="caracter" class="form-control" required value="{{ evento.caracter }}" required disabled>
-                              </div>
-                            </div>
-                            <div class="col-md-6 col-lg-4">
-                              <div class="form-group">
-                                <label for="example-text-input" class="form-control-label">ISBN</label>
-                                <input type="text" name="isbn" id="isbn" class="form-control" required value="{{ evento.isbn }}" required disabled>
-                              </div>
-                            </div>
-                            <div class="col-md-6 col-lg-4">
-                              <div class="form-group select">
-                                <label for="text-input" class="form-control-label">Tipo</label>
-                                <input type="text" name="tipo" id="tipo" class="form-control" required value="{{ evento.tipo }}" required disabled>
-                              </div>
-                            </div>
-                            <div class="col-md-6 col-lg-4">
-                              <div class="form-group select">
-                                <label for="text-input" class="form-control-label">Area</label>
-                                <input type="text" name="area" id="area" class="form-control" required value="{{ evento.area }}" required disabled>
-                              </div>
-                            </div>
-                            <div class="col-md-6 col-lg-4">
-                              <div class="form-group">
-                                <label for="example-text-input" class="form-control-label">Certificado</label>
-                                {% if evento.certificado %}
-                                <a href="{{ evento.certificado.url }}" download > Descargar Archivo</a>
+                          </div>
+                          <div class="col-md-12">
+                            <div class="form-group">
+                              <label class="form-control-label">Participantes</label>
+                              <div class="form-control readonly-input" style="height: auto; min-height: 38px;">
+                                {% if evento.autores.all %}
+                                <div class="d-flex flex-wrap">
+                                  {% for autor in evento.autores.all %}
+                                  <span class="autor-badge">
+                                    {% if autor.usuario.username %}
+                                    {{ autor.nombre_completo }}
+                                    {% elif autor.colaborador %}
+                                    {{ autor.colaborador.nombre }} {{ autor.colaborador.apellidos }}
+                                    {% else %}
+                                    Desconocido
+                                    {% endif %}
+                                  </span>
+                                  {% endfor %}
+                                </div>
                                 {% else %}
-                                <input type="text" name="certificado" id="certificado" class="form-control" placeholder="No hay certificado disponible." required disabled>
-                                  
-                                {% endif %} 
-                                
+                                <span class="text-muted">No hay participantes seleccionados</span>
+                                {% endif %}
                               </div>
                             </div>
-                            <div class="col-md-6 col-lg-4">
-                              <div class="form-group select">
-                                <label for="text-input" class="form-control-label">Presencialidad</label>
-                                <input type="text" name="presencialidad" id="presencialidad" class="form-control" required value="{{ evento.presencialidad }}" required disabled>
-                              </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label class="form-control-label">URL</label>
+                              {% if evento.publicacion %}
+                              <input type="text" class="form-control readonly-input" value="{{ evento.url }}" readonly>
+                              {% else %}
+                              <input type="text" class="form-control readonly-input"
+                                value="No se ha especificado URL de publicación" readonly>
+                              {% endif %}
                             </div>
-                            <div class="col-md-6 col-lg-4">
-                              <div class="form-group select">
-                                <label for="text-input" class="form-control-label">Publicación</label>
-                                <input type="text" name="publicacion" id="publicacion" class="form-control" required value="{{ evento.publicacion }}" required disabled>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="form-group icon-input">
+                              <label class="form-control-label">Certificado</label>
+                              {% if evento.certificado %}
+                              <div class="current-file-info-disabled">
+                                <strong>Archivo actual:</strong>
+                                <a href="{{ evento.certificado.url }}" target="_blank" class="current-file-link">
+                                  <i class="fas fa-paperclip me-1"></i>
+                                  Ver certificado
+                                </a>
                               </div>
+                              {% else %}
+                              <input type="text" class="form-control readonly-input"
+                                value="No existe certificado del evento" readonly>
+                              {% endif %}
                             </div>
-                            <div class="col-md-6 col-lg-4">
-                              <div class="form-group select">
-                                <label for="text-input" class="form-control-label">Estado del Evento</label>
-                                <input type="text" name="publicacion" id="publicacion" class="form-control" required value="{{ evento.aprobacion }}" required disabled>
-                              </div>
-                            </div>
-                          </div>   
+                          </div>
                         </div>
-                        <div class="boot d-flex flex-wrap justify-content-center align-items-center">
-                          <a href="{% url 'Evento_List_Vicerrector' %}" class="btn1 m-2 btn btn-primary btn-sm text-decoration-none">Atr&aacute;s</a>
+                      </div>
+                      <!-- Información adicional -->
+                      <div class="seccion-formulario">
+                        <h5>Información adicional</h5>
+                        <div class="row">
+                          {% if evento.proyecto %}
+                          <div class="col-md-12">
+                            <div class="form-group">
+                              <label class="form-control-label">Proyecto asociado</label>
+                              <input type="text" class="form-control readonly-input"
+                                value="{{ evento.proyecto.nombre_proyecto }}" readonly>
+                            </div>
+                          </div>
+                          {% else %}
+                          <div class="col-md-12">
+                            <div class="form-group">
+                              <label class="form-control-label">No hay proyectos asociado</label>
+                            </div>
+                          </div>
+                          {% endif %}
                         </div>
-                      </form>
+                      </div>
+                      <!-- Botones -->
+                      <div class="row mt-4">
+                        <div class="col-md-12 text-center">
+                          <a href="javascript:history.back()" class="btn btn-cancelar ml-3">
+                            <i class="fas fa-arrow-left me-2"></i>Volver
+                          </a>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>    
+          </div>
         </div>
       </div>
-    {% endblock %}
-    
-    {% block js %}
-      <script src = "{% static 'js/validations.js' %}"></script>
-    {% endblock %}
-  
- 
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'js/validations.js' %}"></script>
+{% endblock %}
