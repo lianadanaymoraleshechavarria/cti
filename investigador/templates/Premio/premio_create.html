@@ -162,7 +162,7 @@
 <!-- Modal para agregar Tipo de Premio -->
 <div class="modal fade" id="tipoPremioModal" tabindex="-1" role="dialog" aria-labelledby="tipoPremioModalLabel"
   aria-hidden="true">
-  <div class="modal-dialog" role="document">
+  <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <form id="tipo-premio-form" method="post" action="{% url 'TipoPremio_Create' %}">
         {% csrf_token %}
@@ -194,7 +194,7 @@
 <!-- Modal para agregar Caracter de Premio -->
 <div class="modal fade" id="caracterPremioModal" tabindex="-1" role="dialog" aria-labelledby="caracterPremioModalLabel"
   aria-hidden="true">
-  <div class="modal-dialog" role="document">
+  <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <form id="caracter-premio-form" method="POST" action="{% url 'CaracterPremio_Create' %}">
         {% csrf_token %}
@@ -218,7 +218,7 @@
 </div>
 <!-- Modal para agregar Institución -->
 <div class="modal fade" id="institucionModal" tabindex="-1" aria-labelledby="institucionModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <form id="institucion-form" method="post" action="{% url 'crear_institucion_ajax' %}">
         {% csrf_token %}
@@ -243,7 +243,7 @@
 <!-- Modal para agregar colaborador personalizado -->
 <div class="modal fade" id="nuevoUsuarioModal" tabindex="-1" aria-labelledby="nuevoUsuarioModalLabel"
   aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <form id="nuevo-usuario-form">
         {% csrf_token %}

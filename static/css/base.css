@@ -446,4 +446,62 @@ select.user-select {
     display: none;
 }
 
+.dropdown-submenu {
+    position: relative;
+}
+
+.dropdown-submenu > .dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-left: .1rem;
+}
+
+.boton-form.btn:hover,
+.boton-form.btn:focus {
+    background: linear-gradient(to right, #7FC957, #49842A) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+.boton-form {
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    background: linear-gradient(to right, #7FC957, #49842A);
+    border: none;
+    border-radius: 35px;
+    width: 140px;
+    height: 40px;
+    font-weight: 700;
+    color: white;
+    line-height: 30px;
+    text-align: center;
+    cursor: pointer;
+    margin-left: 5px;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-cancelar {
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    background-color: var(--backgroundSoft);
+    color: var(--primary);
+    border: none;
+    border-radius: 35px;
+    width: 140px;
+    height: 40px;
+    font-weight: 700;
+    line-height: 30px;
+    text-align: center;
+    cursor: pointer;
+    margin-left: 5px;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-cancelar.btn:hover,
+.btn-cancelar.btn:focus {
+    color: var(--primary) !important;
+    background: #e0e0e0 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+}
 

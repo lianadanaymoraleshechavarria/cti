@@ -329,3 +329,8 @@ td a {
     text-decoration: none !important;
     border-bottom: none !important;
 }
+
+td {
+    word-break: break-all; /* rompe palabras largas */
+    overflow-wrap: anywhere; /* alternativa moderna */
+}

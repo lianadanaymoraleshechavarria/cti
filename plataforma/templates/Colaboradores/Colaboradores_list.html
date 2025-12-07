@@ -32,24 +32,28 @@
                     <th scope="col">Nombre</th>
                     <th scope="col">Apellidos</th>
                     <th scope="col">ORCID</th>
+                    <th scope="col">Google Académico</th>
+                    <th scope="col">Research Gate</th>
                     <th scope="col">Opciones</th>
                 </tr>
             </thead>
             <tbody>
                 {% for colaborador in colaboradores %}
-                <tr>
+                <tr data-id="{{ colaborador.id }}">
                     <td style="text-align:center;">{{ forloop.counter }}</td>
                     <td>{{ colaborador.nombre }}</td>
                     <td>{{ colaborador.apellidos }}</td>
                     <td>{{ colaborador.orci|default:"-" }}</td>
+                    <td class="google">{{ colaborador.google_academico }}</td>
+                    <td class="rgate">{{ colaborador.rgate }}</td>
                     <td>
-                        <a href="{% url 'Colaboradores_Detail' colaborador.id %}" title="Ver detalles" style="text-decoration: none;">
+                        <a href="{% url 'Colaboradores_Detail' colaborador.id %}" title="Ver detalles">
                             <i class="fas fa-solid fa-info-circle detail mx-1 fs-6"></i>
                         </a>
-                        <a href="{% url 'Colaboradores_Update' colaborador.id %}" title="Editar colaborador" style="text-decoration: none;">
+                        <a href="{% url 'Colaboradores_Update' colaborador.id %}" title="Editar colaborador">
                             <i class="fas fa-solid fa-pen-to-square update mx-1 fs-6"></i>
                         </a>
-                        <a data-bs-toggle="modal" data-bs-target="#Colaborador{{ colaborador.id }}" style="text-decoration: none;"
+                        <a data-bs-toggle="modal" data-bs-target="#Colaborador{{ colaborador.id }}"
                             title="Eliminar colaborador">
                             <i class="fas fa-solid fa-trash-can delete mx-1 fs-6"></i>
                         </a>
@@ -67,28 +71,26 @@
 
         <!-- Modales de Eliminación -->
         {% for colaborador in colaboradores %}
-        <div class="modal fade" id="Colaborador{{ colaborador.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog">
+        <div class="modal fade" id="Colaborador{{ colaborador.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel" style="color:black">
-                    <i class="bi bi-exclamation-triangle" style="color:black"></i> Advertencia
-                    </h5>
-                    <button type="button" class="btn-close cerrar" data-bs-dismiss="modal" aria-label="Close"
-                            style="box-shadow: none"></button>
-                </div>
-                <div class="modal-body" style="color:black">
-                    ¿Desea eliminar al colaborador "{{ colaborador.apellidos }}, {{ colaborador.nombre }}"?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-danger btn-eliminar" 
-                            data-id="{{ colaborador.id }}">Confirmar</button>
-                </div>
+                    <div class="modal-header">
+                        <h5 class="modal-title">Eliminar colaborador</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        ¿Seguro que quieres eliminar a {{ colaborador.nombre }}?
+                    </div>
+                    <div class="modal-footer">
+                        <form method="POST" action="{% url 'Colaboradores_Delete' colaborador.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form>
+                        <button type="button" class="btn btn-cancelr" data-bs-dismiss="modal">Cancelar</button>
+                    </div>
                 </div>
             </div>
-            </div>
+        </div>
         {% endfor %}
     </div>
 </section>
@@ -112,121 +114,101 @@
 
 <script>
     $(document).ready(function () {
-        // Solo inicializar DataTables si la tabla existe y tiene datos
         if ($('#Colaboradores').length && $('#Colaboradores tbody tr').length > 0) {
-
-            // Debug: Verificar estructura antes de inicializar
-            console.log("Inicializando DataTables...");
-            console.log("Número de columnas en thead:", $('#Colaboradores thead th').length);
-            console.log("Número de filas en tbody:", $('#Colaboradores tbody tr').length);
-
-            // Verificar que cada fila tenga exactamente 5 columnas
-            var allRowsValid = true;
-            $('#Colaboradores tbody tr').each(function (index) {
-                var numCols = $(this).find('td').length;
-                console.log("Fila " + index + " tiene " + numCols + " columnas");
-                if (numCols !== 5) {
-                    console.error("Error: Fila " + index + " no tiene 5 columnas");
-                    allRowsValid = false;
-                }
+            var table = $('#Colaboradores').DataTable({
+                responsive: true,
+                dom: 'Bfrtip',
+                buttons: ['copy', 'csv', 'excel', 'pdf', 'print', 'colvis'],
+                language: { url: "{% static 'libs/Datatable/dataTableLenguage.json' %}" },
+                columnDefs: [
+                    { targets: [0, 6], orderable: false, searchable: false }, // primera y última columna sin ordenar
+                    { responsivePriority: 1, targets: [1, 2] },
+                    { responsivePriority: 2, targets: [0, 3, 4, 5] }
+                ],
+                order: [[1, 'asc']],
+                pageLength: 10,
+                autoWidth: false
             });
-
-            if (allRowsValid) {
-                try {
-                    // Inicializar DataTables con configuración segura
-                    var table = $('#Colaboradores').DataTable({
-                        responsive: true,
-                        dom: 'Bfrtip',
-                        buttons: [
-                            'copy', 'csv', 'excel', 'pdf', 'print', 'colvis'
-                        ],
-                        language: {
-                            url: "{% static 'libs/Datatable/dataTableLenguage.json' %}"
-                        },
-                        columnDefs: [
-                            {
-                                targets: [0, 4],
-                                orderable: false,
-                                searchable: false
-                            },
-                            {
-                                responsivePriority: 1,
-                                targets: [1, 2]
-                            },
-                            {
-                                responsivePriority: 2,
-                                targets: [0, 3, 4]
-                            }
-                        ],
-                        order: [[1, 'asc']],
-                        pageLength: 10,
-                        // Configuración adicional para evitar errores
-                        autoWidth: false,
-                        processing: false,
-                        serverSide: false,
-                        // Manejo de errores
-                        initComplete: function (settings, json) {
-                            console.log("DataTables inicializado correctamente");
-                        },
-                        drawCallback: function (settings) {
-                            console.log("Tabla redibujada");
-                        }
-                    });
-
-                    console.log("DataTable inicializado con " + table.columns().count() + " columnas");
-
-                } catch (error) {
-                    console.error("Error al inicializar DataTables:", error);
-                }
-            } else {
-                console.error("No se puede inicializar DataTables: estructura de tabla inválida");
-            }
-        } else {
-            console.log("No se inicializa DataTables: tabla vacía o no existe");
+            console.log("DataTable inicializado ✅");
         }
+    });
+
+    // Eliminación de colaboradores
+    document.addEventListener("DOMContentLoaded", function () {
+        const csrftoken = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
+
+        document.querySelectorAll(".btn-eliminar").forEach(boton => {
+            boton.addEventListener("click", function () {
+                let id = this.getAttribute("data-id");
+
+                fetch(`/Plataforma/Colaboradores_Delete/${id}/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrftoken,
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Cierra el modal
+                            let modalEl = document.getElementById("Colaborador" + id);
+                            let modal = bootstrap.Modal.getInstance(modalEl);
+                            modal.hide();
+
+                            // Elimina la fila correspondiente
+                            let fila = document.querySelector('tr[data-id="' + id + '"]');
+                            if (fila) fila.remove();
+                        } else {
+                            alert(data.error || "Error al eliminar colaborador");
+                        }
+                    })
+                    .catch(err => console.error("Error:", err));
+            });
+        });
     });
 </script>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    console.log("Script cargado ✅");
-  // Tomar el CSRF token desde la meta tag
-  const csrftoken = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
+    document.addEventListener("DOMContentLoaded", function () {
+        console.log("Script cargado ✅");
+        // Tomar el CSRF token desde la meta tag
+        const csrftoken = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
 
-  document.querySelectorAll(".btn-eliminar").forEach(boton => {
-    boton.addEventListener("click", function () {
-      let id = this.getAttribute("data-id");
+        document.querySelectorAll(".btn-eliminar").forEach(boton => {
+            boton.addEventListener("click", function () {
+                let id = this.getAttribute("data-id");
 
-      fetch(`/Plataforma/Colaboradores_Delete/${id}/`, {
-        method: "POST",
-        headers: {
-          "X-CSRFToken": csrftoken,
-          "X-Requested-With": "XMLHttpRequest"
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          // Cierra el modal
-          let modalEl = document.getElementById("Colaborador" + id);
-          let modal = bootstrap.Modal.getInstance(modalEl);
-          modal.hide();
+                fetch(`/Plataforma/Colaboradores_Delete/${id}/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrftoken,
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Cierra el modal
+                            let modalEl = document.getElementById("Colaborador" + id);
+                            let modal = bootstrap.Modal.getInstance(modalEl);
+                            modal.hide();
 
-          // Elimina la fila de la tabla
-          modalEl.closest("tr")?.remove();
-        } else {
-          alert(data.error || "Error al eliminar colaborador");
-        }
-      })
-      .catch(err => console.error("Error:", err));
+                            // Elimina la fila de la tabla
+                            modalEl.closest("tr")?.remove();
+                        } else {
+                            alert(data.error || "Error al eliminar colaborador");
+                        }
+                    })
+                    .catch(err => console.error("Error:", err));
+            });
+        });
+        document.querySelectorAll(".btn-eliminar").forEach(boton => {
+            boton.addEventListener("click", function () {
+                console.log("Click detectado en ID:", this.getAttribute("data-id"));
+            });
+        });
     });
-  });
-  document.querySelectorAll(".btn-eliminar").forEach(boton => {
-    boton.addEventListener("click", function () {
-      console.log("Click detectado en ID:", this.getAttribute("data-id"));
-    });
-  });
-});
 </script>
 
 

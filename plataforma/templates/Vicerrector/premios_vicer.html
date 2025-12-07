@@ -1,190 +1,121 @@
 {% extends "base.html" %}
 {% load static %}
 
-<!-- Container CSS -->
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/Dashboard.css' %}">
 <link rel="stylesheet" href="{% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
 <link rel="stylesheet" href="{% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
 <link rel="stylesheet" href="{% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
 <link rel="stylesheet" href="{% static 'css/datatableSD.css' %}">
-<style>
-  .filtros-container {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-  }
-  
-  .filtro-grupo {
-    flex: 1;
-    min-width: 200px;
-  }
-  
-  .filtro-grupo label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-  }
-  
-  .filtro-grupo select {
-    width: 100%;
-    padding: 8px;
-    border-radius: 4px;
-    border: 1px solid #ced4da;
-  }
-  
-  .btn-filtrar {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  
-  .btn-filtrar:hover {
-    background-color: #0069d9;
-  }
-  
-  .btn-limpiar {
-    background-color: #6c757d;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  
-  .btn-limpiar:hover {
-    background-color: #5a6268;
-  }
-  
-  .filtros-acciones {
-    display: flex;
-    align-items: flex-end;
-    gap: 10px;
-  }
-</style>
+<link rel="stylesheet" href="{% static 'css/styless.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="main" style="padding-top:60px;">
-  <main class="content-inside px-3 py-2">
-    <div class="container-fluid">
-      <div class="container-fluid">
-        <!--Table Element-->
-        <section id="tablaTramites">
-          <div class="card card-a p-3 h-100">
-            <div class="card-header">
-              <h5 class="card-title title-t" style="text-align: start;">
-                Premios
-              </h5>
-
-              <div class="boot d-flex flex-wrap justify-content-start align-items-center">
-                <a href="{% url 'Premio_Create' %}" class="btn1 m-2 btn btn-success btn-sm text-decoration-none">Añadir</a>
-              </div>
-              
-              <!-- Filtros -->
-              <div class="filtros-container">
-                <div class="filtro-grupo">
-                  <label for="filtro-area">Filtrar por Área:</label>
-                  <select id="filtro-area" class="form-select">
-                    <option value="">Todas las áreas</option>
-                    {% for area in areas %}
-                      <option value="{{ area.nombre_area }}">{{ area.nombre_area }}</option>
-                    {% endfor %}
-                  </select>
-                </div>
-                
-                <div class="filtro-grupo">
-                  <label for="filtro-departamento">Filtrar por Departamento:</label>
-                  <select id="filtro-departamento" class="form-select">
-                    <option value="">Todos los departamentos</option>
-                    {% for departamento in departamentos %}
-                      <option value="{{ departamento.nombre_departamento }}" 
-                              data-area="{{ departamento.area.nombre_area|default_if_none:'' }}">
-                          {{ departamento.nombre_departamento }}
-                      </option>
-                    {% endfor %}
-                  </select>
-                </div>
-                
-                <div class="filtros-acciones">
-                  <button id="btn-limpiar-filtros" class="btn-limpiar">Limpiar filtros</button>
-                </div>
-              </div>
-            </div>
-            
-            <table id="Premios" class="display table table-striped table-hover table-bg-success" style="width:100%; height: 100%;">
-              <thead class="encabezado">
-                <tr>
-                  <th scope="col" style="color: white; text-align: center;">No</th>
-                  <th scope="col" style="color: white; text-align: center;">Título</th>
-                  <th scope="col" style="color: white; text-align: center;">Fecha</th>
-                  <th scope="col" style="color: white; text-align: center;">Usuario</th>
-                  <th scope="col" style="color: white; text-align: center;">Área</th>
-                  <th scope="col" style="color: white; text-align: center;">Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for p in premios %}
-                  <tr>
-                    <td style="text-align: center;">{{forloop.counter}}</td>
-                    <td style="text-align: center;">
-                      <a class="details" style="color:blue" href="{% url 'Premio_Detail_Vicerrector' p.id %}">
-                        {{p.titulo}}
-                      </a>
-                    </td>
-                    <td style="text-align: center;">{{p.fecha|date:"Y-m-d"}}</td>
-                    <td style="text-align: center;">{{p.usuario}}</td>
-                    <td style="text-align: center;">{{p.area.nombre_area}}</td>
-                    <td style=" text-align: start;"><a class="cambiar-estado" style=" text-decoration: none; " href="{% url "Cambiar_Estado_Premio" p.id %}">{{ p.aprobacion }}</a></td>
-                  </tr>    
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </section>
-        
-        <section class="mb-2 row row-gap-1">
-          <section class="col-md-6 col-sm-12" id="graficaPremios">
-            <div class="card">
-              <div class="p-2">
-                <div id="grafAreasPendientes"></div>
-              </div>
-            </div>
-          </section>
-          <section class="col-md-6 col-sm-12" id="graficaBarMarcadores">
-            <div class="card">
-              <div class="p-2">
-                <div id="grafTiposPremios"></div>
-              </div>
-            </div>
-          </section>
-        </section>
-      </div>
+<section class="tabla" id="tablaPremios">
+  <div class="card-header">
+    <h5 class="card-title" style="text-align:center;">
+      Historial de Premios
+    </h5>
+  </div>
+  <div class="boot d-flex flex-wrap justify-content-start align-items-center" style="margin-bottom: 20px;">
+    <a href="{% url 'Premio_Create' %}" class="btn boton-form">
+      <i class="fas fa-plus"></i> Nuevo
+    </a>
+  </div>
+  <!-- Filtros -->
+  <div class="filters-container">
+    <div class="filtro-grupo">
+      <label for="filtro-area">Filtrar por Área:</label>
+      <select id="filtro-area" class="form-select">
+        <option value="">Todas las áreas</option>
+        {% for area in areas %}
+        <option value="{{ area.nombre_area }}">{{ area.nombre_area }}</option>
+        {% endfor %}
+      </select>
     </div>
-  </main>
-</div>
+
+    <div class="filtro-grupo">
+      <label for="filtro-departamento">Filtrar por Departamento:</label>
+      <select id="filtro-departamento" class="form-select">
+        <option value="">Todos los departamentos</option>
+        {% for departamento in departamentos %}
+        <option value="{{ departamento.nombre_departamento }}"
+          data-area="{{ departamento.area.nombre_area|default_if_none:'' }}">
+          {{ departamento.nombre_departamento }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="filtros-acciones">
+      <button id="btn-limpiar-filtros" class="btn btn-cancelar" style="margin-top: 20px;">Limpiar filtros</button>
+    </div>
+  </div>
+  <div class="table-responsive">
+    <table id="Premios" class="display table table-striped table-hover table-primary" style="width:100%; height: 100%;">
+      <thead class="encabezado">
+        <tr>
+          <th scope="col" style="text-align: center;">No</th>
+          <th scope="col">Título</th>
+          <th scope="col">Fecha</th>
+          <th scope="col">Usuario</th>
+          <th scope="col">Área</th>
+          <th scope="col">Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in premios %}
+        <tr>
+          <td style="text-align: center;">{{forloop.counter}}</td>
+          <td>
+            <a class="details" style="color:#4f69c7" href="{% url 'Premio_Detail_Vicerrector' p.id %}">
+              {{p.titulo}}
+            </a>
+          </td>
+          <td>{{p.fecha_create}}</td>
+          <td>{{p.usuario}}</td>
+          <td>{{p.area.nombre_area}}</td>
+          <td><a class="cambiar-estado" style="text-decoration: none; color:#4f69c7"
+              href="{% url 'Cambiar_Estado_Premio' p.id %}">{{ p.aprobacion }}</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <br>
+  <section class="mb-2 row row-gap-1">
+    <section class="col-md-6 col-sm-12" id="graficaPremios">
+      <div class="card">
+        <div class="p-2">
+          <div id="grafAreasPendientes"></div>
+        </div>
+      </div>
+    </section>
+    <section class="col-md-6 col-sm-12" id="graficaBarMarcadores">
+      <div class="card">
+        <div class="p-2">
+          <div id="grafTiposPremios"></div>
+        </div>
+      </div>
+    </section>
+  </section>
+</section>
 {% endblock %}
 
 {% block js %}
-<script src="{% static 'libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
-<script src="{% static 'libs/Datatable/JS/dataTables.js' %}"></script>
-<script src="{% static 'libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
-<script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>
-<script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>
-<script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>
-<script src="{% static 'libs/Datatable/JS/pdfmake.min.js' %}"></script>
-<script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>
-<script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>
-<script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>
-<script src="{% static 'libs/Datatable/JS/bottons.colVis.min.js' %}"></script>
-<script src="{% static 'libs/Datatable/JS/dataTables.responsive.js' %}"></script>
-<script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.buttons.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/jszip.min.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/pdfmake.min.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/vfs_fonts.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/buttons.html5.min.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/buttons.print.min.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/buttons.colVis.min.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.responsive.js' %}"></script>
+<script src="{% static 'Plataforma/libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>
 <script src="{% static 'libs/Highcharts/code/highcharts.js' %}"></script>
 <script src="{% static 'libs/Highcharts/code/modules/accessibility.js' %}"></script>
 <script src="{% static 'libs/Highcharts/code/modules/exporting.js' %}"></script>
@@ -192,101 +123,69 @@
 <script src="{% static 'libs/Highcharts/code/modules/export-data.js' %}"></script>
 
 <script>
-$(document).ready(function() {
-    // Inicializar DataTable con configuración personalizada
+document.addEventListener("DOMContentLoaded", function() {
+    // Inicializar DataTable
     var table = $('#Premios').DataTable({
         responsive: true,
         dom: 'Bfrtip',
-        buttons: [
-            'copy', 'csv', 'excel', 'pdf', 'print'
-        ],
-        language: {
-          url: "{% static 'libs/Datatable/dataTableLenguage.json' %}"
-      },
+        buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+        language: { url: "{% static 'libs/Datatable/dataTableLenguage.json' %}" }
     });
-    
-    
-    // Función para actualizar los departamentos según el área seleccionada
-    function actualizarDepartamentos() {
-      var areaSeleccionada = $('#filtro-area').val();
-      var departamentoSelect = $('#filtro-departamento');
-      
-      // Guardar el valor actual del departamento
-      var valorActual = departamentoSelect.val();
-      
-      // Limpiar el select de departamentos
-      departamentoSelect.empty();
-      departamentoSelect.append('<option value="">Todos los departamentos</option>');
-      
-      // Si no hay área seleccionada, mostrar todos los departamentos
-      if (!areaSeleccionada) {
-          $('#filtro-departamento-hidden option').each(function() {
-              departamentoSelect.append($(this).clone());
-          });
-      } else {
-          // Filtrar departamentos por área
-          $('option', '#filtro-departamento-hidden').each(function() {
-              if ($(this).data('area') === areaSeleccionada) {
-                  departamentoSelect.append($(this).clone());
-              }
-          });
-      }
-      
-      // Intentar restaurar el valor anterior si existe en las nuevas opciones
-      if (valorActual && departamentoSelect.find('option[value="' + valorActual + '"]').length > 0) {
-          departamentoSelect.val(valorActual);
-      }
-  }
-  
-  // Crear un select oculto con todos los departamentos para referencia
-  var departamentosHidden = $('<select id="filtro-departamento-hidden" style="display:none;"></select>');
-  $('#filtro-departamento option').each(function() {
-      departamentosHidden.append($(this).clone());
-  });
-  $('body').append(departamentosHidden);
-  
-  // Evento de cambio en el filtro de área
-  $('#filtro-area').on('change', function() {
-      var areaSeleccionada = $(this).val();
-      
-      // Actualizar departamentos disponibles
-      actualizarDepartamentos();
-      
-      // Aplicar filtro a la tabla
-      table.column(4).search(areaSeleccionada).draw();
-  });
-  
-  // Evento de cambio en el filtro de departamento
-  $('#filtro-departamento').on('change', function() {
-      var departamentoSeleccionado = $(this).val();
-      table.column(5).search(departamentoSeleccionado).draw();
-  });
-  
-  // Botón para limpiar filtros
-  $('#btn-limpiar-filtros').on('click', function() {
-      // Limpiar selecciones
-      $('#filtro-area').val('');
-      $('#filtro-departamento').val('');
-      
-      // Restaurar todos los departamentos
-      actualizarDepartamentos();
-      
-      // Limpiar filtros de la tabla
-      table.columns().search('').draw();
-  });
 
-    // Evento de cambio en el filtro de área
-    $('#filtro-area').on('change', function() {
-        var areaSeleccionada = $(this).val();
-        table.column(4).search(areaSeleccionada).draw();
+    // Crear un select oculto con todos los departamentos
+    var departamentosHidden = $('<select id="filtro-departamento-hidden" style="display:none;"></select>');
+    $('#filtro-departamento option').each(function() {
+        departamentosHidden.append($(this).clone());
     });
-    
-    // Botón para limpiar filtros
+    $('body').append(departamentosHidden);
+
+    // Función para actualizar departamentos según área seleccionada
+    function actualizarDepartamentos() {
+        var areaSeleccionada = $('#filtro-area').val();
+        var departamentoSelect = $('#filtro-departamento');
+
+        var valorActual = departamentoSelect.val();
+        departamentoSelect.empty();
+        departamentoSelect.append('<option value="">Todos los departamentos</option>');
+
+        $('#filtro-departamento-hidden option').each(function() {
+            if (!areaSeleccionada || $(this).data('area') === areaSeleccionada) {
+                departamentoSelect.append($(this).clone());
+            }
+        });
+
+        if (valorActual && departamentoSelect.find('option[value="' + valorActual + '"]').length > 0) {
+            departamentoSelect.val(valorActual);
+        } else {
+            departamentoSelect.val('');
+        }
+    }
+
+    // Evento cambio de área
+    $('#filtro-area').on('change', function() {
+        actualizarDepartamentos();
+        var area = $(this).val();
+        table.column(4).search(area).draw(); // Filtra la columna Área
+        table.column(5).search($('#filtro-departamento').val()).draw(); // Aplica filtro de departamento si hay
+    });
+
+    // Evento cambio de departamento
+    $('#filtro-departamento').on('change', function() {
+        table.column(5).search($(this).val()).draw(); // Filtra la columna Departamento
+    });
+
+    // Botón limpiar filtros
     $('#btn-limpiar-filtros').on('click', function() {
         $('#filtro-area').val('');
+        $('#filtro-departamento').val('');
+        actualizarDepartamentos();
         table.columns().search('').draw();
     });
-    
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
     // Gráfica de áreas con premios pendientes
     var areasPendientes = {{ areas_pendientes_json|safe }};
     var dataAreasPendientes = areasPendientes.map(function(item) {
@@ -295,9 +194,6 @@ $(document).ready(function() {
 
     Highcharts.chart('grafAreasPendientes', {
         chart: {
-            plotBackgroundColor: null,
-            plotBorderWidth: null,
-            plotShadow: false,
             type: 'pie'
         },
         title: {
@@ -337,9 +233,6 @@ $(document).ready(function() {
 
     Highcharts.chart('grafTiposPremios', {
         chart: {
-            plotBackgroundColor: null,
-            plotBorderWidth: null,
-            plotShadow: false,
             type: 'pie'
         },
         title: {
@@ -372,6 +265,6 @@ $(document).ready(function() {
         }]
     });
 });
-
 </script>
+
 {% endblock %}

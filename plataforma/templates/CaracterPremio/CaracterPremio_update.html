@@ -1,32 +1,65 @@
 {% extends "base.html" %}
 {% load static %}
 
-<!-- Container CSS -->
 {% block css %}
-<link rel="stylesheet" href="{% static 'Plataforma/css/estilobeta.css' %}">
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
 {% endblock %}
-<!-- End Container CSS -->
 
 {% block content %}
-<div class="container-form">
-    <div class="form">
-        <div class="contact-form">
-            <form action="." method="POST">
-                {% csrf_token %}
-                <h3 class="title">Editar Carácter de Premio</h3>
-                <div class="input-container">
-                     {{ form.as_p }}
+<div class="content">
+    <div class="col">
+        <div class="container-form">
+            <div class="form">
+                <div class="container-fluid py-4">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="title">
+                                    <h3 class="title-text p-3">Editar Carácter de Premio</h3>
+                                </div>
+                                <form action="." method="POST">
+                                    {% csrf_token %}
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="seccion-formulario">
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="form-group icon-input">
+                                                                <label
+                                                                    class="form-control-label required-field">Nombre</label>
+                                                                <div class="input-container">
+                                                                    <div class="input-wrapper">
+                                                                        {{form.nombre}}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mt-4">
+                                                        <div class="col-md-12 text-center">
+                                                            <a href="{% url 'CaracterPremio_List' %}"
+                                                                class="btn btn-cancelar ml-3">Cancelar</a>
+                                                            <button type="submit" class="btn boton-form"><i
+                                                                    class="fas fa-check"></i> Guardar</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <input type="submit" value="Guardar" class="btn1" id="boton">
-            </form>
+            </div>
         </div>
     </div>
 </div>
 {% endblock %}
 
-<!-- Container JS -->
 {% block js %}
 <script src="{% static 'Plataforma/js/FormularioSelect.js' %}"></script>
 <script src="{% static 'Plataforma/js/CrearCaracteristica.js' %}"></script>
 {% endblock %}
-<!-- End Container JS -->

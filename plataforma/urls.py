@@ -208,13 +208,13 @@ path('tipo_participacion/update/<int:pk>/', views.TipoParticipacion_Update.as_vi
 path('tipo_participacion/delete/<int:id>/', views.TipoParticipacion_Delete, name='TipoParticipacion_Delete'),
 
 path('tipo_premio/list/', views.TipoPremio_List.as_view(), name='TipoPremio_List'),
-path('tipo_premio/create/', views.TipoPremio_Create.as_view(), name='TipoPremio_Create'),
+path('tipo_premio/create/', views.TipoPremio_Create.as_view(), name='TiposPremio_Create'),
 path('tipo_premio/update/<int:pk>/', views.TipoPremio_Update.as_view(), name='TipoPremio_Update'),
 path('tipo_premio/detail/<int:pk>/', views.TipoPremio_Detail.as_view(), name='TipoPremio_Detail'),
 path('tipo_premio/delete/<int:id>/', views.TipoPremio_Delete, name='TipoPremio_Delete'),
     
 path('caracter_premio/list/', views.CaracterPremio_List.as_view(), name='CaracterPremio_List'),
-path('caracter_premio/create/', views.CaracterPremio_Create.as_view(), name='CaracterPremio_Create'),
+path('caracter_premio/create/', views.CaracterPremio_Create.as_view(), name='CaracteresPremio_Create'),
 path('caracter_premio/update/<int:pk>/', views.CaracterPremio_Update.as_view(), name='CaracterPremio_Update'),
 path('caracter_premio/detail/<int:pk>/', views.CaracterPremio_Detail.as_view(), name='CaracterPremio_Detail'),
 path('caracter_premio/delete/<int:id>/', views.CaracterPremio_Delete, name='CaracterPremio_Delete'),

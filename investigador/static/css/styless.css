@@ -375,3 +375,9 @@ td a {
     text-decoration: none !important;
     border-bottom: none !important;
 }
+
+td.google, td.rgate {
+    max-width: 150px;  /* ajusta según tu diseño */
+    word-break: break-all;
+    overflow-wrap: anywhere;
+}

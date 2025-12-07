@@ -254,7 +254,7 @@ class Evento_Form(forms.ModelForm):
     evento_base = forms.ModelChoiceField(
         queryset=EventoBase.objects.all(),
         required=False,
-        widget=forms.Select(attrs={'class': 'form-control', 'style': 'display:none;'}),
+        widget=forms.Select(attrs={'id':'id_evento_base', 'class': 'form-control', 'style': 'display:none;'}),
         label="Evento Base"
     )
     

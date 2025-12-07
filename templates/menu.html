@@ -1,39 +1,333 @@
 {% load static %}
+<nav class="navbar navbar-expand-lg navbar-dark px-3 shadow-sm"
+    style="height: 55px; position: fixed; top: 0; left: 0; right: 0; z-index: 2000;  background:#02157d; box-shadow: 0 0 1px 0 white !important">
+    <div class="d-flex align-items-center w-100 justify-content-between">
+        <span class="navbar-brand mb-0 h5">
+            {% if user.is_superuser or user.Administrador%}
+            <a href="{% url 'Dashboard_Admin' %}" %}>
+                <img src="{% static 'img/Id UHo-03-white.png' %}" width="100" height="40px"
+                    alt="Universidad de Holguín">
+            </a>
+            {% elif user.rol == 'Investigador' %}
+            <a href="{% url 'Dashboard_Investigador' %}" %}>
+                <img src="{% static 'img/Id UHo-03-white.png' %}" width="100" height="40px"
+                    alt="Universidad de Holguín">
+            </a>
+
+            {% elif user.rol == 'Vicerrector' %}
+            <a href="{% url 'Dashboard_Vicerrector' %}" %}>
+                <img src="{% static 'img/Id UHo-03-white.png' %}" width="100" height="40px"
+                    alt="Universidad de Holguín">
+            </a>
+            {% elif user.rol == 'Jefe_departamento' %}
+            <a href="{% url 'Dashboard_JefeDepartamento' %}" %}>
+                <img src="{% static 'img/Id UHo-03-white.png' %}" width="100" height="40px"
+                    alt="Universidad de Holguín">
+            </a>
+            {% elif user.rol == 'Jefe_area' %}
+            <a href="{% url 'Dashboard_JefeArea' %}" %}>
+                <img src="{% static 'img/Id UHo-03-white.png' %}" width="100" height="40px"
+                    alt="Universidad de Holguín">
+            </a>
+            {% else %}
+            <a href="#" class="navbar-brand">
+                <img src="{% static 'img/Id UHo-03-white.png' %}" width="200" height="80px"
+                    alt="Universidad de Holguín">
+            </a>
+            {% endif %}
+            CTI
+        </span>
+        <div class="d-flex align-items-center gap-4">
+            {% if user.is_superuser or user.Administrador %}
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" id="gestionarDropdown" role="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-gear"></i> Gestionar
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="gestionarDropdown">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'Area_List' %}">
+                                <i class="fas fa-users me-2"></i> Areas
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'Departamento_List' %}">
+                                <i class="fas fa-users me-2"></i> Departamentos
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'Usuarios' %}">
+                                <i class="fas fa-user me-2"></i> Usuarios
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <!-- Submenú Editar Opciones -->
+                        <li class="dropdown-submenu">
+                            <a class="dropdown-item dropdown-toggle" href="#">
+                                <i class="fas fa-edit me-2"></i> Editar Opciones
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'editar_nombres_roles' %}">
+                                        Roles
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'Cargo_List' %}">
+                                        Cargo
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'CategoriaCientificaList' %}">
+                                        Categorías Científicas
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'CategoriaDocenteList' %}">
+                                        Categorías Docentes
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'BasesDatosList' %}">
+                                        Bases de Datos
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'TipoEvento_List' %}">
+                                        Tipos de Eventos
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'CarcterEvento_List' %}">
+                                        Carácteres de Eventos
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'Modalidad_List' %}">
+                                        Modalidades de Eventos
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'TipoPremio_List' %}">
+                                        Tipos de Premios
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'CaracterPremio_List' %}">
+                                        Carácteres de Premios
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'Revista_Libro_Conferencia_List' %}">
+                                        Crear Revistas, Libros u Otros
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+                    </ul>
+                </li>
+            </ul>
+            {% endif %}
+            {% if user.rol == 'Vicerrector' %}
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" id="gestionarVicerrectorDropdown"
+                        role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-gear"></i> Gestionar
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="gestionarVicerrectorDropdown">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'Area_List' %}">
+                                <i class="fas fa-users me-2"></i> Areas
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'Departamento_List' %}">
+                                <i class="fas fa-users me-2"></i> Departamentos
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'Usuarios' %}">
+                                <i class="fas fa-user me-2"></i> Usuarios
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <!-- Submenú Editar Opciones -->
+                        <li class="dropdown-submenu">
+                            <a class="dropdown-item dropdown-toggle" href="#">
+                                <i class="fas fa-edit me-2"></i> Editar Opciones
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{% url 'editar_nombres_roles' %}">Roles</a></li>
+                                <li><a class="dropdown-item" href="{% url 'Cargo_List' %}">Cargo</a></li>
+                                <li><a class="dropdown-item" href="{% url 'CategoriaCientificaList' %}">Categorías
+                                        Científicas</a></li>
+                                <li><a class="dropdown-item" href="{% url 'CategoriaDocenteList' %}">Categorías
+                                        Docentes</a></li>
+                                <li><a class="dropdown-item" href="{% url 'BasesDatosList' %}">Bases de Datos</a></li>
+                                <!-- Submenú de Eventos -->
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">
+                                        <i class="fas fa-calendar me-2"></i> Eventos
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="{% url 'TipoEvento_List' %}">Tipos de
+                                                Eventos</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'CarcterEvento_List' %}">Carácteres de
+                                                Eventos</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'Modalidad_List' %}">Modalidades de
+                                                Eventos</a></li>
+                                    </ul>
+                                </li>
+                                <!-- Submenú de Premios -->
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">
+                                        <i class="fas fa-award me-2"></i> Premios
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="{% url 'TipoPremio_List' %}">Tipos de
+                                                Premios</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'CaracterPremio_List' %}">Carácteres
+                                                de Premios</a></li>
+                                    </ul>
+                                </li>
+                                <li><a class="dropdown-item" href="{% url 'Revista_Libro_Conferencia_List' %}">Crear
+                                        Revistas, Libros u Otros</a></li>
+                                <!-- Submenú de Programas -->
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">
+                                        <i class="fas fa-check-circle me-2"></i> Programas
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="{% url 'TipoPrograma_List' %}">Tipos de
+                                                Programas</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'SectorEstrategico_List' %}">Sector
+                                                Estratégico</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'LineaInvestigacion_List' %}">Líneas
+                                                de Investigación</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'TipoParticipacion_List' %}">Tipos de
+                                                Participación</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            {% endif %}
+            {% if user.rol == 'Jefe_area' or user.rol == 'jefe de area' %}
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" id="gestionarJefeAreaDropdown" role="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-gear"></i> Gestionar
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="gestionarJefeAreaDropdown">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'Usuarios' %}">
+                                <i class="fas fa-users me-2"></i> Usuarios
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'Departamento_List' %}">
+                                <i class="fas fa-users me-2"></i> Departamentos
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <!-- Submenú Editar Opciones -->
+                        <li class="dropdown-submenu">
+                            <a class="dropdown-item dropdown-toggle" href="#">
+                                <i class="fas fa-edit me-2"></i> Editar Opciones
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{% url 'Cargo_List' %}">Cargo</a></li>
+                                <li><a class="dropdown-item" href="{% url 'CategoriaCientificaList' %}">Categorías
+                                        Científicas</a></li>
+                                <li><a class="dropdown-item" href="{% url 'CategoriaDocenteList' %}">Categorías
+                                        Docentes</a></li>
+                                <li><a class="dropdown-item" href="{% url 'BasesDatosList' %}">Bases de Datos</a></li>
+                                <!-- Submenú de Eventos -->
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">
+                                        <i class="fas fa-calendar me-2"></i> Eventos
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="{% url 'TipoEvento_List' %}">Tipos de
+                                                Eventos</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'CarcterEvento_List' %}">Carácteres de
+                                                Eventos</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'Modalidad_List' %}">Modalidades de
+                                                Eventos</a></li>
+                                    </ul>
+                                </li>
+                                <!-- Submenú de Premios -->
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">
+                                        <i class="fas fa-award me-2"></i> Premios
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="{% url 'TipoPremio_List' %}">Tipos de
+                                                Premios</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'CaracterPremio_List' %}">Carácteres
+                                                de Premios</a></li>
+                                    </ul>
+                                </li>
+                                <li><a class="dropdown-item" href="{% url 'Revista_Libro_Conferencia_List' %}">Crear
+                                        Revistas, Libros u Otros</a></li>
+                                <!-- Submenú de Programas -->
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">
+                                        <i class="fas fa-check-circle me-2"></i> Programas
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="{% url 'TipoPrograma_List' %}">Tipos de
+                                                Programas</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'SectorEstrategico_List' %}">Sector
+                                                Estratégico</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'LineaInvestigacion_List' %}">Líneas
+                                                de Investigación</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'TipoParticipacion_List' %}">Tipos de
+                                                Participación</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            {% endif %}
+            <a href="{% url 'lista_notificaciones' %}" class="text-white position-relative">
+                <i class="fas fa-bell fs-5"></i>
+                {% if tiene_notificaciones_no_leidas %}
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    {{ contador_notificaciones_no_leidas }}
+                </span>
+                {% endif %}
+            </a>
+            <span class="text-white">
+                {{ user.username }}
+            </span>
+            <a href="#" class="text-white" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                <i class="fas fa-sign-out-alt fs-5"></i>
+            </a>
+        </div>
+    </div>
+</nav>
 
 <!-- Sidebar -->
 <div id="bdSidebar"
     class="d-flex flex-column flex-shrink-0 pt-0 pb-0 text-white offcanvas-md offcanvas-start responsivo"
     style="width: 17%; height: 100vh; overflow-y: auto;">
     <!-- Modificar la estructura del enlace del logo para asegurar que sea clickeable -->
-    {% if user.is_superuser or user.Administrador%}
-    <a href="{% url 'Dashboard_Admin' %}" %}>
-        <img src="{% static 'img/Id UHo-03-white.png' %}" width="200" height="80px" alt="Universidad de Holguín">
-    </a>
-
-    {% elif user.rol == 'Investigador' %}
-    <a href="{% url 'Dashboard_Investigador' %}" %}>
-        <img src="{% static 'img/Id UHo-03-white.png' %}" width="200" height="80px" alt="Universidad de Holguín">
-    </a>
-
-    {% elif user.rol == 'Vicerrector' %}
-    <a href="{% url 'Dashboard_Vicerrector' %}" %}>
-        <img src="{% static 'img/Id UHo-03-white.png' %}" width="200" height="80px" alt="Universidad de Holguín">
-    </a>
-    {% elif user.rol == 'Jefe_departamento' %}
-    <a href="{% url 'Dashboard_JefeDepartamento' %}" %}>
-        <img src="{% static 'img/Id UHo-03-white.png' %}" width="200" height="80px" alt="Universidad de Holguín">
-    </a>
-    {% elif user.rol == 'Jefe_area' %}
-    <a href="{% url 'Dashboard_JefeArea' %}" %}>
-
-        <img src="{% static 'img/Id UHo-03-white.png' %}" width="200" height="80px" alt="Universidad de Holguín">
-    </a>
-
-    {% else %}
-    <a href="#" class="navbar-brand">
-        <img src="{% static 'img/Id UHo-03-white.png' %}" width="200" height="80px" alt="Universidad de Holguín">
-    </a>
-    {% endif %}
+    <br>
     <hr>
     {% if user.is_superuser or user.Administrador%}
     <ul class="mynav nav nav-pills flex-column mb-auto p-2">
@@ -43,113 +337,6 @@
                 Bienvenido, <strong>{{ user.username }}</strong>
             </a>
         </li>
-        <!-- Icono de notificaciones para Admin -->
-        <li class="nav-item mb-1" aria-label="Notificaciones">
-            <a href="{% url 'lista_notificaciones' %}" class="d-flex align-items-center">
-                <div class="notification-icon">
-                    <i class="fas fa-bell text-white"></i>
-                    {% if tiene_notificaciones_no_leidas %}
-                    <span class="notification-badge">{{ contador_notificaciones_no_leidas }}</span>
-                    {% endif %}
-                </div>
-                Notificaciones
-            </a>
-        </li>
-        <li>
-            <a class="nav-link text-white " data-bs-toggle="collapse" aria-expanded="false"
-                data-bs-target="#Gestionar-collapse" aria-controls="contents-collapse">
-                <i class="fas fa-gear text-white"></i> Gestionar <i class="fas fa-angle-down text-white"></i>
-            </a>
-        </li>
-        <ul class="list-unstyled ps-3 collapse" id="Gestionar-collapse">
-            </li>
-            <li class="nav-item mb-1" aria-label="Usuarios">
-                <a href="{% url 'Usuarios' %}" class="">
-                    <i class="fas fa-solid fa-users mx-1"></i>
-                    Usuarios
-                </a>
-            </li>
-            <li class="nav-item mb-1" aria-label="Departamento_List">
-                <a href="{% url 'Departamento_List' %}" class="">
-                    <i class="fas fa-solid fa-users mx-1"></i>
-                    Departamentos
-                </a>
-            </li>
-            <li class="nav-item mb-1" aria-label="Area_List">
-                <a href="{% url 'Area_List' %}" class="">
-                    <i class="fas fa-solid fa-users mx-1"></i>
-                    Areas
-                </a>
-            </li>
-            <li class="nav-item mb-1">
-                <a data-bs-toggle="collapse" aria-expanded="false" data-bs-target="#Opciones-collapse"
-                    aria-controls="contents-collapse">
-                    <i class="fas fa-edit text-white"></i> Editar Opciones
-                    <i class="fas fa-angle-down text-white"></i></b>
-                </a>
-            </li>
-            <ul class="list-unstyled ps-3 collapse" id="Opciones-collapse">
-
-                <li class="nav-item mb-1" aria-label="editar_nombres_roles">
-                    <a href="{% url 'editar_nombres_roles' %}" class="">
-                        Roles
-                    </a>
-                </li>
-                <li class="nav-item mb-1" aria-label="Cargo_List">
-                    <a href="{% url 'Cargo_List' %}" class="">
-                        Cargo
-                    </a>
-                </li>
-                <li class="nav-item mb-1" aria-label="CategoriaCientificaList">
-                    <a href="{% url 'CategoriaCientificaList' %}" class="">
-                        Categorias Cientificas
-                    </a>
-                </li>
-                <li class="nav-item mb-1" aria-label="CategoriaDocenteList">
-                    <a href="{% url 'CategoriaDocenteList' %}" class="">
-                        Categorias Docentes
-                    </a>
-                </li>
-                <li class="nav-item mb-1" aria-label="BasesDastos">
-                    <a href="{% url 'BasesDatosList' %}" class="">
-                        Bases de datos
-                    </a>
-                </li>
-                <li class="nav-item mb-1" aria-label="TipoEvento_List">
-                    <a href="{% url 'TipoEvento_List' %}" class="">
-                        Tipos de Eventos
-                    </a>
-                </li>
-                <li class="nav-item mb-1" aria-label="CarcterEvento_List">
-                    <a href="{% url 'CarcterEvento_List' %}" class="">
-                        Carácteres de Eventos
-                    </a>
-                </li>
-
-                <li class="nav-item mb-1" aria-label="Modalidad_List">
-                    <a href="{% url 'Modalidad_List' %}" class="">
-                        Modalidades de Eventos
-                    </a>
-                </li>
-
-                <li class="nav-item mb-1" aria-label="TipoPremio_List">
-                    <a href="{% url 'TipoPremio_List' %}" class="">
-                        Tipos de Premios
-                    </a>
-                </li>
-                <li class="nav-item mb-1" aria-label="CaracterPremio_List">
-                    <a href="{% url 'CaracterPremio_List' %}" class="">
-                        Carácteres de Premios
-                    </a>
-                </li>
-                <li class="nav-item mb-1" aria-label="Revista_Libro_Conferencia_List">
-                    <a href="{% url 'Revista_Libro_Conferencia_List' %}" class="">
-                        Crear Revistas, Libro u otros.
-                    </a>
-                </li>
-            </ul>
-        </ul>
-
         <li class="nav-item mb-1" aria-label="Artículos">
             <a href="{% url 'Articulo_List_Admin' %}" class="">
                 <i class="fa-solid fa-scroll"></i>
@@ -207,17 +394,6 @@
                 <i class="bi bi-person-circle mx-1"></i>
                 Bienvenido, Investigador: <strong>{{ user.username }}</strong>
             </a>
-
-        <li class="nav-item mb-1" aria-label="Notificaciones">
-            <a href="{% url 'lista_notificaciones' %}" class="d-flex align-items-center">
-                <div class="notification-icon">
-                    <i class="fas fa-bell text-white"></i>
-                    {% if tiene_notificaciones_no_leidas %}
-                    <span class="notification-badge">{{ contador_notificaciones_no_leidas }}</span>
-                    {% endif %}
-                </div> Notificaciones
-            </a>
-        </li>
         <li>
             <a class="nav-link text-white " data-bs-toggle="collapse" aria-expanded="false"
                 data-bs-target="#Perfil-collapse" aria-controls="contents-collapse">
@@ -301,19 +477,6 @@
                 Bienvenido, Vicerrector: <strong>{{ user.username }}</strong>
             </a>
         </li>
-
-        <!-- Icono de notificaciones para Vicerrector -->
-        <li class="nav-item mb-1" aria-label="Notificaciones">
-            <a href="{% url 'lista_notificaciones' %}" class="d-flex align-items-center">
-                <div class="notification-icon">
-                    <i class="fas fa-bell text-white"></i>
-                    {% if tiene_notificaciones_no_leidas %}
-                    <span class="notification-badge">{{ contador_notificaciones_no_leidas }}</span>
-                    {% endif %}
-                </div> Notificaciones
-            </a>
-        </li>
-
         <li class="nav-item mb-1" aria-label="MisTramites">
             <a href="{% url 'Perfil_Detail_Investigador' %}" data-bs-toggle="collapse" aria-expanded="false"
                 data-bs-target="#Perfil-collapse" aria-controls="contents-collapse">
@@ -349,7 +512,6 @@
             </li>
         </ul>
         </li>
-
         <li>
             <a class="nav-link text-white " data-bs-toggle="collapse" aria-expanded="false"
                 data-bs-target="#Publicaciones-collapse" aria-controls="contents-collapse">
@@ -364,7 +526,6 @@
                     Mi Currículo
                 </a>
             </li>
-
             <li class="nav-item mb-1" aria-label="Artículos">
                 <a href="{% url 'Articulo_List_Investigador' %}" class="">
                     <i class="fa-solid fa-scroll"></i>
@@ -377,154 +538,12 @@
                     Mis Eventos
                 </a>
             </li>
-
-
             <li class="nav-item mb-1" aria-label="InfoPersonal">
                 <a href="{% url 'Premio_List_Investigador' %}" class="">
                     <i class="fas  fa-award"></i>
                     Mis Premios
                 </a>
             </li>
-        </ul>
-        <li>
-            <a class="nav-link text-white " data-bs-toggle="collapse" aria-expanded="false"
-                data-bs-target="#Gestionar-collapse" aria-controls="contents-collapse">
-                <i class="fas fa-gear text-white"></i> Gestionar <i class="fas fa-angle-down text-white"></i>
-            </a>
-        </li>
-        <ul class="list-unstyled ps-3 collapse" id="Gestionar-collapse">
-            </li>
-            <li class="nav-item mb-1" aria-label="Usuarios">
-                <a href="{% url 'Usuarios' %}" class="">
-                    <i class="fas fa-solid fa-users mx-1"></i>
-                    Usuarios
-                </a>
-            </li>
-            <li class="nav-item mb-1" aria-label="Departamento_List">
-                <a href="{% url 'Departamento_List' %}" class="">
-                    <i class="fas fa-solid fa-users mx-1"></i>
-                    Departamentos
-                </a>
-            </li>
-            <li class="nav-item mb-1" aria-label="Area_List">
-                <a href="{% url 'Area_List' %}" class="">
-                    <i class="fas fa-solid fa-users mx-1"></i>
-                    Areas
-                </a>
-            </li>
-            <li class="nav-item mb-1" aria-label="Area_List">
-                <a data-bs-toggle="collapse" aria-expanded="false"
-                    data-bs-target="#Opciones-collapse" aria-controls="contents-collapse">
-                    <i class="fas fa-edit text-white"></i> Editar Opciones
-                    <i class="fas fa-angle-down text-white"></i></b>
-                </a>
-            </li>
-            <ul class="list-unstyled ps-3 collapse" id="Opciones-collapse">
-
-                <li class="nav-item mb-1" aria-label="editar_nombres_roles">
-                    <a href="{% url 'editar_nombres_roles' %}" class="">
-                        Roles
-                    </a>
-                </li>
-                <li class="nav-item mb-1" aria-label="Cargo_List">
-                    <a href="{% url 'Cargo_List' %}" class="">
-                        Cargo
-                    </a>
-                </li>
-                <li class="nav-item mb-1" aria-label="CategoriaCientificaList">
-                    <a href="{% url 'CategoriaCientificaList' %}" class="">
-                        Categorias Cientificas
-                    </a>
-                </li>
-                <li class="nav-item mb-1" aria-label="CategoriaDocenteList">
-                    <a href="{% url 'CategoriaDocenteList' %}" class="">
-                        Categorias Docentes
-                    </a>
-                </li>
-                <li class="nav-item mb-1" aria-label="BasesDastos">
-                    <a href="{% url 'BasesDatosList' %}" class="">
-                        Bases de datos
-                    </a>
-                </li>
-                <li class="nav-item mb-1">
-                    <a data-bs-toggle="collapse" aria-expanded="false" data-bs-target="#Eventos-collapse"
-                        aria-controls="contents-collapse">
-                        <i class="fas fa-calendar"></i> Eventos
-                        <i class="fas fa-angle-down text-white"></i></b>
-                    </a>
-                </li>
-                <ul class="list-unstyled ps-3 collapse" id="Eventos-collapse">
-                    <li class="nav-item mb-1" aria-label="TipoEvento_List">
-                        <a href="{% url 'TipoEvento_List' %}" class="">
-                            Tipos de Eventos
-                        </a>
-                    </li>
-                    <li class="nav-item mb-1" aria-label="CarcterEvento_List">
-                        <a href="{% url 'CarcterEvento_List' %}" class="">
-                            Carácteres de Eventos
-                        </a>
-                    </li>
-
-                    <li class="nav-item mb-1" aria-label="Modalidad_List">
-                        <a href="{% url 'Modalidad_List' %}" class="">
-                            Modalidades de Eventos
-                        </a>
-                    </li>
-                </ul>
-                <li class="nav-item mb-1">
-                    <a data-bs-toggle="collapse" aria-expanded="false" data-bs-target="#Premios-collapse"
-                        aria-controls="contents-collapse">
-                        <i class="fas  fa-award"></i> Premios
-                        <i class="fas fa-angle-down text-white"></i></b>
-                    </a>
-                </li>
-                <ul class="list-unstyled ps-3 collapse" id="Premios-collapse">
-                    <li class="nav-item mb-1" aria-label="TipoPremio_List">
-                        <a href="{% url 'TipoPremio_List' %}" class="">
-                            Tipos de Premios
-                        </a>
-                    </li>
-                    <li class="nav-item mb-1" aria-label="CaracterPremio_List">
-                        <a href="{% url 'CaracterPremio_List' %}" class="">
-                            Carácteres de Premios
-                        </a>
-                    </li>
-                </ul>
-                <li class="nav-item mb-1" aria-label="Revista_Libro_Conferencia_List">
-                    <a href="{% url 'Revista_Libro_Conferencia_List' %}" class="">
-                        Crear Revistas, Libro u otros.
-                    </a>
-                </li>
-                <li class="nav-item mb-1">
-                    <a data-bs-toggle="collapse" aria-expanded="false" data-bs-target="#Programas-collapse"
-                        aria-controls="contents-collapse">
-                        <i class="fas fa-check-circle"></i> Programas
-                        <i class="fas fa-angle-down text-white"></i></b>
-                    </a>
-                </li>
-                <ul class="list-unstyled ps-3 collapse" id="Programas-collapse">
-                    <li class="nav-item mb-1" aria-label="TipoPrograma_List">
-                        <a href="{% url 'TipoPrograma_List' %}" class="">
-                            Tipos de Programas
-                        </a>
-                    </li>
-                    <li class="nav-item mb-1" aria-label="SectorEstrategico_List">
-                        <a href="{% url 'SectorEstrategico_List' %}" class="">
-                            Sector Estratégico
-                        </a>
-                    </li>
-                    <li class="nav-item mb-1" aria-label="LineaInvestigacion_List">
-                        <a href="{% url 'LineaInvestigacion_List' %}" class="">
-                            Líneas de Investigación
-                        </a>
-                    </li>
-                    <li class="nav-item mb-1" aria-label="TipoParticipacion_List">
-                        <a href="{% url 'TipoParticipacion_List' %}" class="">
-                            Tipos de Participación
-                        </a>
-                    </li>
-                </ul>
-            </ul>
         </ul>
         <li class="nav-item mb-1" aria-label="InfoPersonal">
             <a href="{% url 'Articulo_List_Vicerrector' %}" class="">
@@ -550,13 +569,11 @@
                 Proyectos
             </a>
         </li>
-
         <li class="nav-item mb-1" aria-label="Programa List">
             <a href="{% url 'Programa_List_Vicerrector' %}" class="">
                 <i class="fas fa-check-circle"></i>
                 Programas
             </a>
-        </li>
         </li>
         <li class="nav-item mb-1" aria-label="Usuarios">
             <a href="{% url 'reporte' %}" class="">
@@ -584,20 +601,6 @@
                 Bienvenido, Jefe del departamento: <strong>{{ user.username }}</strong>
             </a>
         </li>
-
-        <!-- Icono de notificaciones para Jefe de Departamento -->
-        <li class="nav-item mb-1" aria-label="Notificaciones">
-            <a href="{% url 'lista_notificaciones' %}" class="d-flex align-items-center">
-                <div class="notification-icon">
-                    <i class="fas fa-bell text-white"></i>
-                    {% if tiene_notificaciones_no_leidas %}
-                    <span class="notification-badge">{{ contador_notificaciones_no_leidas }}</span>
-                    {% endif %}
-                </div>
-                Notificaciones
-            </a>
-        </li>
-
         <li class="nav-item mb-1" aria-label="MisTramites">
             <a href="{% url 'Perfil_Detail_Investigador' %}" data-bs-toggle="collapse" aria-expanded="false"
                 data-bs-target="#Perfil-collapse" aria-controls="contents-collapse">
@@ -723,7 +726,6 @@
             </li>
         </ul>
     </div>
-
     {% endif %}
 
     {% if user.rol == 'Jefe_area' or user.rol == 'jefe de area' %}
@@ -734,20 +736,6 @@
                 Bienvenido, Jefe del Area: <strong>{{ user.username }}</strong>
             </a>
         </li>
-
-        <!-- Icono de notificaciones para Jefe de Área -->
-        <li class="nav-item mb-1" aria-label="Notificaciones">
-            <a href="{% url 'lista_notificaciones' %}" class="d-flex align-items-center">
-                <div class="notification-icon">
-                    <i class="fas fa-bell text-white"></i>
-                    {% if tiene_notificaciones_no_leidas %}
-                    <span class="notification-badge">{{ contador_notificaciones_no_leidas }}</span>
-                    {% endif %}
-                </div>
-                Notificaciones
-            </a>
-        </li>
-
         <li class="nav-item mb-1" aria-label="MisTramites">
             <a href="{% url 'Perfil_Detail_Investigador' %}" data-bs-toggle="collapse" aria-expanded="false"
                 data-bs-target="#Perfil-collapse" aria-controls="contents-collapse">
@@ -788,102 +776,6 @@
                 <i class="fas fa-list text-white"></i> Mis Marcadores <i class="fas fa-angle-down text-white"></i>
             </a>
         </li>
-        <li>
-            <a class="nav-link text-white " data-bs-toggle="collapse" aria-expanded="false"
-                data-bs-target="#Gestionar-collapse" aria-controls="contents-collapse">
-                <i class="fas fa-gear text-white"></i> Gestionar
-                <i class="fas fa-angle-down text-white"></i>
-            </a>
-        </li>
-        <ul class="list-unstyled ps-3 collapse" id="Gestionar-collapse">
-            </li>
-            <li class="nav-item mb-1" aria-label="Usuarios">
-                <a href="{% url 'Usuarios' %}" class="">
-                    <i class="fas fa-solid fa-users mx-1"></i>
-                    Usuarios
-                </a>
-            </li>
-            <li class="nav-item mb-1" aria-label="Departamento_List">
-                <a href="{% url 'Departamento_List' %}" class="">
-                    <i class="fas fa-solid fa-users mx-1"></i>
-                    Departamentos
-                </a>
-            </li>
-            <li class="nav-item mb-1" aria-label="Area_List">
-                <a href="{% url 'Area_List' %}" class="">
-                    <i class="fas fa-solid fa-users mx-1"></i>
-                    Areas
-                </a>
-            </li>
-            <li class="nav-item mb-1">
-                <a data-bs-toggle="collapse" aria-expanded="false" data-bs-target="#Opciones-collapse"
-                    aria-controls="contents-collapse">
-                    <i class="fas fa-edit text-white"></i> Editar Opciones
-                    <i class="fas fa-angle-down text-white"></i></b>
-                </a>
-            </li>
-            <ul class="list-unstyled ps-3 collapse" id="Opciones-collapse">
-
-                <li class="nav-item mb-1" aria-label="editar_nombres_roles">
-                    <a href="{% url 'editar_nombres_roles' %}" class="">
-                        Roles
-                    </a>
-                </li>
-                <li class="nav-item mb-1" aria-label="Cargo_List">
-                    <a href="{% url 'Cargo_List' %}" class="">
-                        Cargo
-                    </a>
-                </li>
-                <li class="nav-item mb-1" aria-label="CategoriaCientificaList">
-                    <a href="{% url 'CategoriaCientificaList' %}" class="">
-                        Categorias Cientificas
-                    </a>
-                </li>
-                <li class="nav-item mb-1" aria-label="CategoriaDocenteList">
-                    <a href="{% url 'CategoriaDocenteList' %}" class="">
-                        Categorias Docentes
-                    </a>
-                </li>
-                <li class="nav-item mb-1" aria-label="BasesDastos">
-                    <a href="{% url 'BasesDatosList' %}" class="">
-                        Bases de datos
-                    </a>
-                </li>
-                <li class="nav-item mb-1" aria-label="TipoEvento_List">
-                    <a href="{% url 'TipoEvento_List' %}" class="">
-                        Tipos de Eventos
-                    </a>
-                </li>
-                <li class="nav-item mb-1" aria-label="CarcterEvento_List">
-                    <a href="{% url 'CarcterEvento_List' %}" class="">
-                        Carácteres de Eventos
-                    </a>
-                </li>
-
-                <li class="nav-item mb-1" aria-label="Modalidad_List">
-                    <a href="{% url 'Modalidad_List' %}" class="">
-                        Modalidades de Eventos
-                    </a>
-                </li>
-
-                <li class="nav-item mb-1" aria-label="TipoPremio_List">
-                    <a href="{% url 'TipoPremio_List' %}" class="">
-                        Tipos de Premios
-                    </a>
-                </li>
-                <li class="nav-item mb-1" aria-label="CaracterPremio_List">
-                    <a href="{% url 'CaracterPremio_List' %}" class="">
-                        Carácteres de Premios
-                    </a>
-                </li>
-                <li class="nav-item mb-1" aria-label="Revista_Libro_Conferencia_List">
-                    <a href="{% url 'Revista_Libro_Conferencia_List' %}" class="">
-                        Crear Revistas, Libro u otros.
-                    </a>
-                </li>
-            </ul>
-        </ul>
-
         <ul class="list-unstyled ps-3 collapse" id="Publicaciones-collapse">
             <li class="nav-item mb-1" aria-label="InfoPersonal">
                 <a href="{% url 'Curriculo_List_Investigador' %}" class="">
@@ -963,7 +855,7 @@
 </div>
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel"><i class="bi bi-exclamation-triangle"></i>
@@ -975,10 +867,99 @@
                 ¿Desea cerrar esta sesión?
             </div>
             <div class="modal-footer">
-
-                <a href="{% url 'CerrarSesion' %}" class="btn btn-primary">Aceptar</a>
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancelar</button>
+                <a href="{% url 'CerrarSesion' %}" class="btn boton-form">Aceptar</a>
+                <button type="button" class="btn btn-cancelar" data-bs-dismiss="modal">Cancelar</button>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .dropdown-submenu {
+        position: relative;
+    }
+
+    .dropdown-submenu>.dropdown-menu {
+        top: 0;
+        right: 100%;
+        left: auto;
+        margin-right: .1rem;
+        margin-left: 0;
+        transform-origin: right top;
+        min-width: 12rem;
+        z-index: 2100;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const submenuToggles = Array.from(document.querySelectorAll('.dropdown-submenu > .dropdown-toggle'));
+
+        submenuToggles.forEach(toggle => {
+            const parentLi = toggle.parentElement;
+            const submenu = parentLi.querySelector('.dropdown-menu');
+
+            toggle.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const isOpen = submenu.classList.contains('show');
+
+                const siblings = parentLi.parentElement.querySelectorAll('.dropdown-submenu .dropdown-menu.show');
+                siblings.forEach(sib => {
+                    if (sib !== submenu) {
+                        sib.classList.remove('show');
+                        const parentToggle = sib.closest('.dropdown-submenu')?.querySelector('.dropdown-toggle');
+                        if (parentToggle) parentToggle.setAttribute('aria-expanded', 'false');
+                    }
+                });
+
+                if (!isOpen) {
+                    submenu.classList.add('show');
+                    toggle.setAttribute('aria-expanded', 'true');
+
+                    const parentDropdownMenu = parentLi.closest('.dropdown-menu');
+                    if (parentDropdownMenu) parentDropdownMenu.addEventListener('click', stopCloseOnClick);
+                } else {
+                    submenu.classList.remove('show');
+                    toggle.setAttribute('aria-expanded', 'false');
+                }
+            });
+
+            const bsDropdownParent = parentLi.closest('.dropdown');
+            if (bsDropdownParent) {
+                bsDropdownParent.addEventListener('hidden.bs.dropdown', function () {
+                    parentLi.querySelectorAll('.dropdown-menu.show').forEach(sm => {
+                        sm.classList.remove('show');
+                        const t = sm.closest('.dropdown-submenu')?.querySelector('.dropdown-toggle');
+                        if (t) t.setAttribute('aria-expanded', 'false');
+                    });
+                });
+            }
+
+            document.addEventListener('keydown', function (ev) {
+                if (ev.key === 'Escape') {
+                    if (submenu.classList.contains('show')) {
+                        submenu.classList.remove('show');
+                        toggle.setAttribute('aria-expanded', 'false');
+                    }
+                }
+            });
+        });
+
+        document.addEventListener('click', function (e) {
+            const opened = document.querySelectorAll('.dropdown-submenu .dropdown-menu.show');
+            opened.forEach(sm => {
+                if (!sm.contains(e.target) && !sm.closest('.dropdown-submenu')?.querySelector('.dropdown-toggle')?.contains(e.target)) {
+                    sm.classList.remove('show');
+                    const t = sm.closest('.dropdown-submenu')?.querySelector('.dropdown-toggle');
+                    if (t) t.setAttribute('aria-expanded', 'false');
+                }
+            });
+        });
+
+        function stopCloseOnClick(e) {
+            e.stopPropagation();
+        }
+    });
+</script>

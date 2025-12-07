@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% load static %}
- 
+
 {% block css %}
+<link rel="stylesheet" href="{% static 'css/Dashboard.css' %}">
 <link rel="stylesheet" href="{% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
 <link rel="stylesheet" href="{% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
 <link rel="stylesheet" href="{% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
@@ -10,65 +11,75 @@
 {% endblock %}
 
 {% block content %}
-<section class="tabla" id="Premio">
+<section class="tabla" id="tablaTiposPremio">
     <div class="card-header">
         <h5 class="card-title" style="text-align:center;">
             Tipos de Premios
         </h5>
     </div>
-    <div class="boot d-flex flex-wrap justify-content-start align-items-center">
-        <a href="{% url 'TipoPremio_Create' %}" class="btn-add">Añadir</a>
+    <div class="boot d-flex flex-wrap justify-content-start align-items-center" style="margin-bottom: 20px;">
+        <a href="{% url 'TiposPremio_Create' %}" class="btn boton-form">
+            <i class="fas fa-plus"></i> Nuevo
+        </a>
     </div>
-    <table id="Premios" class="table">
-        <thead class="encabezado">
-            <tr>
-                <th scope="col">No</th>
-                <th scope="col">Nombre</th>
-                <th scope="col">Institución</th>
-                <th scope="col" style="text-align:center;">Opciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for p in tipos_premios %}
-            <tr>
-                <td style=" text-align:center;">{{forloop.counter}}</td>
-                <td style=" text-align:start;">{{p.nombre}}</td>
-                <td style=" text-align:start;">{{p.institucion}}</td>
-                <td style="text-align:center;">
-                    <a href="{% url 'TipoPremio_Detail' p.id %}"> <i class="fas fa-solid fa-info-circle detail"></i></a>
-                    <a href="{% url 'TipoPremio_Update' p.id %}"> <i
-                            class="fas fa-solid fa-pen-to-square update"></i></a>
-                    <a class="iconos" data-bs-toggle="modal" data-bs-target="#Premio{{ p.id }}"><i
-                            class="fas fa-solid fa-trash-can delete"></i></a>
-                </td>
-            </tr>
-            <!-- Modal -->
-            <div class="modal fade" id="Premio{{ p.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel"><i class="bi bi-exclamation-triangle"></i>
-                                Eliminar</h5>
-                            <button type="button" class="btn-close cerrar" data-bs-dismiss="modal"
-                                aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            ¿Desea eliminar el Premio seleccionado?
-                            Esta acci&oacute;n ser&aacute; permanente.
-                        </div>
-                        <div class="modal-footer">
-                            <a href="{% url 'TipoPremio_Delete' p.id  %}" class="btn btn-success">Aceptar</a>
-                            <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Cancelar</button>
+    <div class="table-responsive">
+        <p><strong>Total:</strong> {{ tipos_premios|length }} tipos de premios</p>
+        <table id="TiposPremios" class="table">
+            <thead class="encabezado">
+                <tr>
+                    <th scope="col">No</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Institución</th>
+                    <th scope="col" style="text-align:center;">Opciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in tipos_premios %}
+                <tr data-id="{{ p.id }}">
+                    <td style=" text-align:center;">{{forloop.counter}}</td>
+                    <td style=" text-align:start;">{{p.nombre}}</td>
+                    <td style=" text-align:start;">{{p.institucion}}</td>
+                    <td style="text-align:center;">
+                        <a href="{% url 'TipoPremio_Detail' p.id %}"> <i
+                                class="fas fa-solid fa-info-circle detail"></i></a>
+                        <a href="{% url 'TipoPremio_Update' p.id %}"> <i
+                                class="fas fa-solid fa-pen-to-square update"></i></a>
+                        <a class="iconos" data-bs-toggle="modal" data-bs-target="#Premio{{ p.id }}"><i
+                                class="fas fa-solid fa-trash-can delete"></i></a>
+                    </td>
+                </tr>
+                <!-- Modal -->
+                <div class="modal fade" id="Premio{{ p.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel"><i
+                                        class="bi bi-exclamation-triangle"></i>
+                                    Eliminar</h5>
+                                <button type="button" class="btn-close cerrar" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                ¿Desea eliminar el Premio seleccionado?
+                                Esta acci&oacute;n ser&aacute; permanente.
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-cancelar" data-bs-dismiss="modal">Cancelar</button>
+                                <form method="post" action="{% url 'TipoPremio_Delete' p.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn boton-form">Aceptar</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            {% endfor %}
-        </tbody>
-    </table>
-    <div class="option bgs">
-        <div class="bg-active" id="bg-active"></div>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="option bgs">
+            <div class="bg-active" id="bg-active"></div>
+        </div>
     </div>
 </section>
 {% endblock %}
@@ -91,7 +102,7 @@
 
 <script>
     $(document).ready(function () {
-        $('#TiposEvento').DataTable({
+        $('#TiposPremios').DataTable({
             responsive: true,
             dom: 'Bfrtip',
             buttons: [
@@ -108,4 +119,5 @@
         });
     });
 </script>
+
 {% endblock %}

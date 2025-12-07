@@ -1,86 +1,82 @@
 {% extends "base.html" %}
 {% load static %}
 
-<!-- Conatiner CSS -->
 {% block css %}
-<link rel="stylesheet" href=" {% static 'css/Dashboard.css' %}">
-<link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
-<link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
-<link rel="stylesheet" href=" {% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
-<link rel="stylesheet" href=" {% static 'css/datatableSD.css' %}">
+<link rel="stylesheet" href="{% static 'css/Dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'css/datatableSD.css' %}">
+<link rel="stylesheet" href="{% static 'css/styless.css' %}">
 {% endblock %}
-<!-- End Conatiner CSS -->
 
 {% block content %}
-<div class="main" style="padding-top:60px;">
-  <main class="content-inside px-3 py-2">
-    <div class="container-fluid">
-      <div class="container-fluid">
-        <!--Table Element-->
-        <section id="tablaTramites">
-          <h5 class="card-title title-t" style=" text-align: start;">
-                Carácteres de Premios
-              </h5>
-            <div class="boot d-flex flex-wrap justify-content-start align-items-center">
-              <a href="{% url 'CaracterPremio_Create' %}"
-                class="btn1 m-2 btn btn-primary btn-sm text-decoration-none">Añadir</a>
+<section class="tabla" id="tablaCaracterPremio">
+  <div class="card-header">
+    <h5 class="card-title" style="text-align:center;">
+      Carácteres de Premios
+    </h5>
+  </div>
+  <div class="boot d-flex flex-wrap justify-content-start align-items-center" style="margin-bottom: 20px;">
+    <a href="{% url 'CaracteresPremio_Create' %}" class="btn boton-form">
+      <i class="fas fa-plus"></i> Nuevo
+    </a>
+  </div>
+  <div class="table-responsive">
+    <p><strong>Total:</strong> {{ caracteres_premios|length }} carácteres de premios</p>
+    <table id="CaracterPremio" class="display table table-striped table-hover table-primary"
+      style="width:100%; height: 100%;">
+      <thead class="encabezado">
+        <tr>
+          <th scope="col">No</th>
+          <th scope="col">Nombre del Carácter</th>
+          <th scope="col" style="text-align:center;">Opciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for caracter in caracteres_premios %}
+        <tr>
+          <td style="text-align: center;">{{ forloop.counter }}</td>
+          <td style="text-align: center;">{{ caracter.nombre }}</td>
+          <td style="text-align: center; font-size: 1.2rem;">
+            <a class="iconos p-2" href="{% url 'CaracterPremio_Update' caracter.id %}"><i
+                class="fas fa-solid fa-pen-to-square update"></i></a>
+            <a class="iconos p-2" data-bs-toggle="modal" data-bs-target="#Caracter{{ caracter.id }}"><i
+                class="fas fa-solid fa-trash-can delete"></i></a>
+          </td>
+        </tr>
+
+        <!-- Modal -->
+        <div class="modal fade" id="Caracter{{ caracter.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+          aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">
+                  <i class="bi bi-exclamation-triangle"></i> Eliminar
+                </h5>
+                <button type="button" class="btn-close cerrar" data-bs-dismiss="modal" aria-label="Close"
+                  style="box-shadow: none"></button>
+              </div>
+              <div class="modal-body">
+                ¿Desea eliminar el carácter de premio seleccionado?
+                Esta acci&oacute;n ser&aacute; permanente.
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-cancelar" data-bs-dismiss="modal">Cancelar</button>
+                <form method="post" action="{% url 'CaracterPremio_Delete' caracter.id %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn boton-form">Aceptar</button>
+                </form>
+              </div>
             </div>
           </div>
-          <table id="CaracterEvento" class="display table table-striped table-hover table-primary"
-            style="width:100%; height: 100%;">
-            <thead class="encabezado">
-              <tr>
-                <th scope="col">No</th>
-                <th scope="col">Nombre del Carácter</th>
-                <th scope="col">Opciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for caracter in caracteres_premios %}
-              <tr>
-                <td style="text-align: center;">{{ forloop.counter }}</td>
-                <td style="text-align: center;">{{ caracter.nombre }}</td>
-                <td style="text-align: center; font-size: 1.2rem;">
-                  <a class="iconos p-2" href="{% url 'CaracterPremio_Update' caracter.id %}"><i
-                      class=" fas fa-solid fa-pen-to-square"></i></a>
-                  <a class="iconos p-2" data-bs-toggle="modal" data-bs-target="#Caracter{{ caracter.id }}"><i
-                      class="fas fa-solid fa-trash-can"></i></a>
-                </td>
-              </tr>
-
-              <!-- Modal -->
-              <div class="modal fade" id="Caracter{{ caracter.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title" id="exampleModalLabel" style="color:black">
-                        <i class="bi bi-exclamation-triangle" style="color:black"></i> Advertencia
-                      </h5>
-                      <button type="button" class="btn-close cerrar" data-bs-dismiss="modal" aria-label="Close"
-                        style="box-shadow: none"></button>
-                    </div>
-                    <div class="modal-body" style="color:black">
-                      ¿Desea eliminar este Carácter de Premio?
-                    </div>
-                    <div class="modal-footer">
-                      <form method="post" action="{% url 'CaracterPremio_Delete' caracter.id %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-primary">Eliminar</button>
-                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancelar</button>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {% endfor %}
-            </tbody>
-          </table>
-        </section>
-      </div>
-    </div>
-  </main>
-</div>
+        </div>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
 {% endblock %}
 
 <!-- Conatiner JS -->
@@ -88,7 +84,6 @@
 <script src="{% static 'Plataforma/libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
 <script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.js' %}"></script>
 <script src="{% static 'Plataforma/libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
-
 <script src="{% static 'libs/Datatable/JS/dataTables.buttons.js' %}"></script>
 <script src="{% static 'libs/Datatable/JS/buttons.bootstrap5.js' %}"></script>
 <script src="{% static 'libs/Datatable/JS/jszip.min.js' %}"></script>
@@ -97,10 +92,8 @@
 <script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>
 <script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>
 <script src="{% static 'libs/Datatable/JS/bottons.colVis.min.js' %}"></script>
-
 <script src="{% static 'libs/Datatable/JS/dataTables.responsive.js' %}"></script>
 <script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>
-
 <script src="{% static 'libs/Highcharts/code/highcharts.js' %}"></script>
 <script src="{% static 'libs/Highcharts/code/modules/accessibility.js' %}"></script>
 <script src="{% static 'libs/Highcharts/code/modules/exporting.js' %}"></script>
@@ -110,7 +103,7 @@
 <script>
   $(document).ready(function () {
     // Initialize DataTable
-    $('#CaracterEvento').DataTable({
+    $('#CaracterPremio').DataTable({
       responsive: true,
       dom: 'Bfrtip',
       buttons: [

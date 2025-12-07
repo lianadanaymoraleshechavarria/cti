@@ -34,6 +34,7 @@
           <th scope="col">Código</th>
           <th scope="col">Jefe</th>
           <th scope="col">Sector Estratégico</th>
+          <th scope="col">Estado</th>
           <th scope="col" style="text-align: center;">Opciones</th>
         </tr>
       </thead>
@@ -46,6 +47,12 @@
           <td>{{p.codigo_programa }}</td>
           <td>{{p.jefe_programa}}</td>
           <td>{{p.sector_estrategico}}</td>
+          <td>
+            <a class="cambiar-estado" style="text-decoration: none; color:#4f69c7"
+              href="{% url 'Cambiar_Estado_Programa' p.id %}">
+              {{p.aprobacion}}
+            </a>
+          </td>
           <td style=" text-align: center;">
             <a href="{% url 'Programa_Detail_Investigador' p.id %}">
               <i class="detail fa-solid fa-info-circle mx-1 fs-6"></i>
@@ -57,6 +64,7 @@
               <i class="delete fas fa-solid fa-trash-can mx-1 fs-6"></i>
             </a>
           </td>
+          
         </tr>
         <!-- Modal -->
         <div class="modal fade" id="Programa{{ p.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"

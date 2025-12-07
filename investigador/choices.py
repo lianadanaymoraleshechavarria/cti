@@ -134,7 +134,7 @@ PROVINCIAS_CUBA = [
     ('CFG', 'Cienfuegos'),
     ('SSP', 'Sancti Spíritus'),
     ('CAV', 'Ciego de Ávila'),
-    ('CAM', 'Camagüey'),
+    ('CMG', 'Camagüey'),
     ('LTU', 'Las Tunas'),
     ('HOL', 'Holguín'),
     ('GRA', 'Granma'),

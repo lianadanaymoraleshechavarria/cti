@@ -42,8 +42,7 @@
                                     </div>
                                     <div class="row mt-4">
                                         <div class="col-md-12 text-center">
-                                            <a href="{% url 'TipoPrograma_List' %}"
-                                                class="btn btn-cancelar ml-3">
+                                            <a href="{% url 'TipoPrograma_List' %}" class="btn btn-cancelar ml-3">
                                                 <i class="fas fa-arrow-left me-2"></i>Volver
                                             </a>
                                             <a href="{% url 'TipoPrograma_Update' tipo_programa.id %}"
@@ -57,27 +56,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Modal de Eliminación -->
-<div class="modal fade" id="deleteTipoEvento" tabindex="-1" aria-labelledby="deleteTipoEventoLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteTipoEventoLabel">Confirmar eliminación</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                ¿Está seguro de que desea eliminar el tipo de evento "{{ tipo_evento.nombre }}"?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <form action="{% url 'TipoEvento_Delete' tipo_programa.id %}" method="post">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">Eliminar</button>
-                </form>
             </div>
         </div>
     </div>

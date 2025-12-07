@@ -636,32 +636,6 @@ def api_eventos_base(request):
 
 
 @login_required
-def api_crear_evento_base(request):
-    if request.method == 'POST':
-        form = EventoBaseForm(request.POST)
-        if form.is_valid():
-            evento_base = form.save()
-            provincia_nombre = evento_base.provincia.nombre if evento_base.provincia else None
-            return JsonResponse({
-                'success': True,
-                'evento_base': {
-                    'id': evento_base.id,
-                    'nombre': evento_base.nombre,
-                    'tipo_evento_id': evento_base.tipo_evento.id,
-                    'tipo_evento_nombre': evento_base.tipo_evento.nombre,
-                    'institucion': evento_base.institucion_responsable,
-                    'pais': evento_base.pais,
-                    'provincia_id': evento_base.provincia.id if evento_base.provincia else None,
-                    'provincia_nombre': provincia_nombre,
-                }
-            })
-        else:
-            return JsonResponse({'success': False, 'errors': form.errors})
-    
-    return JsonResponse({'success': False, 'message': 'Método no permitido'})
-
-
-@login_required
 def api_instituciones(request):
     search = request.GET.get('search', '')
     # Obtener instituciones únicas de eventos existentes
@@ -1101,22 +1075,34 @@ class Premio_List_JefeArea(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         try:
-            perfil_JefeArea = Perfil.objects.get(usuario=self.request.user)
-            queryset = Premio.objects.filter(area=perfil_JefeArea.area)
-            print(str(queryset.query)) 
-            return queryset
+            perfil = Perfil.objects.get(usuario=self.request.user)
+            return (
+                Premio.objects
+                .filter(area=perfil.area)
+                .select_related("area", "departamento")
+                .order_by("fecha_create")
+            )
         except Perfil.DoesNotExist:
             return Premio.objects.none()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        try:
-            perfil_JefeArea = Perfil.objects.get(usuario=self.request.user)
-            context['area'] = perfil_JefeArea.area
-        except Perfil.DoesNotExist:
-            context['area'] = None  
-        return context
 
+        try:
+            perfil = Perfil.objects.get(usuario=self.request.user)
+            context["area"] = perfil.area
+
+            context["departamentos"] = (
+                Departamento.objects
+                .filter(area=perfil.area)
+                .order_by("nombre_departamento")
+            )
+
+        except Perfil.DoesNotExist:
+            context["area"] = None
+            context["departamentos"] = Departamento.objects.none()
+
+        return context
 
 
 @method_decorator([login_required, jefearea_required ], name='dispatch')
@@ -1286,7 +1272,7 @@ def Cambiar_Estado_Programa(request, id):
         estados = [('Pendiente'), ('No Válido'), ('Aprobado')]
         return render(request, "JefeArea/Programa/cambiar_estado_programa.html", {'estados': estados}) 
 #....................Evento..................
-@method_decorator([login_required, jefearea_required ], name='dispatch')
+@method_decorator([login_required, jefearea_required], name='dispatch')
 class Evento_List_JefeArea(LoginRequiredMixin, ListView):
     model = Evento
     template_name = 'JefeArea/Evento/evento_list_jefearea.html'
@@ -1294,22 +1280,35 @@ class Evento_List_JefeArea(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         try:
-            perfil_JefeArea = Perfil.objects.get(usuario=self.request.user)
-            queryset = Evento.objects.filter(area=perfil_JefeArea.area)
-            return queryset
+            perfil = Perfil.objects.get(usuario=self.request.user)
+            return (
+                Evento.objects
+                .filter(area=perfil.area)
+                .select_related("area", "departamento")
+                .order_by("fecha_create")
+            )
         except Perfil.DoesNotExist:
             return Evento.objects.none()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         try:
-            perfil_JefeArea = Perfil.objects.get(usuario=self.request.user)
-            context['area'] = perfil_JefeArea.area
+            perfil = Perfil.objects.get(usuario=self.request.user)
+
+            context["area"] = perfil.area
+            context["departamentos"] = (
+                Departamento.objects
+                .filter(area=perfil.area)
+                .order_by("nombre_departamento")
+            )
+
         except Perfil.DoesNotExist:
-            # Maneja el caso en que el usuario no tenga un perfil de JefeArea asociado
-            context['area'] = None  # O establece un valor predeterminado según sea necesario
+            context["area"] = None
+            context["departamentos"] = Departamento.objects.none()
+
         return context
-    
+   
 
 @method_decorator([login_required, jefearea_required ], name='dispatch')
 class Evento_Detail_JefeArea(LoginRequiredMixin, DetailView):
@@ -1407,11 +1406,6 @@ class Informacion_Detail_Investigador_Area(LoginRequiredMixin, DetailView):
             context['tiene_perfil'] = False
         
         return context
-
-
-
-
-
 
     
 #ojojojojooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
@@ -2559,6 +2553,8 @@ class Premio_List_Vicerrector(LoginRequiredMixin, ListView):
         context['tipos_premios_json'] = json.dumps(list(tipos_premios), cls=DjangoJSONEncoder)
         
         return context
+
+
 @method_decorator([login_required, vicerrector_required], name='dispatch')
 class Premio_Detail_Vicerrector(LoginRequiredMixin, DetailView):
     model = Premio
@@ -3052,7 +3048,6 @@ def Area_Update(request, Area_id):
 
 #Colaboradores
 @method_decorator([login_required], name='dispatch')
-
 class Colaboradores_Create(LoginRequiredMixin, CreateView):
     model = Colaborador
     form_class = Colaborador_Form
@@ -3090,13 +3085,14 @@ class Colaboradores_List(LoginRequiredMixin, ListView):
         return queryset.filter(usuario=user)
     
 
-@method_decorator([login_required, admin_staff_required], name='dispatch')
+@method_decorator([login_required], name='dispatch')
 class Colaboradores_Detail(LoginRequiredMixin, DetailView):
     model = Colaborador
     template_name = "Colaboradores/Colaboradores_detail.html"
     context_object_name = 'colaborador'
 
-@method_decorator([login_required, admin_staff_required], name='dispatch')
+
+@method_decorator([login_required], name='dispatch')
 class Colaboradores_Update(LoginRequiredMixin, UpdateView):
     model = Colaborador
     form_class = Colaborador_Form
@@ -3112,19 +3108,21 @@ class Colaboradores_Update(LoginRequiredMixin, UpdateView):
         messages.success(self.request, "Colaborador actualizado exitosamente.")
         return super().form_valid(form)
 
-@method_decorator([login_required, admin_staff_required], name='dispatch')
+
+@login_required
 def Colaboradores_Delete(request, id):
     colaborador = get_object_or_404(Colaborador, id=id)
 
     if request.method == "POST":
         if colaborador.usuario != request.user and not request.user.is_superuser:
-            return JsonResponse({"success": False, "error": "No tienes permiso para eliminar este colaborador."}, status=403)
+            messages.error(request, "No tienes permiso para eliminar este colaborador.")
+            return redirect('Colaboradores_List')
 
         colaborador.delete()
-        return JsonResponse({"success": True})
+        messages.success(request, "Colaborador eliminado correctamente.")
+        return redirect('Colaboradores_List')
 
-    return JsonResponse({"success": False, "error": "Método no permitido"}, status=405)
-
+    return redirect('Colaboradores_List')
 
 # Vistas para TipoPremio
 @method_decorator([login_required, admin_staff_required], name='dispatch')
@@ -3179,13 +3177,15 @@ class TipoPremio_Update(LoginRequiredMixin, UpdateView):
 @login_required
 @admin_staff_required
 def TipoPremio_Delete(request, id):
-    tipo_premio = get_object_or_404(TipoPremio, id=id)
-    if request.method == 'POST':
-        tipo_premio.delete()
+    premio = get_object_or_404(TipoPremio, id=id)
+
+    if request.method == "POST":
+        premio.delete()
         messages.success(request, "Tipo de premio eliminado exitosamente.")
         return redirect('TipoPremio_List')
     
-    return render(request, 'TipoPremio/TipoPremio_confirm_delete.html', {'tipo_premio': tipo_premio})
+    return render(request, 'TipoPremio/TipoPremio_confirm_delete.html', {'tipo_premio': premio})
+
 
 # Vistas para CaracterPremio
 @method_decorator([login_required, admin_staff_required], name='dispatch')

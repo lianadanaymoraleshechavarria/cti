@@ -1171,7 +1171,6 @@ def api_crear_evento_base(request):
             'provincia': request.POST.get('provincia') if request.POST.get('pais', '').lower() == 'cuba' else None,
         }
         
-        # Validar datos
         required_fields = ['titulo', 'tipo_id', 'institucion', 'pais']
         missing_fields = [field for field in required_fields if not data[field]]
         
@@ -1181,18 +1180,16 @@ def api_crear_evento_base(request):
                 'errors': {'general': ['Los siguientes campos son requeridos: ' + ', '.join(missing_fields)]}
             })
         
-        # Validación específica para Cuba
         if data['pais'].lower() == 'cuba':
             if not data['provincia']:
                 return JsonResponse({
                     'success': False, 
                     'errors': {
                         'provincia': ['La provincia es requerida para eventos en Cuba'],
-                        'provincias_disponibles': PROVINCIAS_CUBA  # Envía las provincias disponibles
+                        'provincias_disponibles': PROVINCIAS_CUBA
                     }
                 })
             
-            # Verificar que la provincia seleccionada sea válida
             provincias_validas = [p[0] for p in PROVINCIAS_CUBA]
             if data['provincia'] not in provincias_validas:
                 return JsonResponse({
@@ -1203,15 +1200,11 @@ def api_crear_evento_base(request):
                     }
                 })
         
-        # Obtener las instancias
         tipo_evento = get_object_or_404(TipoEvento, id=data['tipo_id'])
-
-        # Crear el evento base
-        
 
         try:
             institucion = get_object_or_404(Institucion, id=data['institucion'])
-            
+
             evento_base = EventoBase.objects.create(
                 titulo=data['titulo'],
                 tipo=tipo_evento,
@@ -1225,23 +1218,20 @@ def api_crear_evento_base(request):
                 'evento_base': {
                     'id': evento_base.id,
                     'titulo': evento_base.titulo,
-                    'tipo': evento_base.tipo.id,
-                    'tipo_nombre': str(evento_base.tipo),
-                    'institucion': evento_base.institucion.id,
+                    'tipo_id': evento_base.tipo.id if evento_base.tipo else None,
+                    'institucion_id': evento_base.institucion.id if evento_base.institucion else None,
                     'pais': evento_base.pais,
                     'provincia': evento_base.provincia,
-                },
-                'provincias_cuba': PROVINCIAS_CUBA  # Opcional: devolver las provincias en la respuesta exitosa
+                }
             })
             
         except Exception as e:
             return JsonResponse({
                 'success': False, 
                 'errors': {'general': [str(e)]},
-                'provincias_cuba': PROVINCIAS_CUBA  # Devuelve las provincias incluso en caso de error
+                'provincias_cuba': PROVINCIAS_CUBA
             })
     
-    # Para GET requests, puedes devolver las provincias disponibles
     elif request.method == 'GET':
         return JsonResponse({
             'provincias_cuba': PROVINCIAS_CUBA,
@@ -1455,13 +1445,13 @@ class Evento_Create(LoginRequiredMixin, CreateView):
         if not form.instance.titulo:
             form.instance.titulo = "Evento sin título"
 
-        if not form.cleaned_data.get("evento_base"):
+        if not form.cleaned_data.get('evento_base'):
             form.instance.evento_base = EventoBase.objects.create(
-                titulo=form.cleaned_data["titulo"],
-                tipo=form.cleaned_data.get("tipo"),
-                institucion=form.cleaned_data.get("institucion"),
-                pais=form.cleaned_data.get("pais"),
-                provincia=form.cleaned_data.get("provincia"),
+                titulo=form.cleaned_data.get('titulo'),
+                tipo=form.cleaned_data.get('tipo'),
+                institucion=form.cleaned_data.get('institucion'),
+                pais=form.cleaned_data.get('pais'),
+                provincia=form.cleaned_data.get('provincia'),
             )
 
         response = super().form_valid(form)

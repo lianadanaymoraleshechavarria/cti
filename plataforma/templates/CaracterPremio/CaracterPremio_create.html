@@ -1,37 +1,64 @@
 {% extends "base.html" %}
 {% load static %}
 
-<!-- Conatiner CSS -->
 {% block css %}
-<link rel="stylesheet" href=" {% static 'Plataforma/css/estilobeta.css' %}">
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
 {% endblock %}
-<!-- End Conatiner CSS -->
 
 {% block content %}
-<div id="error-container">
+<div class="content">
+    <div class="col">
+        <div class="container-form">
+            <div class="form">
+                <div class="container-fluid py-4">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="title">
+                                    <h3 class="title-text p-3">Nuevo carácter de Premio</h3>
+                                </div>
+                                <form action="." method="POST">
+                                    {% csrf_token %}
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="seccion-formulario">
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="form-group icon-input">
+                                                                <label class="form-control-label required-field"
+                                                                    for="id_nombre">Nombre</label>
+                                                                <div class="input-wrapper">
+                                                                    {{form.nombre}}
+                                                                </div>
+                                                            </div>
+                                                        </div>
 
-</div>
-<div class="container-form">
-    <div class="form">
-        <div class="contact-form">
-            <form action="." method="POST">
-                {% csrf_token %}
-                <h3 class="title">Crear carácter de Premio</h3>
-                <div class="input-container">
-                    <input type="text" name="nombre" class="input" required id="caracter">
-                    <label for="caracter">Nombre</label>
-                    <span>Nombre</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-md-12 text-center">
+                                            <a href="{% url 'CaracterPremio_List' %}"
+                                                class="btn btn-cancelar ml-3">Cancelar</a>
+                                            <button type="submit" class="btn boton-form"><i class="fas fa-check"></i>
+                                                Guardar</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <input type="submit" value="Guardar" class="btn1" id="boton">
-            </form>
+            </div>
         </div>
     </div>
 </div>
 {% endblock %}
 
-<!-- Conatiner JS -->
 {% block js %}
 <script src="{% static 'Plataforma/js/FormularioSelect.js' %}"></script>
 <script src="{% static 'Plataforma/js/Crear area.js' %}"></script>
 {% endblock %}
-<!-- End Conatiner JS -->

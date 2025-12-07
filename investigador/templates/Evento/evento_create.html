@@ -20,7 +20,7 @@
                 <form id="formu" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 <!-- Campo oculto para evento_base -->
-                  <input type="hidden" name="evento_base" id="evento_base" value="{{ form.evento_base.value|default:'' }}">
+                  {{ form.evento_base }}
                   <div class="card-body">
                     <div class="row">
                       <div class="col-md-12">
@@ -201,7 +201,7 @@
 
 <!-- Modal para crear nuevo evento base -->
 <div class="modal fade" id="modal-evento-base" tabindex="-1" aria-labelledby="modalEventoBaseLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="modalEventoBaseLabel">Crear Nuevo Evento Base</h5>
@@ -251,7 +251,7 @@
               <option value="CFG">Cienfuegos</option>
               <option value="SSP">Sancti Spíritus</option>
               <option value="CFG">Ciego de Ávila</option>
-              <option value="CAM">Camagüey</option>
+              <option value="CMG">Camagüey</option>
               <option value="LTU">Las Tunas</option>
               <option value="HOL">Holguín</option>
               <option value="GRA">Granma</option>
@@ -265,7 +265,7 @@
       <div class="modal-footer">
         <div class="col-md-12 text-center">
           <button type="button" class="btn btn-cancelar" data-bs-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn boton-form" id="guardar-evento-base"><i class="fas fa-check"></i> Guardar</button>
+          <button type="button" class="btn boton-form" id="guardar-evento-base"><i class="fas fa-check"></i> Guardar</button>
         </div>
       </div>
     </div>
@@ -275,12 +275,12 @@
 <!-- Modal para agregar colaborador personalizado -->
 <div class="modal fade" id="nuevoUsuarioModal" tabindex="-1" aria-labelledby="nuevoUsuarioModalLabel"
   aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <form id="nuevo-usuario-form">
         {% csrf_token %}
         <div class="modal-header">
-          <h5 class="modal-title">Crear nuevo premiado</h5>
+          <h5 class="modal-title">Crear nuevo autor</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
@@ -315,6 +315,7 @@
 <!-- Buscar Eventos -->
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+
   // --- Referencias ---
   const form = document.getElementById("formu");
 
@@ -322,8 +323,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const eventoDropdown    = document.getElementById("eventoDropdown");
   const selectedEventoDiv = document.getElementById("selected-evento");
 
-  const tituloHiddenInput = document.getElementById("id_titulo");   // campo real de Django
-  const eventoBaseInput   = document.getElementById("evento_base"); // hidden que envías al backend
+  const tituloHiddenInput   = document.getElementById("id_titulo");   // campo real
+  const eventoBaseInput     = document.getElementById("id_evento_base"); // CORRECTO
 
   const tipoInput         = document.getElementById("evento-tipo");
   const institucionInput  = document.getElementById("evento-institucion");
@@ -331,259 +332,259 @@ document.addEventListener("DOMContentLoaded", function () {
   const provinciaInput    = document.getElementById("evento-provincia");
   const provinciaContainer= document.getElementById("evento-provincia-container");
 
-  // --- Helpers ---
-  function syncTituloDesdeInput() {
-    if (tituloHiddenInput && eventoSearchInput) {
-      tituloHiddenInput.value = eventoSearchInput.value;
-    }
-    // Si escribe manualmente, NO hay evento_base seleccionado
-    if (eventoBaseInput) eventoBaseInput.value = "";
-    if (selectedEventoDiv) selectedEventoDiv.textContent = "";
+  // --- Render verde ---
+  function pintarEventoSeleccionado(titulo) {
+    selectedEventoDiv.innerHTML = `
+      <span class="item-badge w-100 p-2">
+        ${titulo}
+      </span>
+    `;
   }
 
-  function setProvinciaSegunPaisYEvento(evento) {
-    if (!provinciaContainer || !provinciaInput || !paisInput) return;
-
-    if ((paisInput.value || "").trim().toLowerCase() === "cuba") {
-      provinciaContainer.style.display = "block";
-      provinciaInput.required = true;
-
-      if (evento && evento.provincia) {
-        const provOption = Array.from(provinciaInput.options)
-          .find(opt =>
-            opt.text.trim().toLowerCase() === evento.provincia.trim().toLowerCase() ||
-            opt.value == evento.provincia
-          );
-        if (provOption) provinciaInput.value = provOption.value;
-      }
-    } else {
-      provinciaContainer.style.display = "none";
-      provinciaInput.required = false;
-      provinciaInput.value = "";
-    }
-  }
-
-  // --- Búsqueda y render del dropdown ---
+  // --- Búsqueda ---
   async function searchEventos(query) {
-    if (!eventoDropdown) return;
+    eventoDropdown.innerHTML = '<div class="p-2 text-center">Buscando eventos...</div>';
+    eventoDropdown.style.display = "block";
 
-    try {
-      eventoDropdown.innerHTML = '<div class="p-2 text-center">Buscando eventos...</div>';
-      eventoDropdown.style.display = "block";
+    const response = await fetch(`/Investigador/api_eventos_base/?search=${encodeURIComponent(query)}`);
+    const eventos = await response.json();
 
-      const response = await fetch(`/Investigador/api_eventos_base/?search=${encodeURIComponent(query)}`);
-      if (!response.ok) throw new Error("Error en la respuesta del servidor");
+    eventoDropdown.innerHTML = "";
 
-      const eventos = await response.json();
-      eventoDropdown.innerHTML = "";
+    if (!eventos.length) {
+      eventoDropdown.innerHTML = '<div class="p-2 text-center">No se encontraron eventos</div>';
+      return;
+    }
 
-      if (!eventos.length) {
-        eventoDropdown.innerHTML = '<div class="p-2 text-center">No se encontraron eventos</div>';
-        return;
-      }
+    eventos.forEach(evento => {
+      const item = document.createElement("div");
+      item.className = "select-item p-2 border-bottom";
+      item.style.cursor = "pointer";
+      item.dataset.id = evento.id;
 
-      eventos.forEach(evento => {
-        const item = document.createElement("div");
-        item.className = "select-item p-2 border-bottom"; // <- esta clase ya la usabas
-        item.style.cursor = "pointer";
+      item.innerHTML = `
+        <div class="fw-bold">${evento.titulo}</div>
+        <div class="text-muted small">${evento.tipo} | ${evento.institucion} | ${evento.pais}${evento.provincia ? " - "+evento.provincia: ""}</div>
+      `;
 
-        // guarda el id para el hidden evento_base
-        item.dataset.id = evento.id;
+      item.addEventListener("click", () => {
 
-        const title = document.createElement("div");
-        title.className = "fw-bold";
-        title.textContent = evento.titulo || "";
+        // input visible
+        eventoSearchInput.value = evento.titulo;
 
-        const info = document.createElement("div");
-        info.className = "text-muted small";
-        info.textContent = `${evento.tipo || ""} | ${evento.institucion || ""} | ${evento.pais || ""}${evento.provincia ? " - " + evento.provincia : ""}`;
+        // campos reales
+        tituloHiddenInput.value = evento.titulo;
+        eventoBaseInput.value   = evento.id;  // AHORA SÍ
 
-        item.appendChild(title);
-        item.appendChild(info);
+        pintarEventoSeleccionado(evento.titulo);
 
-        item.addEventListener("click", () => {
-          // título visible y oculto
-          if (eventoSearchInput)  eventoSearchInput.value  = evento.titulo || "";
-          if (tituloHiddenInput)  tituloHiddenInput.value  = evento.titulo || "";
+        eventoDropdown.style.display = "none";
 
-          // setear evento_base (CLAVE)
-          if (eventoBaseInput)    eventoBaseInput.value    = item.dataset.id || "";
+        // rellenar auxiliares
+        if (tipoInput && evento.tipo) {
+          const tipoOption = Array.from(tipoInput.options)
+            .find(opt =>
+              opt.text.trim().toLowerCase() === (evento.tipo || "").trim().toLowerCase() ||
+              opt.value == evento.tipo
+            );
+          if (tipoOption) tipoInput.value = tipoOption.value;
+        }
 
-          // pintar selección abajo si quieres
-          if (selectedEventoDiv)  selectedEventoDiv.textContent = evento.titulo || "";
+        if (institucionInput && evento.institucion) {
+          const instOption = Array.from(institucionInput.options)
+            .find(opt =>
+              opt.text.trim().toLowerCase() === (evento.institucion || "").trim().toLowerCase() ||
+              opt.value == evento.institucion
+            );
+          if (instOption) institucionInput.value = instOption.value;
+        }
 
-          // setear selects auxiliares
-          if (tipoInput && evento.tipo) {
-            const tipoOption = Array.from(tipoInput.options)
-              .find(opt =>
-                opt.text.trim().toLowerCase() === (evento.tipo || "").trim().toLowerCase() ||
-                opt.value == evento.tipo
-              );
-            if (tipoOption) tipoInput.value = tipoOption.value;
-          }
+        if (paisInput) paisInput.value = evento.pais || "";
 
-          if (institucionInput && evento.institucion) {
-            const instOption = Array.from(institucionInput.options)
-              .find(opt =>
-                opt.text.trim().toLowerCase() === (evento.institucion || "").trim().toLowerCase() ||
-                opt.value == evento.institucion
-              );
-            if (instOption) institucionInput.value = instOption.value;
-          }
-
-          if (paisInput) paisInput.value = evento.pais || "";
-          setProvinciaSegunPaisYEvento(evento);
-
-          if (eventoDropdown) eventoDropdown.style.display = "none";
-          console.log("Evento seleccionado y campos rellenados:", evento);
-        });
-
-        eventoDropdown.appendChild(item);
+        if (paisInput.value.trim().toLowerCase() === "cuba") {
+          provinciaContainer.style.display = "block";
+          provinciaInput.required = true;
+          provinciaInput.value = evento.provincia || "";
+        } else {
+          provinciaContainer.style.display = "none";
+          provinciaInput.required = false;
+          provinciaInput.value = "";
+        }
       });
 
-    } catch (error) {
-      console.error("Error al buscar eventos:", error);
-      if (eventoDropdown) {
-        eventoDropdown.innerHTML = '<div class="p-2 text-center text-danger">Error al buscar eventos</div>';
-      }
+      eventoDropdown.appendChild(item);
+    });
+  }
+
+  // --- Input listeners ---
+  eventoSearchInput.addEventListener("input", () => {
+    tituloHiddenInput.value = eventoSearchInput.value;
+    eventoBaseInput.value = "";    // si escribe a mano, se borra el evento base
+    selectedEventoDiv.innerHTML = "";
+    searchEventos(eventoSearchInput.value.trim());
+  });
+
+  eventoSearchInput.addEventListener("focus", () => {
+    if (!eventoSearchInput.value.trim()) searchEventos("");
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!eventoDropdown.contains(e.target) && e.target !== eventoSearchInput) {
+      eventoDropdown.style.display = "none";
     }
-  }
+  });
 
-  // --- Listeners del input de búsqueda ---
-  if (eventoSearchInput) {
-    eventoSearchInput.addEventListener("input", () => {
-      if (tituloHiddenInput) tituloHiddenInput.value = eventoSearchInput.value;
-      if (eventoBaseInput) eventoBaseInput.value = "";  
-      searchEventos(eventoSearchInput.value.trim());
-    });
-
-    eventoSearchInput.addEventListener("focus", () => {
-      if (!eventoSearchInput.value.trim()) searchEventos("");
-    });
-
-    eventoSearchInput.addEventListener("blur", () => {
-      setTimeout(() => {
-        if (eventoDropdown) eventoDropdown.style.display = "none";
-      }, 200);
-    });
-  }
-
-  // --- Validación del submit ---
-  if (form) {
-    form.addEventListener("submit", (e) => {
-      if (!tituloHiddenInput || !tituloHiddenInput.value.trim()) {
-        e.preventDefault();
-        alert("Debes escribir un título o seleccionar un evento antes de enviar el formulario");
-        if (eventoSearchInput) eventoSearchInput.focus();
-      }
-    });
-  }
 });
 </script>
 <!-- Crear Evento Base-->
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const form = document.getElementById("evento-base-form");
-    const saveBtn = document.getElementById("guardar-evento-base");
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("evento-base-form");
+  const saveBtn = document.getElementById("guardar-evento-base");
 
-    // Campos del formulario principal que se deben autorrellenar después de crear el evento
-    const mainTituloInput = document.getElementById("eventoSearchInput");
-    const mainTipoSelect = document.getElementById("evento-tipo");
-    const mainInstitucionSelect = document.getElementById("evento-institucion");
-    const mainPaisInput = document.getElementById("evento-pais");
-    const mainProvinciaSelect = document.getElementById("evento-provincia");
+  // Campos del formulario principal (inputs reales del form Django)
+  const mainEventoBaseInput = document.getElementById("id_evento_base"); // widget generado por Django (ModelChoiceField)
+  const mainTituloHidden = document.getElementById("id_titulo");         // campo oculto real que envía el título
+  const mainTituloVisible = document.getElementById("eventoSearchInput"); // input visible
+  const mainTipoSelect = document.getElementById("evento-tipo");
+  const mainInstitucionSelect = document.getElementById("evento-institucion");
+  const mainPaisInput = document.getElementById("evento-pais");
+  const mainProvinciaSelect = document.getElementById("evento-provincia");
 
-    // Campos del modal (formulario base)
-    const modalTituloInput = document.getElementById("evento-base-titulo");
-    const modalTipoSelect = document.getElementById("evento-base-tipo");
-    const modalInstitucionSelect = document.getElementById("evento-base-institucion");
-    const modalPaisInput = document.getElementById("evento-base-pais");
-    const modalProvinciaSelect = document.getElementById("evento-base-provincia");
-    const modalProvinciaContainer = document.getElementById("evento-base-provincia-container");
+  // Campos del modal
+  const modalTituloInput = document.getElementById("evento-base-titulo");
+  const modalTipoSelect = document.getElementById("evento-base-tipo");
+  const modalInstitucionSelect = document.getElementById("evento-base-institucion");
+  const modalPaisInput = document.getElementById("evento-base-pais");
+  const modalProvinciaSelect = document.getElementById("evento-base-provincia");
+  const modalProvinciaContainer = document.getElementById("evento-base-provincia-container");
 
-    // Mostrar/ocultar select de provincias según país en el modal
-    if (modalPaisInput) {
-      modalPaisInput.addEventListener('input', function () {
-        const paisValue = this.value.trim().toLowerCase();
-        if (paisValue === 'cuba') {
-          modalProvinciaContainer.style.display = 'block';
-          modalProvinciaSelect.required = true;
-        } else {
-          modalProvinciaContainer.style.display = 'none';
-          modalProvinciaSelect.value = '';
-          modalProvinciaSelect.required = false;
-        }
-      });
+  // Mostrar/ocultar select de provincias en el modal
+  if (modalPaisInput) {
+    const actualizarProvinciaModal = () => {
+      const pv = (modalPaisInput.value || "").trim().toLowerCase();
+      if (pv === "cuba") {
+        modalProvinciaContainer.style.display = "block";
+        modalProvinciaSelect.required = true;
+      } else {
+        modalProvinciaContainer.style.display = "none";
+        modalProvinciaSelect.required = false;
+        modalProvinciaSelect.value = "";
+      }
+    };
+    modalPaisInput.addEventListener("input", actualizarProvinciaModal);
+    modalPaisInput.addEventListener("change", actualizarProvinciaModal);
+    actualizarProvinciaModal();
+  }
+
+  // Evitar que el form del modal haga submit normal si tiene action en HTML
+  if (form) {
+    form.addEventListener("submit", e => e.preventDefault());
+  }
+
+  // Guardar evento base y autorrellenar formulario principal
+  saveBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+
+    // Validación mínima en cliente
+    if (!modalTituloInput || !modalTituloInput.value.trim()) {
+      alert("El título es obligatorio.");
+      modalTituloInput && modalTituloInput.focus();
+      return;
     }
 
-    // Guardar evento base y autorrellenar campos del formulario principal
-    saveBtn.addEventListener("click", async (e) => {
-      e.preventDefault();
+    const data = {
+      titulo: modalTituloInput.value.trim(),
+      tipo: modalTipoSelect ? modalTipoSelect.value : "",
+      institucion: modalInstitucionSelect ? modalInstitucionSelect.value : "",
+      pais: modalPaisInput ? modalPaisInput.value.trim() : "",
+      provincia: modalProvinciaSelect ? modalProvinciaSelect.value : ""
+    };
 
-      const data = {
-        titulo: modalTituloInput.value.trim(),
-        tipo: modalTipoSelect.value,
-        institucion: modalInstitucionSelect.value,
-        pais: modalPaisInput.value.trim(),
-        provincia: modalProvinciaSelect.value,
-      };
+    try {
+      const response = await fetch("/Investigador/api_crear_evento_base/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "X-CSRFToken": getCookie("csrftoken")
+        },
+        body: new URLSearchParams(data).toString()
+      });
 
-      try {
-        const response = await fetch("/Investigador/api_crear_evento_base/", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-            "X-CSRFToken": getCookie("csrftoken"),
-          },
-          body: new URLSearchParams(data).toString(),
-        });
+      // parseo JSON (si el backend devuelve texto por error, verás excepción en catch)
+      const result = await response.json();
+      console.log("api_crear_evento_base ->", result);
 
-        const result = await response.json();
-
-        if (!result.success) {
-          console.error("Errores:", result.errors);
-          alert("Error al crear el evento: " + JSON.stringify(result.errors));
-          return;
-        }
+      if (!result.success) {
+        console.error("Errores servidor:", result.errors);
+        alert("Error al crear el evento base: " + JSON.stringify(result.errors));
+        return;
+      }
 
       const evento = result.evento_base;
 
-      // Autorrellenar campos del formulario principal
-      if (mainTituloInput) mainTituloInput.value = evento.titulo;
-      if (mainTipoSelect) mainTipoSelect.value = evento.tipo;
-      if (mainInstitucionSelect) mainInstitucionSelect.value = evento.institucion.id || evento.institucion;
-      if (mainPaisInput) mainPaisInput.value = evento.pais;
-      if (mainProvinciaSelect) mainProvinciaSelect.value = evento.provincia || '';
+      // 1) Rellenar inputs visibles
+      if (mainTituloVisible) mainTituloVisible.value = evento.titulo || "";
+      if (mainTipoSelect && evento.tipo_id !== undefined && evento.tipo_id !== null) mainTipoSelect.value = evento.tipo_id;
+      if (mainInstitucionSelect && evento.institucion_id !== undefined && evento.institucion_id !== null) mainInstitucionSelect.value = evento.institucion_id;
+      if (mainPaisInput) mainPaisInput.value = evento.pais || "";
+      if (mainProvinciaSelect) mainProvinciaSelect.value = evento.provincia || "";
 
-       const mainProvinciaContainer = mainProvinciaSelect.closest(".col-md-6");
-
-      // Mostrar u ocultar select de provincia según país
-      if (mainPaisInput.value.trim().toLowerCase() === "cuba") {
-        if (mainProvinciaContainer) mainProvinciaContainer.style.display = "block";
-        mainProvinciaSelect.required = true;
-      } else {
-        if (mainProvinciaContainer) mainProvinciaContainer.style.display = "none";
-        mainProvinciaSelect.required = false;
-        mainProvinciaSelect.value = "";
+      // actualizar label verde
+      const selectedEventoDiv = document.getElementById("selected-evento");
+      if (selectedEventoDiv) {
+        selectedEventoDiv.innerHTML = `<span class="item-badge w-100 p-2">${evento.titulo}</span>`;
       }
-      
-      // Cerrar modal con Bootstrap
+
+      // 2) IMPORTANT: actualizar los inputs reales que envía Django
+      if (mainTituloHidden) {
+        mainTituloHidden.value = evento.titulo || "";
+        // disparar eventos para que listeners/client-side detecten el cambio
+        mainTituloHidden.dispatchEvent(new Event('input', { bubbles: true }));
+        mainTituloHidden.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+
+      if (mainEventoBaseInput) {
+        mainEventoBaseInput.value = evento.id;
+        // dispatch change para que Django widget JS, validaciones u observers reaccionen
+        mainEventoBaseInput.dispatchEvent(new Event('input', { bubbles: true }));
+        mainEventoBaseInput.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+
+      // Si hay listeners que muestran/ocultan provincia, forzamos actualización:
+      if (mainPaisInput) {
+        mainPaisInput.dispatchEvent(new Event('input', { bubbles: true }));
+        mainPaisInput.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+
+      // Asegurarse que cualquier validación que bloquee el submit (por ejemplo required) no quede en estado inválido.
+      // Ejemplo: quitar disabled del botón submit si por alguna razón quedó deshabilitado.
+      const submitBtn = document.querySelector("#formu button[type='submit']");
+      if (submitBtn && submitBtn.disabled) submitBtn.disabled = false;
+
+      // Cerrar modal correctamente y eliminar backdrop residual
       const modalEl = document.getElementById("modal-evento-base");
-      if (modalEl) {
-        const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-        modal.hide();
-        document.body.classList.remove('modal-open');
-        const backdrops = document.querySelectorAll('.modal-backdrop');
-        backdrops.forEach(b => b.remove());
-      }
+      let modalInstance = bootstrap.Modal.getInstance(modalEl);
+      if (!modalInstance) modalInstance = new bootstrap.Modal(modalEl);
+      modalInstance.hide();
 
-    } catch (error) {
-      console.error("Error en la petición:", error);
-      alert("Error en la petición al servidor.");
+      // limpieza final del backdrop y clases
+      document.body.classList.remove("modal-open");
+      document.body.style.removeProperty("overflow");
+      document.body.style.removeProperty("padding-right");
+      document.querySelectorAll(".modal-backdrop").forEach(b => b.remove());
+
+      // opcional: poner foco al campo título real
+      if (mainTituloVisible) mainTituloVisible.focus();
+
+    } catch (err) {
+      console.error("Error en petición a api_crear_evento_base:", err);
+      // si el servidor devolvió HTML o texto en vez de JSON, muéstralo en consola
+      alert("Error en la petición al servidor. Revisa la consola del navegador.");
     }
   });
 
-  // Función para obtener CSRF token en Django
+  // helper CSRF
   function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== "") {
