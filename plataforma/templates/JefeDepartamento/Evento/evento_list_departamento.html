@@ -35,7 +35,8 @@
         {% for e in eventos %}
         <tr>
           <td style="text-align: center;">{{forloop.counter}}</td>
-          <td style="text-align:start;">{{e.titulo}}</td>
+          <td style="text-align:start;"><a class="details" style="color:#4f69c7"
+              href="{% url 'Evento_Detail_JefeDepartamento' e.id %}">{{e.titulo}}</a></td>
           <td style="text-align:start;">{{e.tipo}}</td>
           <td style="text-align:start;">{{e.modalidad}}</td>
           <td style="text-align:start;">{{e.institucion}}</td>
@@ -100,6 +101,20 @@
 <!--DataTables responsivo-->
 <script src="{% static 'libs/Datatable/JS/dataTables.responsive.js' %}"></script>
 <script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>
-<!--Inicializar DataTables-->
-<script src="{% static 'libs/Datatable/JS/Eventos.js' %}"></script>
+<script>
+  $(document).ready(function () {
+
+    var table = $('#Eventos').DataTable({
+      responsive: true,
+      dom: 'Bfrtip',
+      buttons: [
+        'copy', 'csv', 'excel', 'pdf', 'print'
+      ],
+      language: {
+        url: "{% static 'libs/Datatable/dataTableLenguage.json' %}"
+      }
+    });
+
+  });
+</script>
 {% endblock %}

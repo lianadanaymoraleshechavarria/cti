@@ -165,7 +165,7 @@ class EventoBaseForm(forms.ModelForm):
         widgets = {
             'titulo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Título del evento base'}),
             'tipo': forms.Select(attrs={'type':'text','name':'tipo','id':'ortipoganismo','class':'form-control', 'placeholder':'Seleccione el tipo de evento'}),
-            'institucion': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Institución responsable'}),
+            'institucion': forms.Select(attrs={'type':'text','name':'institucion','id':'evento-institucion','class':'form-control required-field', 'placeholder':'Institución responsable'}),
             'pais': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'País'}),
             'provincia': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Provincia (solo si es Cuba)'}),
         }
@@ -175,16 +175,6 @@ class EventoBaseForm(forms.ModelForm):
         # Filtrar provincias solo de Cuba (si estás usando un modelo Provincia)
         if hasattr(self, 'fields') and 'provincia' in self.fields:
             self.fields['provincia'].required = False
-        
-        # Configurar formatos de fecha aceptados
-        self.fields['fecha'].input_formats = ['%Y-%m', '%m/%Y', '%Y/%m']
-    
-    def clean_fecha(self):
-        fecha = self.cleaned_data.get('fecha')
-        if fecha:
-            # Forzar el día a 1 para consistencia en la base de datos
-            return fecha.replace(day=1)
-        return fecha
     
 
 class TipoEventoForm(forms.ModelForm):

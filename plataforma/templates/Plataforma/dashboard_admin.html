@@ -5,8 +5,8 @@
 <link rel="stylesheet" href="{% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
 <link rel="stylesheet" href="{% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
 <link rel="stylesheet" href="{% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
-<link rel="stylesheet" href="{% static 'css/datatableSD.css' %}">
 <link rel="stylesheet" href="{% static 'css/Dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'css/datatableSD.css' %}">
 <style>
 </style>
 {% endblock %}
@@ -138,59 +138,36 @@
             </section>
 
             <!-- Investigators Table -->
-            <section id="tablaTramites" style="padding-top:30px; padding-bottom: 15px;">
-                <div class="card card-a p-3 h-100">
+            <section style="padding-top:15px; padding-bottom: 15px;">
                     <div class="card-header">
                         <h5 class="card-title title-t" style="text-align: start;">
                             Investigadores
                         </h5>
                     </div>
                     <table id="Investigadores" class="display table table-striped table-hover table-primary" style="width:100%; height: 100%;">
-                        <thead class="encabezado" style="background-color:#0d6efd;">
+                        <thead class="encabezado">
                             <tr>
-                                <th scope="col" style="color: white; text-align: center;">No</th>
-                                <th scope="col" style="color: white; text-align: center;">Investigador</th>
-                                <th scope="col" style="color: white; text-align: center;">Email</th>
-                                <th scope="col" style="color: white; text-align: center;">Cargo</th>
-                                <th scope="col" style="color: white; text-align: center;">Categoría Docente</th>
-                                <th scope="col" style="color: white; text-align: center;">Categoría Científica</th>
-                                <th scope="col" style="color: white; text-align: center;">Área</th>
+                                <th scope="col" style="text-align: center;">No</th>
+                                <th scope="col">Investigador</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Cargo</th>
+                                <th scope="col">Área</th>
+                                <th scope="col">Departamento</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for i in investigadores %}
                             <tr>
                                 <td style="text-align: center;">{{ forloop.counter }}</td>
-                                <td style="text-align: center;">{{ i.nombre }} {{ i.apellidos }}</td>
-                                <td style="text-align: center;">{{ i.email }}</td>
-                                <td style="text-align: center;">{{ i.cargo }}</td>
-                                <td style="text-align: center;">{{ i.categoria_docente }}</td>
-                                <td style="text-align: center;">{{ i.categoria_cientifica }}</td>
-                                <td style="text-align: center;">{{ i.area }}</td>
+                                <td>{{ i.nombre }} {{ i.apellidos }}</td>
+                                <td>{{ i.email }}</td>
+                                <td>{{ i.cargo }}</td>
+                                <td>{{ i.area }}</td>
+                                <td>{{ i.departamento }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
-                </div>
-
-                <!-- User Summary Card -->
-                <div class="container mt-4">
-                    <div class="row justify-content-center">
-                        <div class="col-md-6">
-                            <div class="card user-summary-card shadow">
-                                <div class="card-header text-center">
-                                    <h4 class="mb-0">
-                                        <i class="bx bx-users me-2"></i>
-                                        Resumen de Usuarios
-                                    </h4>
-                                </div>
-                                <div class="card-body text-center">
-                                    <h1 class="display-1 mb-3">{{ total_usuarios }}</h1>
-                                    <p class="lead mb-0">Usuarios registrados en el sistema</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </section>
 
@@ -206,7 +183,6 @@
 {% endblock %}
 
 {% block js %}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="{% static 'libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
 <script src="{% static 'libs/Datatable/JS/dataTables.js' %}"></script>
 <script src="{% static 'libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
@@ -227,135 +203,79 @@
 <script src="{% static 'libs/Highcharts/code/modules/offline-exporting.js' %}"></script>
 <script src="{% static 'libs/Highcharts/code/modules/export-data.js' %}"></script>
 <script src="{% static 'libs/Highcharts/graficos.js' %}"></script>
-
 <script>
 $(document).ready(function() {
-    // Global chart variables
-    let investigadoresChart, pendientesChart;
-    let loadingTimeout;
-    
-    // Initial data
-    let dataGraficaInvestigadores = {{ data_grafica_investigadores|safe }};
-    let dataGraficaEstados = {{ datos_gráfico_pendientes|safe }};
+    // -------------------------
+    // 1. Inicializar DataTable una sola vez
+    // -------------------------
+    if (!$.fn.DataTable.isDataTable('#Investigadores')) {
+        $('#Investigadores').DataTable({
+            responsive: true,
+            paging: true,
+            searching: true,
+            ordering: true,
+            order: [[0, 'asc']],
+            language: { url: '//cdn.datatables.net/plug-ins/1.13.5/i18n/es-ES.json' },
+            lengthMenu: [10, 25, 50, 100],
+            pageLength: 10
+        });
+    }
 
-    // Initialize charts
-    function initializeCharts() {
-        // Investigators Chart
+    // -------------------------
+    // 2. Inicializar Gráficas
+    // -------------------------
+    var investigadoresChart, pendientesChart;
+
+    var dataGraficaInvestigadores = {{ data_grafica_investigadores|safe }};
+    var dataGraficaEstados = {{ datos_gráfico_pendientes|safe }};
+
+    function renderCharts(investigadoresData, pendientesData) {
+        // Gráfica Investigadores
+        if (investigadoresChart) { investigadoresChart.destroy(); }
         investigadoresChart = Highcharts.chart('graficaInvestigador', {
-            chart: {
-                type: 'column',
-                animation: {
-                    duration: 1000
-                }
-            },
-            title: {
-                text: 'Cantidad de<br>Investigadores por<br>Área',
-                style: {
-                    fontSize: '16px',
-                    fontWeight: 'bold'
-                }
-            },
+            chart: { type: 'column', animation: { duration: 1000 } },
+            title: { text: 'Cantidad de Investigadores por Área', style: { fontSize: '16px', fontWeight: 'bold' } },
             xAxis: {
-                categories: dataGraficaInvestigadores.map(function(item) { 
-                    return item.area__nombre_area || item.area || 'Sin especificar'; 
-                }),
-                labels: {
-                    rotation: -45,
-                    style: {
-                        fontSize: '12px'
-                    }
-                }
+                categories: investigadoresData.map(function(item) { return item.area__nombre_area || item.area || 'Sin especificar'; }),
+                labels: { rotation: -45, style: { fontSize: '12px' } }
             },
-            yAxis: {
-                title: {
-                    text: 'Cantidad de Investigadores'
-                },
-                min: 0
-            },
+            yAxis: { title: { text: 'Cantidad de Investigadores' }, min: 0 },
             plotOptions: {
-                column: {
-                    borderRadius: 5,
-                    dataLabels: {
-                        enabled: true,
-                        format: '{point.y}'
-                    }
-                }
+                column: { borderRadius: 5, dataLabels: { enabled: true, format: '{point.y}' } }
             },
-            series: [{
-                name: 'Investigadores',
-                data: dataGraficaInvestigadores.map(function(item) { return item.count; }),
-                color: '#667eea'
-            }],
-            exporting: {
-                enabled: true,
-                buttons: {
-                    contextButton: {
-                        menuItems: ['downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
-                    }
-                }
-            }
+            series: [{ name: 'Investigadores', data: investigadoresData.map(item => item.count), color: '#667eea' }],
+            exporting: { enabled: true, buttons: { contextButton: { menuItems: ['downloadPNG','downloadJPEG','downloadPDF','downloadSVG'] } } }
         });
 
-        // Pending Items Pie Chart
+        // Gráfica Pendientes
+        if (pendientesChart) { pendientesChart.destroy(); }
         pendientesChart = Highcharts.chart('marcadores', {
-            chart: {
-                plotBackgroundColor: null,
-                plotBorderWidth: null,
-                plotShadow: false,
-                type: 'pie',
-                animation: {
-                    duration: 1000
-                }
-            },
-            title: {
-                text: 'Cantidad de Premios, Proyectos, Eventos, Programas y Artículos Pendientes',
-                style: {
-                    fontSize: '16px',
-                    fontWeight: 'bold'
-                }
-            },
-            tooltip: {
-                pointFormat: '{series.name}: <b>{point.y}</b><br>Porcentaje: <b>{point.percentage:.1f}%</b>'
-            },
-            accessibility: {
-                point: {
-                    valueSuffix: '%'
-                }
-            },
-            plotOptions: {
-                pie: {
-                    allowPointSelect: true,
-                    cursor: 'pointer',
-                    dataLabels: {
-                        enabled: true,
-                        format: '<b>{point.name}</b>: {point.y}'
-                    },
-                    showInLegend: true
-                }
-            },
+            chart: { type: 'pie', animation: { duration: 1000 } },
+            title: { text: 'Cantidad de Premios, Proyectos, Eventos, Programas y Artículos Pendientes', style: { fontSize: '16px', fontWeight: 'bold' } },
+            tooltip: { pointFormat: '{series.name}: <b>{point.y}</b><br>Porcentaje: <b>{point.percentage:.1f}%</b>' },
+            accessibility: { point: { valueSuffix: '%' } },
+            plotOptions: { pie: { allowPointSelect: true, cursor: 'pointer', dataLabels: { enabled: true, format: '<b>{point.name}</b>: {point.y}' }, showInLegend: true } },
             series: [{
                 name: 'Total',
                 colorByPoint: true,
                 data: [
-                    {name: 'Artículos', y: dataGraficaEstados['Artículos'], color: '#FF6B6B'},
-                    {name: 'Premios', y: dataGraficaEstados['Premios'], color: '#4ECDC4'},
-                    {name: 'Proyectos', y: dataGraficaEstados['Proyectos'], color: '#45B7D1'},
-                    {name: 'Eventos', y: dataGraficaEstados['Eventos'], color: '#96CEB4'},
-                    {name: 'Programas', y: dataGraficaEstados['Programas'], color: '#FFEAA7'}
+                    {name: 'Artículos', y: pendientesData['Artículos'], color: '#FF6B6B'},
+                    {name: 'Premios', y: pendientesData['Premios'], color: '#4ECDC4'},
+                    {name: 'Proyectos', y: pendientesData['Proyectos'], color: '#45B7D1'},
+                    {name: 'Eventos', y: pendientesData['Eventos'], color: '#96CEB4'},
+                    {name: 'Programas', y: pendientesData['Programas'], color: '#FFEAA7'}
                 ]
             }],
-            exporting: {
-                enabled: true,
-                buttons: {
-                    contextButton: {
-                        menuItems: ['downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
-                    }
-                }
-            }
+            exporting: { enabled: true, buttons: { contextButton: { menuItems: ['downloadPNG','downloadJPEG','downloadPDF','downloadSVG'] } } }
         });
     }
 
-    // Update statistics cards with animation
+    // Inicializar las gráficas con datos de template
+    renderCharts(dataGraficaInvestigadores, dataGraficaEstados);
+
+    // -------------------------
+    // 3. Actualizar estadísticas y gráficas al cambiar año
+    // -------------------------
     function updateStatsCards(data) {
         const cards = [
             {id: '#totalArticulos', value: data.totals.articulos},
@@ -363,275 +283,46 @@ $(document).ready(function() {
             {id: '#totalProyectos', value: data.totals.proyectos},
             {id: '#totalEventos', value: data.totals.eventos}
         ];
-
-        cards.forEach(function(card) {
-            const $element = $(card.id);
-            const currentValue = parseInt($element.text()) || 0;
-            const newValue = card.value;
-            
-            // Animate number change
-            $({count: currentValue}).animate({count: newValue}, {
+        cards.forEach(card => {
+            const $el = $(card.id);
+            const current = parseInt($el.text()) || 0;
+            const target = card.value;
+            $({count: current}).animate({count: target}, {
                 duration: 1000,
-                step: function() {
-                    $element.text(Math.floor(this.count));
-                },
-                complete: function() {
-                    $element.text(newValue);
-                }
+                step: function() { $el.text(Math.floor(this.count)); },
+                complete: function() { $el.text(target); }
             });
         });
     }
 
-    // Show loading overlay
-    function showLoading() {
-        $('#loadingOverlay').css('display', 'flex');
-        // Add timeout to prevent infinite loading issues
-        loadingTimeout = setTimeout(function() {
-            if ($('#loadingOverlay').css('display') === 'flex') {
-                hideLoading();
-                showToast('Error: Tiempo de espera agotado', 'danger');
-            }
-        }, 30000); // 30 seconds timeout
-    }
+    $('#yearFilter').on('change', function() {
+        const selectedYear = $(this).val();
+        $.ajax({
+            url: '{% url "api_dashboard_data" %}',
+            method: 'GET',
+            data: { year: selectedYear },
+            success: function(data) {
+                updateStatsCards(data);
+                renderCharts(data.charts.investigadores, data.pending);
 
-    // Hide loading overlay
-    function hideLoading() {
-        clearTimeout(loadingTimeout);
-        $('#loadingOverlay').hide();
-    }
-
-    // Show toast notification
-    function showToast(message, type = 'success') {
-        const toastHtml = `
-            <div class="toast align-items-center text-white bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="d-flex">
-                    <div class="toast-body">
-                        ${message}
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-            </div>
-        `;
-        
-        // Create toast container if it doesn't exist
-        if (!$('#toastContainer').length) {
-            $('body').append('<div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>');
-        }
-        
-        const $toast = $(toastHtml);
-        $('#toastContainer').append($toast);
-        
-        const toast = new bootstrap.Toast($toast[0]);
-        toast.show();
-        
-        // Remove toast element after it's hidden
-        $toast.on('hidden.bs.toast', function() {
-            $(this).remove();
+                // Actualizar URL sin recargar
+                const newUrl = new URL(window.location);
+                selectedYear === 'all' ? newUrl.searchParams.delete('year') : newUrl.searchParams.set('year', selectedYear);
+                window.history.pushState({}, '', newUrl);
+            },
+            error: function(xhr, status, error) { console.error(error); }
         });
-    }
-
-      // Year filter change handler
-  $('#yearFilter').on('change', function() {
-    const selectedYear = $(this).val();
-    
-    // Eliminar la carga visual
-    // showLoading(); // Comentar o eliminar esta línea
-    
-    // Make AJAX request to get filtered data
-    $.ajax({
-        url: '{% url "api_dashboard_data" %}',
-        method: 'GET',
-        data: {
-            year: selectedYear
-        },
-        success: function(data) {
-            // Update statistics cards
-            updateStatsCards(data);
-            
-            // Update charts with error handling
-            updateCharts(data, function() {
-                // hideLoading(); // Comentar o eliminar esta línea
-            });
-            
-            // Update URL without page reload
-            const newUrl = new URL(window.location);
-            if (selectedYear === 'all') {
-                newUrl.searchParams.delete('year');
-            } else {
-                newUrl.searchParams.set('year', selectedYear);
-            }
-            window.history.pushState({}, '', newUrl);
-            
-            // Show success message
-            const yearText = selectedYear === 'all' ? 'todos los años' : selectedYear;
-            showToast(`Dashboard actualizado para ${yearText}`, 'success');
-        },
-        error: function(xhr, status, error) {
-            console.error('Error fetching dashboard data:', error);
-            showToast('Error al actualizar el dashboard. Por favor, intente nuevamente.', 'danger');
-            // hideLoading(); // Comentar o eliminar esta línea
-        }
     });
-  });
 
-
-
-    // Function to update charts with callback
-    function updateCharts(data, callback) {
-        try {
-            // Clear existing charts
-            if (investigadoresChart) {
-                investigadoresChart.destroy();
-            }
-            if (pendientesChart) {
-                pendientesChart.destroy();
-            }
-            
-            // Create new charts
-            investigadoresChart = Highcharts.chart('graficaInvestigador', {
-                chart: {
-                    type: 'column',
-                    animation: {
-                        duration: 1000
-                    }
-                },
-                title: {
-                    text: 'Cantidad de<br>Investigadores por<br>Área',
-                    style: {
-                        fontSize: '16px',
-                        fontWeight: 'bold'
-                    }
-                },
-                xAxis: {
-                    categories: data.charts.investigadores.map(function(item) {
-                        return item.area__nombre_area || item.area || 'Sin especificar';
-                    }),
-                    labels: {
-                        rotation: -45,
-                        style: {
-                            fontSize: '12px'
-                        }
-                    }
-                },
-                yAxis: {
-                    title: {
-                        text: 'Cantidad de Investigadores'
-                    },
-                    min: 0
-                },
-                plotOptions: {
-                    column: {
-                        borderRadius: 5,
-                        dataLabels: {
-                            enabled: true,
-                            format: '{point.y}'
-                        }
-                    }
-                },
-                series: [{
-                    name: 'Investigadores',
-                    data: data.charts.investigadores.map(function(item) { 
-                        return item.count; 
-                    }),
-                    color: '#667eea'
-                }],
-                exporting: {
-                    enabled: true,
-                    buttons: {
-                        contextButton: {
-                            menuItems: ['downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
-                        }
-                    }
-                },
-                // Error handling
-                load: function() {
-                    callback();
-                },
-                error: function() {
-                    console.error('Error loading investigators chart');
-                    callback();
-                }
-            });
-
-            pendientesChart = Highcharts.chart('marcadores', {
-                chart: {
-                    plotBackgroundColor: null,
-                    plotBorderWidth: null,
-                    plotShadow: false,
-                    type: 'pie',
-                    animation: {
-                        duration: 1000
-                    }
-                },
-                title: {
-                    text: 'Cantidad de Premios, Proyectos, Eventos, Programas y Artículos Pendientes',
-                    style: {
-                        fontSize: '16px',
-                        fontWeight: 'bold'
-                    }
-                },
-                tooltip: {
-                    pointFormat: '{series.name}: <b>{point.y}</b><br>Porcentaje: <b>{point.percentage:.1f}%</b>'
-                },
-                accessibility: {
-                    point: {
-                        valueSuffix: '%'
-                    }
-                },
-                plotOptions: {
-                    pie: {
-                        allowPointSelect: true,
-                        cursor: 'pointer',
-                        dataLabels: {
-                            enabled: true,
-                            format: '<b>{point.name}</b>: {point.y}'
-                        },
-                        showInLegend: true
-                    }
-                },
-                series: [{
-                    name: 'Total',
-                    colorByPoint: true,
-                    data: [
-                        {name: 'Artículos', y: data.pending['Artículos'], color: '#FF6B6B'},
-                        {name: 'Premios', y: data.pending['Premios'], color: '#4ECDC4'},
-                        {name: 'Proyectos', y: data.pending['Proyectos'], color: '#45B7D1'},
-                        {name: 'Eventos', y: data.pending['Eventos'], color: '#96CEB4'},
-                        {name: 'Programas', y: data.pending['Programas'], color: '#FFEAA7'}
-                    ]
-                }],
-                exporting: {
-                    enabled: true,
-                    buttons: {
-                        contextButton: {
-                            menuItems: ['downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
-                        }
-                    }
-                },
-                // Error handling
-                load: function() {
-                    callback();
-                },
-                error: function() {
-                    console.error('Error loading pending items chart');
-                    callback();
-                }
-            });
-        } catch (error) {
-            console.error('Error updating charts:', error);
-            callback();
-        }
-    }
-
-    // Initialize charts on page load
-    initializeCharts();
-
-    // Handle browser back/forward buttons
-    window.addEventListener('popstate', function(event) {
+    // -------------------------
+    // 4. Manejar back/forward buttons
+    // -------------------------
+    window.addEventListener('popstate', function() {
         const urlParams = new URLSearchParams(window.location.search);
         const year = urlParams.get('year') || 'all';
         $('#yearFilter').val(year).trigger('change');
     });
 });
 </script>
+
 {% endblock %}

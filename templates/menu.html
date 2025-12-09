@@ -70,64 +70,61 @@
                                 <i class="fas fa-edit me-2"></i> Editar Opciones
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'editar_nombres_roles' %}">
-                                        Roles
+                                <li><a class="dropdown-item" href="{% url 'editar_nombres_roles' %}">Roles</a></li>
+                                <li><a class="dropdown-item" href="{% url 'Cargo_List' %}">Cargo</a></li>
+                                <li><a class="dropdown-item" href="{% url 'CategoriaCientificaList' %}">Categorías
+                                        Científicas</a></li>
+                                <li><a class="dropdown-item" href="{% url 'CategoriaDocenteList' %}">Categorías
+                                        Docentes</a></li>
+                                <li><a class="dropdown-item" href="{% url 'BasesDatosList' %}">Bases de Datos</a></li>
+                                <!-- Submenú de Eventos -->
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">
+                                        <i class="fas fa-calendar me-2"></i> Eventos
                                     </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="{% url 'evento_base_list' %}">Eventos
+                                                Base</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'TipoEvento_List' %}">Tipos de
+                                                Eventos</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'CarcterEvento_List' %}">Carácteres de
+                                                Eventos</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'Modalidad_List' %}">Modalidades de
+                                                Eventos</a></li>
+                                    </ul>
                                 </li>
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'Cargo_List' %}">
-                                        Cargo
+                                <!-- Submenú de Premios -->
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">
+                                        <i class="fas fa-award me-2"></i> Premios
                                     </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="{% url 'TipoPremio_List' %}">Tipos de
+                                                Premios</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'CaracterPremio_List' %}">Carácteres
+                                                de Premios</a></li>
+                                    </ul>
                                 </li>
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'CategoriaCientificaList' %}">
-                                        Categorías Científicas
+                                <li><a class="dropdown-item" href="{% url 'Revista_Libro_Conferencia_List' %}">Crear
+                                        Revistas, Libros u Otros</a></li>
+                                <!-- Submenú de Programas -->
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">
+                                        <i class="fas fa-check-circle me-2"></i> Programas
                                     </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'CategoriaDocenteList' %}">
-                                        Categorías Docentes
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'BasesDatosList' %}">
-                                        Bases de Datos
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'TipoEvento_List' %}">
-                                        Tipos de Eventos
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'CarcterEvento_List' %}">
-                                        Carácteres de Eventos
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'Modalidad_List' %}">
-                                        Modalidades de Eventos
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'TipoPremio_List' %}">
-                                        Tipos de Premios
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'CaracterPremio_List' %}">
-                                        Carácteres de Premios
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'Revista_Libro_Conferencia_List' %}">
-                                        Crear Revistas, Libros u Otros
-                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="{% url 'TipoPrograma_List' %}">Tipos de
+                                                Programas</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'SectorEstrategico_List' %}">Sector
+                                                Estratégico</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'LineaInvestigacion_List' %}">Líneas
+                                                de Investigación</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'TipoParticipacion_List' %}">Tipos de
+                                                Participación</a></li>
+                                    </ul>
                                 </li>
                             </ul>
                         </li>
-
                     </ul>
                 </li>
             </ul>
@@ -177,6 +174,8 @@
                                         <i class="fas fa-calendar me-2"></i> Eventos
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="{% url 'evento_base_list' %}">Eventos
+                                                Base</a></li>
                                         <li><a class="dropdown-item" href="{% url 'TipoEvento_List' %}">Tipos de
                                                 Eventos</a></li>
                                         <li><a class="dropdown-item" href="{% url 'CarcterEvento_List' %}">Carácteres de
@@ -260,6 +259,8 @@
                                         <i class="fas fa-calendar me-2"></i> Eventos
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="{% url 'evento_base_list' %}">Eventos
+                                                Base</a></li>
                                         <li><a class="dropdown-item" href="{% url 'TipoEvento_List' %}">Tipos de
                                                 Eventos</a></li>
                                         <li><a class="dropdown-item" href="{% url 'CarcterEvento_List' %}">Carácteres de

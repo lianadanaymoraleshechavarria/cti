@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="content">
+  <div class="col">
+    <div class="container-form">
+      <div class="form">
+        <div class="container-fluid py-4">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="title">
+                  <h3 class="title-text p-3">Detalles del Evento Base</h3>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div class="seccion-formulario">
+                        <h5>Datos del Evento</h5>
+                        <!-- Datos del Evento -->
+                        <div class="row">
+                          <div class="col-md-12">
+                            <div class="form-group">
+                              <label class="form-control-label">Título</label>
+                              <input type="text" class="form-control readonly-input" value="{{ evento.titulo }}"
+                                readonly>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label class="form-control-label">Tipo de evento</label>
+                              <input type="text" class="form-control readonly-input" value="{{ evento.tipo }}" readonly>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label class="form-control-label">Institución</label>
+                              <input type="text" class="form-control readonly-input" value="{{ evento.institucion }}"
+                                readonly>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label class="form-control-label">País</label>
+                              <input type="text" class="form-control readonly-input"
+                                value="{{ evento.pais|default:'No especificado' }}" readonly>
+                            </div>
+                          </div>
+                          {% if evento.provincia %}
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label class="form-control-label">Provincia</label>
+                              <input type="text" class="form-control readonly-input" value="{{ evento.provincia }}"
+                                readonly>
+                            </div>
+                          </div>
+                          {% endif %}
+                        </div>
+                      </div>
+                      <!-- Botones -->
+                      <div class="row mt-4">
+                        <div class="col-md-12 text-center">
+                          <a href="{% url 'evento_base_list' %}" class="btn btn-cancelar ml-3">
+                            <i class="fas fa-arrow-left me-2"></i>Volver
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'js/validations.js' %}"></script>
+{% endblock %}

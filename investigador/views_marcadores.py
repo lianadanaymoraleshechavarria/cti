@@ -1076,59 +1076,45 @@ class Dashboard_Investigador(LoginRequiredMixin, TemplateView):
 
 
 # Vistas para EventoBase
-class EventoBaseListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+@method_decorator(login_required, name='dispatch')
+class EventoBaseListView(ListView):
     model = EventoBase
-    template_name = 'configuracion/evento_base_list.html'
-    context_object_name = 'eventos_base'
+    template_name = 'EventoBase/evento_base_list.html'
+    context_object_name = 'eventos'
     
-    def test_func(self):
-        # Solo administradores pueden acceder
-        return self.request.user.is_staff
-
-
-class EventoBaseCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+@method_decorator(login_required, name='dispatch')
+class EventoBaseCreateView(CreateView):
     model = EventoBase
     form_class = EventoBaseForm
-    template_name = 'configuracion/evento_base_form.html'
+    template_name = 'EventoBase/evento_base_create.html'
     success_url = reverse_lazy('evento_base_list')
-    
-    def test_func(self):
-        # Solo administradores pueden acceder
-        return self.request.user.is_staff
     
     def form_valid(self, form):
         messages.success(self.request, 'Evento base creado correctamente.')
         return super().form_valid(form)
 
+@method_decorator(login_required, name='dispatch')
+class EventoBaseDetailView(DetailView):
+    model = EventoBase
+    template_name =  "EventoBase/evento_base_detail.html" 
+    context_object_name = 'evento'
 
-class EventoBaseUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+@method_decorator(login_required, name='dispatch')
+class EventoBaseUpdateView(UpdateView):
     model = EventoBase
     form_class = EventoBaseForm
-    template_name = 'configuracion/evento_base_form.html'
+    template_name = 'EventoBase/evento_base_update.html'
     success_url = reverse_lazy('evento_base_list')
-    
-    def test_func(self):
-        # Solo administradores pueden acceder
-        return self.request.user.is_staff
     
     def form_valid(self, form):
         messages.success(self.request, 'Evento base actualizado correctamente.')
         return super().form_valid(form)
 
 
-class EventoBaseDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    model = EventoBase
-    template_name = 'configuracion/evento_base_confirm_delete.html'
-    success_url = reverse_lazy('evento_base_list')
-    
-    def test_func(self):
-        # Solo administradores pueden acceder
-        return self.request.user.is_staff
-    
-    def delete(self, request, *args, **kwargs):
-        messages.success(self.request, 'Evento base eliminado correctamente.')
-        return super().delete(request, *args, **kwargs)
-
+def EventoBaseDelete(request,id):
+    evento = EventoBase.objects.get(id=id)
+    evento.delete()
+    return redirect("evento_base_list")
 
 # API para autocompletado de eventos base
 @login_required

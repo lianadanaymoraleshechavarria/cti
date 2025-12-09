@@ -4,7 +4,7 @@ from .forms import(
                     Perfil_Jefedepartamento_Form)
 from investigador.models import  (Articulo, Evento, Programa, Proyecto, Premio, Perfil, Area, Departamento,
                                   Categoria_cientifica, Categoria_docente, CarcterEvento, Cargo, Revista_Libro_Conferencia, 
-                                  Notificacion, Colaborador, LineaInvestigacion, TipoParticipacion,
+                                  Notificacion, Colaborador, LineaInvestigacion, TipoParticipacion, Provincia,
                                 Indexacion, EventoBase, TipoEvento, TipoPremio, CaracterPremio, Modalidad, EntidadParticipante, TipoPrograma, SectorEstrategico)
 from django.views.generic import ListView, DetailView, TemplateView, CreateView, UpdateView, DeleteView
 from investigador.forms import (Area_Form, Departamento_Form, CategoriaCientificaForm, CategoriaDocenteForm, CarcterEvento_Form, CaracterPremioForm, 
@@ -220,10 +220,10 @@ class Dashboard_Vicerrector(LoginRequiredMixin, TemplateView):
         year_filter = {}
         if selected_year != 'all' and selected_year.isdigit():
             year_int = int(selected_year)
-            articulos_filter = Q(fecha_creacion__year=year_int)
-            premios_filter = Q(fecha__year=year_int)
+            articulos_filter = Q(fecha_create__year=year_int)
+            premios_filter = Q(fecha_create__year=year_int)
             proyectos_filter = Q(fecha_inicio__year=year_int)
-            eventos_filter = Q(fecha__year=year_int)
+            eventos_filter = Q(fecha_create__year=year_int)
             programas_filter = Q(fecha_create__year=year_int)
         else:
             articulos_filter = Q()
@@ -319,10 +319,10 @@ class Dashboard_Admin(LoginRequiredMixin, TemplateView):
         # Filtros por año
         if selected_year != 'all' and selected_year.isdigit():
             year_int = int(selected_year)
-            articulos_filter = Q(fecha_creacion__year=year_int)
-            premios_filter = Q(fecha__year=year_int)
+            articulos_filter = Q(fecha_create__year=year_int)
+            premios_filter = Q(fecha_create__year=year_int)
             proyectos_filter = Q(fecha_inicio__year=year_int)
-            eventos_filter = Q(fecha__year=year_int)
+            eventos_filter = Q(fecha_create__year=year_int)
             programas_filter = Q(fecha_create__year=year_int)
         else:
             articulos_filter = Q()
@@ -425,10 +425,10 @@ class Dashboard_JefeArea(LoginRequiredMixin, TemplateView):
         # Year filtering
         if selected_year != 'all' and selected_year.isdigit():
             year_int = int(selected_year)
-            articulos_filter = Q(fecha_creacion__year=year_int)
-            premios_filter = Q(fecha__year=year_int)
+            articulos_filter = Q(fecha_create__year=year_int)
+            premios_filter = Q(fecha_create__year=year_int)
             proyectos_filter = Q(fecha_inicio__year=year_int)
-            eventos_filter = Q(fecha__year=year_int)
+            eventos_filter = Q(fecha_create__year=year_int)
             programas_filter = Q(fecha_create__year=year_int)
         else:
             articulos_filter = Q()
@@ -535,10 +535,10 @@ class Dashboard_JefeDepartamento(LoginRequiredMixin, TemplateView):
         # Year filtering
         if selected_year != 'all' and selected_year.isdigit():
             year_int = int(selected_year)
-            articulos_filter = Q(fecha_creacion__year=year_int)
-            premios_filter = Q(fecha__year=year_int)
+            articulos_filter = Q(fecha_create__year=year_int)
+            premios_filter = Q(fecha_create__year=year_int)
             proyectos_filter = Q(fecha_inicio__year=year_int)
-            eventos_filter = Q(fecha__year=year_int)
+            eventos_filter = Q(fecha_create__year=year_int)
             programas_filter = Q(fecha_create__year=year_int)
         else:
             articulos_filter = Q()
@@ -763,6 +763,7 @@ def CambiarRol(request, id):
         'rol_actual': usuario.get_rol_display(),
     })
 
+
 class UsuarioAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         qs = Usuario.objects.all()
@@ -774,6 +775,7 @@ class UsuarioAutocomplete(autocomplete.Select2QuerySetView):
                 Q(last_name__icontains=self.q)
             )
         return qs
+
 
 @login_required
 @vicerrector_required
@@ -830,6 +832,7 @@ def editar_nombres_roles(request):
         "roles": roles_data,
     })
 
+
 # Inicio
 def Inicio(request):
     return render(request,"plataforma/Inicio.html")
@@ -881,19 +884,13 @@ def ListaUsuarios(request):
     
     return render(request, "Plataforma/lista_usuarios.html", context)
 
+
 @login_required
 @pure_admin_required
 def EliminarUsuario(request,id):
     usuario = Usuario.objects.get(id=id)
     usuario.delete()
     return redirect("Usuarios")
-
-
-
-
-
-
-    
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>ROl JefeArea>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 #........................Perfil........................
@@ -1011,8 +1008,7 @@ class Articulo_List_JefeArea(LoginRequiredMixin, ListView):
             context['area'] = None
         return context
 
- 
-    
+  
 @method_decorator([login_required, jefearea_required ], name='dispatch')
 class Articulo_Detail_JefeArea(LoginRequiredMixin, DetailView):
     model = Articulo
@@ -1027,6 +1023,7 @@ class Articulo_Detail_JefeArea(LoginRequiredMixin, DetailView):
         context['Articulo_Revista'] = articulo.doi and articulo.issn.strip()!= ''#Variables para controlar qué formularios mostrar
         context['Articulo_Publicacion'] = articulo.volumen and articulo.capitulo.strip()!= ''
         return context
+
 
 @login_required
 @jefearea_required
@@ -1117,12 +1114,14 @@ class Premio_Detail_JefeArea(LoginRequiredMixin, DetailView):
         context['premios_usuario'] = premios_usuario 
         return context
 
+
 @login_required
 @jefearea_required
 def Premio_Delete_JefeArea(request, id):
     premio = get_object_or_404(Premio, id=id)
     premio.delete()
     return redirect(reverse_lazy('Premio_List_JefeArea'))
+
 
 @login_required
 @admin_staff_required
@@ -1189,6 +1188,7 @@ class Proyecto_Detail_JefeArea(LoginRequiredMixin, DetailView):
         proyecto_usuario = Proyecto.objects.filter(usuario=self.request.user)  # Obtiene todos los premios del usuario actual
         context['proyecto_usuario'] = proyecto_usuario  # Agrega los premios del usuario al contexto
         return context
+
 
 @login_required
 @jefearea_required
@@ -1309,7 +1309,6 @@ class Evento_List_JefeArea(LoginRequiredMixin, ListView):
 
         return context
    
-
 @method_decorator([login_required, jefearea_required ], name='dispatch')
 class Evento_Detail_JefeArea(LoginRequiredMixin, DetailView):
     model = Evento
@@ -1322,6 +1321,7 @@ class Evento_Detail_JefeArea(LoginRequiredMixin, DetailView):
         context['evento_usuario'] = evento_usuario  
         return context
 
+
 @login_required
 @jefearea_required
 def Evento_Delete_JefeArea(request, id):
@@ -1330,7 +1330,6 @@ def Evento_Delete_JefeArea(request, id):
     return redirect(reverse_lazy('Evento_List_JefeArea'))
 
 
-    
 @login_required
 @admin_staff_required
 def Cambiar_Estado_Evento(request, id):
@@ -1422,7 +1421,6 @@ class List_Investigador_JefeArea(LoginRequiredMixin, ListView):
             return Perfil.objects.filter(area=area_JefeArea)
         except ObjectDoesNotExist:
             return redirect('Perfil_Create_JefeArea')
-
 
     
 #ojojojojooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
@@ -1674,7 +1672,6 @@ class Premio_List_Areas(LoginRequiredMixin, ListView):
         
         return context
 
-
 @method_decorator([login_required, jefearea_required], name='dispatch')
 class Articulo_List_Areas(LoginRequiredMixin, ListView):
     model = Articulo
@@ -1879,24 +1876,25 @@ class Premio_List_JefeDepartamento(LoginRequiredMixin, ListView):
         try:
             perfil = Perfil.objects.select_related('departamento').get(usuario=self.request.user)
             
-            if not hasattr(perfil, 'departamento') or not perfil.departamento:
+            if not perfil.departamento:
                 return Premio.objects.none()
                 
-            return Premio.objects.filter(departamento=perfil.departamento)
+            return (
+                Premio.objects
+                .filter(departamento=perfil.departamento)
+                .annotate(contador_autores=Count("premiados_set", distinct=True))  # ← CONTADOR
+            )
             
         except Perfil.DoesNotExist:
             return Premio.objects.none()
 
     def get_context_data(self, **kwargs):
-        """
-        Agrega información del departamento al contexto
-        """
         context = super().get_context_data(**kwargs)
         
         try:
             perfil = Perfil.objects.select_related('departamento').get(usuario=self.request.user)
             context['departamento'] = perfil.departamento
-            context['jefe_departamento'] = perfil  # Agrega todo el perfil por si necesitas más datos
+            context['jefe_departamento'] = perfil
         except Perfil.DoesNotExist:
             context['departamento'] = None
             context['jefe_departamento'] = None
@@ -1928,6 +1926,7 @@ class Proyecto_List_JefeDepartamento(LoginRequiredMixin, ListView):
     model = Proyecto
     template_name = 'JefeDepartamento/Proyecto/proyecto_list.html'
     context_object_name = 'proyectos'
+
 
 def get_queryset(self):
     try:
@@ -2036,8 +2035,13 @@ class Evento_List_JefeDepartamento(LoginRequiredMixin, ListView):
             perfil = Perfil.objects.get(usuario=self.request.user)
             if not perfil.departamento:
                 return Evento.objects.none()
-                
-            return Evento.objects.filter(departamento=perfil.departamento)
+
+            return (
+                Evento.objects
+                .filter(departamento=perfil.departamento)
+                .annotate(contador_autores=Count("eventos_set", distinct=True))
+            )
+
         except Perfil.DoesNotExist:
             return Evento.objects.none()
 
@@ -2136,8 +2140,6 @@ class Curriculo_Investigador_Departamento(LoginRequiredMixin, View):
         
         # Pasa los resultados a la plantilla
         return render(request, 'JefeDepartamento/curriculo_list_user.html', {'resultados': resultados, 'perfil_investigador': perfil_investigador})
-    
-
 
 #........................... exportaciones  ...........
 @method_decorator([login_required, jefedepartamento_required ], name='dispatch')
@@ -2262,10 +2264,6 @@ class Proyecto_List_Departamento(LoginRequiredMixin, ListView):
         
         return context
     
-#..........................................................................................
-
-
-
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>    VICERRECTOR       >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -2465,8 +2463,6 @@ def Perfil_Update_Vicerrector(request, perfil_id):
     else:
         form = Perfil_Form_Vicerrector(instance=perfil)  
         return render(request, 'Vicerrector/Perfil/perfil_update_vicerrector.html', {'form': form})
-    
-
 
 #........................EVENTO.............................
 
@@ -2565,9 +2561,6 @@ class Premio_Detail_Vicerrector(LoginRequiredMixin, DetailView):
         premio = self.get_object()
         # Add any additional context data here
         return context
-
-
-
 
 @method_decorator([login_required, vicerrector_required ], name='dispatch')
 class Premio_Detail_Vicerrector(LoginRequiredMixin, DetailView):
@@ -2671,7 +2664,6 @@ class Proyecto_List_Vicerrector(LoginRequiredMixin, ListView):
         context['sector_estrategico'] = json.dumps(list(sector_estrategico), cls=DjangoJSONEncoder)
         
         return context
-
 
 @method_decorator([login_required, vicerrector_required ], name='dispatch')
 class Proyecto_Detail_Vicerrector(LoginRequiredMixin, DetailView):
@@ -2781,7 +2773,6 @@ class Programa_Detail_Vicerrector(LoginRequiredMixin, DetailView):
         return context
 
 
-
 @login_required
 @vicerrector_required
 def programa_estadisticas_api(request):
@@ -2820,7 +2811,6 @@ def programa_estadisticas_api(request):
         'total_programas': Programa.objects.count()
     })
 
-
 #...............................Investigador...................................
 
 @method_decorator([login_required, vicerrector_required], name='dispatch')
@@ -2839,8 +2829,6 @@ class List_Investigador_Vicerrector(LoginRequiredMixin, ListView):
         context['categoria'] = Categoria_docente.objects.all()
         context['departamentos'] = Departamento.objects.select_related('area').order_by('nombre_departamento')
         return context
-        
-
 
 @method_decorator([login_required, vicerrector_required], name='dispatch')
 class List_Investigador_Vicerrector_Usuario(LoginRequiredMixin, ListView):
@@ -2857,9 +2845,7 @@ class List_Investigador_Vicerrector_Usuario(LoginRequiredMixin, ListView):
         context['areas'] = Area.objects.all()
         context['departamentos'] = Departamento.objects.select_related('area').order_by('nombre_departamento')
         return context
-
- 
-#.......................................................       
+     
 #.......................................................
 
 @method_decorator([login_required, vicerrector_required ], name='dispatch')
@@ -2899,14 +2885,10 @@ class Curriculo_Investigador_Vicerrector(LoginRequiredMixin, View):
         # Pasa los resultados a la plantilla
         return render(request, 'Vicerrector/curriculo_list_user_vicerrector.html', {'resultados': resultados, 'perfil_investigador': perfil_investigador})
     
-
 @method_decorator([login_required, vicerrector_required ], name='dispatch')
 class Informacion_Detail_Investigador_Vicerrector(LoginRequiredMixin, DetailView):
     model = Perfil
     template_name = "Vicerrector/informacion_investigador_vicerrector.html"
-
-
-
 
 
 @login_required
@@ -2965,7 +2947,6 @@ class Revista_Libro_Conferencia_Detail(LoginRequiredMixin,  DetailView):
     model = Revista_Libro_Conferencia
     template_name = "RevistaLibro/revista_libro_conferencia_detail.html" 
     context_object_name = 'objeto'
-
 
 
 @login_required
@@ -3371,14 +3352,7 @@ class CategoriaDocenteUpdate(LoginRequiredMixin, UpdateView):
         messages.success(self.request, "Categoría docente actualizada exitosamente.")
         return super().form_valid(form)
 
-
-
-
-
-
 #bASE DE DATOS 
-
-
 
 @method_decorator([login_required, vicerrector_required], name='dispatch') 
 class BasesDatosCreate(LoginRequiredMixin, CreateView):
@@ -3464,6 +3438,7 @@ class CategoriaCientificaDetail(LoginRequiredMixin, DetailView):
     template_name = "Categorias/CategoriaCientifica_detail.html" 
     context_object_name = 'categoria_cientifica'
 
+
 def CategoriaCientificaDelete(request, id):
     categoria = get_object_or_404(Categoria_cientifica, id=id)
     try:
@@ -3488,8 +3463,6 @@ class CategoriaCientificaUpdate(LoginRequiredMixin, UpdateView):
         messages.success(self.request, "Categoría científica actualizada exitosamente.")
         return super().form_valid(form)
 
-
-
 #.......................Departamento....................................
 
 @method_decorator([login_required, vicerrector_required ], name='dispatch')
@@ -3512,7 +3485,6 @@ class Departamento_Create(LoginRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
         context['areas'] = Area.objects.all()
         return context
-
         
 @method_decorator([login_required, vicerrector_required ], name='dispatch')
 class Departamento_List(LoginRequiredMixin, ListView):
@@ -3528,7 +3500,6 @@ class Departamento_Detail(LoginRequiredMixin, DetailView):
 
     def get_queryset(self):
         return Departamento.objects.filter(usuario=self.request.user)
-
 
 
 def Departamento_Delete(request, id):
@@ -4064,7 +4035,6 @@ def LineaInvestigacion_Delete(request, id):
         return redirect('LineaInvestigacion_List')
     
     return render(request, 'LineaInvestigacion/LineaInvestigacion_confirm_delete.html', {'linea_investigacion': linea_investigacion})
-
 
 
 @method_decorator([login_required, pure_admin_required], name='dispatch')

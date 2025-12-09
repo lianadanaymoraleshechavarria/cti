@@ -1,15 +1,19 @@
 {% extends "base.html" %}
 {% load static %}
 
-<!-- Container CSS -->
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/Dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/dataTables.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/buttons.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'libs/Datatable/CSS/responsive.bootstrap5.css' %}">
+<link rel="stylesheet" href="{% static 'css/datatableSD.css' %}">
 {% endblock %}
 
 {% block content %}
 <div class="main">
     <main class="content-inside px-3 py-2">
         <div class="container-fluid">
+            <!-- Year Filter Section -->
             <div class="year-filter-container">
                 <div class="row align-items-center">
                     <div class="col-md-6">
@@ -32,6 +36,8 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Statistics Cards -->
             <div class="row d-flex justify-content-center">
                 <div class="col-lg-3 col-6">
                     <div class="small-box bg-box-one">
@@ -91,7 +97,7 @@
                 </div>
             </div>
 
-            <!-- Charts Section -->
+            <!-- Carusel -->
             <section>
                 <div class="row mt-4">
                     <div class="col-lg-5 mb-lg-0 mb-4">
@@ -142,35 +148,30 @@
             </section>
 
             <!-- Investigators Table -->
-            <section id="tablaTramites" style="padding-top:30px; padding-bottom: 15px;">
-                <div class="card card-a p-3 h-100">
-                    <div class="card-header">
-                        <h5 class="card-title title-t" style="text-align: start;">
+            <section style="padding-top:15px; padding-bottom: 15px;">
+                <div class="card-header">
+                        <h5 class="card-title title-t" style="text-align: start; margin-bottom: 20px;">
                             Investigadores
                         </h5>
                     </div>
                     <table id="Investigadores" class="display table table-striped table-hover table-primary" style="width:100%; height: 100%;">
-                        <thead class="encabezado" style="background-color:#0d6efd;">
+                        <thead class="encabezado">
                             <tr>
-                                <th scope="col" style="color: white; text-align: center;">No</th>
-                                <th scope="col" style="color: white; text-align: center;">Investigador</th>
-                                <th scope="col" style="color: white; text-align: center;">Email</th>
-                                <th scope="col" style="color: white; text-align: center;">Cargo</th>
-                                <th scope="col" style="color: white; text-align: center;">Categoría Docente</th>
-                                <th scope="col" style="color: white; text-align: center;">Categoría Científica</th>
-                                <th scope="col" style="color: white; text-align: center;">Área</th>
+                                <th scope="col" style="text-align: center;">No</th>
+                                <th scope="col">Nombre</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Cargo</th>
+                                <th scope="col">Departamento</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for i in investigadores %}
                                 <tr>
                                     <td style="text-align: center;">{{ forloop.counter }}</td>
-                                    <td style="text-align: center;">{{ i.nombre }} {{ i.apellidos }}</td>
-                                    <td style="text-align: center;">{{ i.email }}</td>
-                                    <td style="text-align: center;">{{ i.cargo }}</td>
-                                    <td style="text-align: center;">{{ i.categoria_docente }}</td>
-                                    <td style="text-align: center;">{{ i.categoria_cientifica }}</td>
-                                    <td style="text-align: center;">{{ i.area }}</td>
+                                    <td>{{ i.nombre }} {{ i.apellidos }}</td>
+                                    <td>{{ i.email }}</td>
+                                    <td>{{ i.cargo }}</td>
+                                    <td>{{ i.departamento }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -193,7 +194,6 @@
 
 <!-- Container JS -->
 {% block js %}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="{% static 'libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
 <script src="{% static 'libs/Datatable/JS/dataTables.js' %}"></script>
 <script src="{% static 'libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
@@ -204,161 +204,99 @@
 <script src="{% static 'libs/Datatable/JS/vfs_fonts.js' %}"></script>
 <script src="{% static 'libs/Datatable/JS/buttons.html5.min.js' %}"></script>
 <script src="{% static 'libs/Datatable/JS/buttons.print.min.js' %}"></script>
-<script src="{% static 'libs/Datatable/JS/bottons.colVis.min.js' %}"></script>
+<script src="{% static 'libs/Datatable/JS/buttons.colVis.min.js' %}"></script>
 <script src="{% static 'libs/Datatable/JS/dataTables.responsive.js' %}"></script>
 <script src="{% static 'libs/Datatable/JS/responsive.bootstrap5.js' %}"></script>
-<script src="{% static 'libs/Datatable/JS/Investigadores_expo.js' %}"></script>
+
 <script src="{% static 'libs/Highcharts/code/highcharts.js' %}"></script>
 <script src="{% static 'libs/Highcharts/code/modules/accessibility.js' %}"></script>
 <script src="{% static 'libs/Highcharts/code/modules/exporting.js' %}"></script>
 <script src="{% static 'libs/Highcharts/code/modules/offline-exporting.js' %}"></script>
 <script src="{% static 'libs/Highcharts/code/modules/export-data.js' %}"></script>
-<script src="{% static 'libs/Highcharts/graficos.js' %}"></script>
 
 <script>
 $(document).ready(function() {
-    // Global chart variables
-    let investigadoresChart, pendientesChart;
-    let loadingTimeout;
-    
-    // Initial data from Django template
+
+    // ----------------------------
+    // Variables globales
+    // ----------------------------
+    let investigadoresChart = null;
+    let pendientesChart = null;
+    let loadingTimeout = null;
+
     let dataGraficaInvestigadores = {{ data_grafica_investigadores|safe }};
     let dataGraficaEstados = {{ datos_gráfico_pendientes|safe }};
 
-    // Initialize charts
+    // ----------------------------
+    // Función para inicializar DataTable
+    // ----------------------------
+    $('#Investigadores').DataTable({
+        responsive: true,
+        autoWidth: false,
+        dom: 'Bfrtip',
+        buttons: [
+            { extend: 'copyHtml5' },
+            { extend: 'excelHtml5' },
+            { extend: 'csvHtml5' },
+            { extend: 'pdfHtml5' },
+            { extend: 'print' }
+        ],
+        language: {
+            url: "{% static 'libs/Datatable/dataTableLenguage.json' %}"
+        }
+    });
+
+    // ----------------------------
+    // Función para inicializar gráficos
+    // ----------------------------
     function initializeCharts() {
-        // Investigators Chart
+        // Destruir gráficos antiguos
+        if (investigadoresChart) investigadoresChart.destroy();
+        if (pendientesChart) pendientesChart.destroy();
+
+        // Gráfico de Investigadores
         investigadoresChart = Highcharts.chart('graficaInvestigador', {
-            chart: {
-                type: 'column',
-                animation: {
-                    duration: 1000
-                }
-            },
-            title: {
-                text: 'Cantidad de Investigadores por Departamento',
-                style: {
-                    fontSize: '16px',
-                    fontWeight: 'bold'
-                }
-            },
+            chart: { type: 'column', animation: { duration: 1000 } },
+            title: { text: 'Cantidad de Investigadores por Departamento', style: { fontSize: '16px', fontWeight: 'bold' } },
             xAxis: {
                 categories: dataGraficaInvestigadores.map(item => item.departamento__nombre_departamento || 'Sin especificar'),
-                labels: {
-                    rotation: -45,
-                    style: {
-                        fontSize: '12px'
-                    }
-                }
+                labels: { rotation: -45, style: { fontSize: '12px' } }
             },
-            yAxis: {
-                title: {
-                    text: 'Cantidad de Investigadores'
-                },
-                min: 0
-            },
-            plotOptions: {
-                column: {
-                    borderRadius: 5,
-                    dataLabels: {
-                        enabled: true,
-                        format: '{point.y}'
-                    }
-                }
-            },
-            series: [{
-                name: 'Investigadores',
-                data: dataGraficaInvestigadores.map(item => item.count),
-                color: '#667eea'
-            }],
-            exporting: {
-                enabled: true,
-                buttons: {
-                    contextButton: {
-                        menuItems: ['downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
-                    }
-                }
-            }
+            yAxis: { title: { text: 'Cantidad de Investigadores' }, min: 0 },
+            plotOptions: { column: { borderRadius: 5, dataLabels: { enabled: true, format: '{point.y}' } } },
+            series: [{ name: 'Investigadores', data: dataGraficaInvestigadores.map(item => item.count), color: '#667eea' }],
+            exporting: { enabled: true, buttons: { contextButton: { menuItems: ['downloadPNG','downloadJPEG','downloadPDF','downloadSVG'] } } }
         });
 
-        // Pending Items Pie Chart
+        // Gráfico de Elementos Pendientes
         pendientesChart = Highcharts.chart('marcadores', {
-            chart: {
-                type: 'pie',
-                animation: {
-                    duration: 1000
-                }
-            },
-            title: {
-                text: 'Elementos Pendientes por Tipo',
-                style: {
-                    fontSize: '16px',
-                    fontWeight: 'bold'
-                }
-            },
-            tooltip: {
-                pointFormat: '{series.name}: <b>{point.y}</b> ({point.percentage:.1f}%)'
-            },
+            chart: { type: 'pie', animation: { duration: 1000 } },
+            title: { text: 'Elementos Pendientes por Tipo', style: { fontSize: '16px', fontWeight: 'bold' } },
+            tooltip: { pointFormat: '{series.name}: <b>{point.y}</b> ({point.percentage:.1f}%)' },
             plotOptions: {
-                pie: {
-                    allowPointSelect: true,
-                    cursor: 'pointer',
-                    dataLabels: {
-                        enabled: true,
-                        format: '<b>{point.name}</b>: {point.y}'
-                    },
-                    showInLegend: true
-                }
+                pie: { allowPointSelect: true, cursor: 'pointer', dataLabels: { enabled: true, format: '<b>{point.name}</b>: {point.y}' }, showInLegend: true }
             },
             series: [{
                 name: 'Total',
                 colorByPoint: true,
                 data: [
-                    {name: 'Artículos', y: dataGraficaEstados['Artículos'], color: '#FF6B6B'},
-                    {name: 'Premios', y: dataGraficaEstados['Premios'], color: '#4ECDC4'},
-                    {name: 'Proyectos', y: dataGraficaEstados['Proyectos'], color: '#45B7D1'},
-                    {name: 'Eventos', y: dataGraficaEstados['Eventos'], color: '#96CEB4'},
-                    {name: 'Programas', y: dataGraficaEstados['Programas'], color: '#FFEAA7'}
+                    {name: 'Artículos', y: dataGraficaEstados['Artículos'] || 0, color: '#FF6B6B'},
+                    {name: 'Premios', y: dataGraficaEstados['Premios'] || 0, color: '#4ECDC4'},
+                    {name: 'Proyectos', y: dataGraficaEstados['Proyectos'] || 0, color: '#45B7D1'},
+                    {name: 'Eventos', y: dataGraficaEstados['Eventos'] || 0, color: '#96CEB4'},
+                    {name: 'Programas', y: dataGraficaEstados['Programas'] || 0, color: '#FFEAA7'}
                 ]
             }],
-            exporting: {
-                enabled: true,
-                buttons: {
-                    contextButton: {
-                        menuItems: ['downloadPNG', 'downloadJPEG', 'downloadPDF', 'downloadSVG']
-                    }
-                }
-            }
+            exporting: { enabled: true, buttons: { contextButton: { menuItems: ['downloadPNG','downloadJPEG','downloadPDF','downloadSVG'] } } }
         });
     }
 
-    // Update statistics cards with animation
-    function updateStatsCards(data) {
-        const cards = [
-            {id: '#totalArticulos', value: data.totals.articulos},
-            {id: '#totalPremios', value: data.totals.premios},
-            {id: '#totalProyectos', value: data.totals.proyectos},
-            {id: '#totalEventos', value: data.totals.eventos}
-        ];
+    // Inicializar gráficos al cargar la página
+    initializeCharts();
 
-        cards.forEach(card => {
-            const $element = $(card.id);
-            const currentValue = parseInt($element.text()) || 0;
-            const newValue = card.value;
-            
-            $({count: currentValue}).animate({count: newValue}, {
-                duration: 1000,
-                step: function() {
-                    $element.text(Math.floor(this.count));
-                },
-                complete: function() {
-                    $element.text(newValue);
-                }
-            });
-        });
-    }
-
-    // Show loading overlay
+    // ----------------------------
+    // Funciones de carga y notificaciones
+    // ----------------------------
     function showLoading() {
         $('#loadingOverlay').css('display', 'flex');
         loadingTimeout = setTimeout(() => {
@@ -367,111 +305,87 @@ $(document).ready(function() {
         }, 15000);
     }
 
-    // Hide loading overlay
     function hideLoading() {
         clearTimeout(loadingTimeout);
         $('#loadingOverlay').hide();
     }
 
-    // Show toast notification
-    function showToast(message, type = 'success') {
+    function showToast(message, type='success') {
         const toastHtml = `
             <div class="toast align-items-center text-white bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="d-flex">
-                    <div class="toast-body">
-                        ${message}
-                    </div>
+                    <div class="toast-body">${message}</div>
                     <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
             </div>
         `;
-        
-        if (!$('#toastContainer').length) {
-            $('body').append('<div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>');
-        }
-        
+        if (!$('#toastContainer').length) $('body').append('<div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>');
         const $toast = $(toastHtml);
         $('#toastContainer').append($toast);
-        
-        const toast = new bootstrap.Toast($toast[0]);
-        toast.show();
-        
-        $toast.on('hidden.bs.toast', function() {
-            $(this).remove();
+        new bootstrap.Toast($toast[0]).show();
+        $toast.on('hidden.bs.toast', function(){ $(this).remove(); });
+    }
+
+    // ----------------------------
+    // Actualizar tarjetas de estadísticas
+    // ----------------------------
+    function updateStatsCards(data) {
+        const cards = [
+            {id:'#totalArticulos', value:data.totals.articulos},
+            {id:'#totalPremios', value:data.totals.premios},
+            {id:'#totalProyectos', value:data.totals.proyectos},
+            {id:'#totalEventos', value:data.totals.eventos}
+        ];
+        cards.forEach(card => {
+            const $el = $(card.id);
+            const current = parseInt($el.text()) || 0;
+            $({count: current}).animate({count: card.value}, {
+                duration: 1000,
+                step: function(){ $el.text(Math.floor(this.count)); },
+                complete: function(){ $el.text(card.value); }
+            });
         });
     }
 
-    // Year filter change handler
+    // ----------------------------
+    // Manejar cambio de año
+    // ----------------------------
     $('#yearFilter').on('change', function() {
-        const selectedYear = $(this).val();
-        
+        const year = $(this).val();
         showLoading();
-        
-        // Make AJAX request to get filtered data
         $.ajax({
             url: '{% url "api_dashboard_data" %}',
             method: 'GET',
-            data: {
-                year: selectedYear
-            },
+            data: { year: year },
             success: function(data) {
-                // Update statistics cards
                 updateStatsCards(data);
-                
-                // Update charts
-                if (investigadoresChart) {
-                    investigadoresChart.update({
-                        series: [{
-                            data: data.charts.investigadores.map(item => item.count)
-                        }],
-                        xAxis: {
-                            categories: data.charts.investigadores.map(item => item.departamento__nombre_departamento || 'Sin especificar')
-                        }
-                    }, true);
-                }
-                
-                if (pendientesChart) {
-                    pendientesChart.series[0].setData([
-                        {name: 'Artículos', y: data.pending['Artículos'], color: '#FF6B6B'},
-                        {name: 'Premios', y: data.pending['Premios'], color: '#4ECDC4'},
-                        {name: 'Proyectos', y: data.pending['Proyectos'], color: '#45B7D1'},
-                        {name: 'Eventos', y: data.pending['Eventos'], color: '#96CEB4'},
-                        {name: 'Programas', y: data.pending['Programas'], color: '#FFEAA7'}
-                    ], true);
-                }
-                
-                // Update URL without page reload
+                dataGraficaInvestigadores = data.charts.investigadores;
+                dataGraficaEstados = data.pending;
+                initializeCharts();
                 const newUrl = new URL(window.location);
-                if (selectedYear === 'all') {
-                    newUrl.searchParams.delete('year');
-                } else {
-                    newUrl.searchParams.set('year', selectedYear);
-                }
+                if (year === 'all') newUrl.searchParams.delete('year');
+                else newUrl.searchParams.set('year', year);
                 window.history.pushState({}, '', newUrl);
-                
-                // Show success message
-                const yearText = selectedYear === 'all' ? 'todos los años' : selectedYear;
-                showToast(`Dashboard actualizado para ${yearText}`, 'success');
-                
+                showToast(`Dashboard actualizado para ${year === 'all' ? 'todos los años' : year}`, 'success');
                 hideLoading();
             },
-            error: function(xhr, status, error) {
-                console.error('Error fetching dashboard data:', error);
-                showToast('Error al actualizar el dashboard. Por favor, intente nuevamente.', 'danger');
+            error: function(err) {
+                console.error('Error al actualizar dashboard:', err);
+                showToast('Error al actualizar dashboard', 'danger');
                 hideLoading();
             }
         });
     });
 
-    // Initialize charts on page load
-    initializeCharts();
-
-    // Handle browser back/forward buttons
+    // ----------------------------
+    // Manejar botones de navegador
+    // ----------------------------
     window.addEventListener('popstate', function() {
         const urlParams = new URLSearchParams(window.location.search);
         const year = urlParams.get('year') || 'all';
         $('#yearFilter').val(year).trigger('change');
     });
+
 });
 </script>
 {% endblock %}

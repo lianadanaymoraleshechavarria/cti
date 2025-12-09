@@ -107,10 +107,11 @@ urlpatterns = [
     path('Evento_Delete_Investigador/<int:id>/', Evento_Delete_Investigador, name="Evento_Delete_Investigador"),
     path('Evento_Update_Investigador/<int:evento_id>/', Evento_Update_Investigador, name='Evento_Update_Investigador'),
 
-    path('configuracion/eventos-base/', views_marcadores.EventoBaseListView.as_view(), name='evento_base_list'),
-    path('configuracion/eventos-base/crear/', views_marcadores.EventoBaseCreateView.as_view(), name='evento_base_create'),
-    path('configuracion/eventos-base/editar/<int:pk>/', views_marcadores.EventoBaseUpdateView.as_view(), name='evento_base_update'),
-    path('configuracion/eventos-base/eliminar/<int:pk>/', views_marcadores.EventoBaseDeleteView.as_view(), name='evento_base_delete'),
+    path('eventos-base/', views_marcadores.EventoBaseListView.as_view(), name='evento_base_list'),
+    path('eventos-base/crear/', views_marcadores.EventoBaseCreateView.as_view(), name='evento_base_create'),
+    path('eventos-base/detail/<int:pk>/', views_marcadores.EventoBaseDetailView.as_view(), name='evento_base_detail'),
+    path('eventos-base/editar/<int:pk>/', views_marcadores.EventoBaseUpdateView.as_view(), name='evento_base_update'),
+    path('eventos-base/eliminar/<int:id>/', views_marcadores.EventoBaseDelete, name='evento_base_delete'),
     
     # APIs para autocompletado
     path('api_eventos_base/', views_marcadores.api_eventos_base, name='api_eventos_base'),
