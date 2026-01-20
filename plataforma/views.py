@@ -2921,7 +2921,7 @@ def CambiarRolVice(request, id):
 #>>>>>>>>>>>>>>>>>>>>>>>>>    Admin     >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 #.......................Revista_Libro_Conferencia....................................
-@method_decorator([login_required, vicerrector_required ], name='dispatch')
+@method_decorator([login_required ], name='dispatch')
 class Revista_Libro_Conferencia_Create(LoginRequiredMixin, CreateView):
     model = Revista_Libro_Conferencia
     form_class = Revista_Libro_Conferencia_Form
@@ -2942,7 +2942,7 @@ class Revista_Libro_Conferencia_List(LoginRequiredMixin, ListView):
     template_name = "RevistaLibro/revista_libro_conferencia_list.html" 
     context_object_name = 'objetos'
     
-@method_decorator([login_required, vicerrector_required ], name='dispatch')
+@method_decorator([login_required ], name='dispatch')
 class Revista_Libro_Conferencia_Detail(LoginRequiredMixin,  DetailView):
     model = Revista_Libro_Conferencia
     template_name = "RevistaLibro/revista_libro_conferencia_detail.html" 
@@ -3354,7 +3354,7 @@ class CategoriaDocenteUpdate(LoginRequiredMixin, UpdateView):
 
 #bASE DE DATOS 
 
-@method_decorator([login_required, vicerrector_required], name='dispatch') 
+@method_decorator([login_required], name='dispatch') 
 class BasesDatosCreate(LoginRequiredMixin, CreateView):
     model = Indexacion
     form_class = BasesDatosForm
@@ -3369,20 +3369,20 @@ class BasesDatosCreate(LoginRequiredMixin, CreateView):
         messages.success(self.request, "Base de datos creada exitosamente.")
         return super().form_valid(form)
 
-@method_decorator([login_required, vicerrector_required], name='dispatch')   
+@method_decorator([login_required], name='dispatch')   
 class BasesDatosList(LoginRequiredMixin, ListView):
     model = Indexacion
     template_name = "BasesDatos/BasesDatos_List.html" 
     context_object_name = 'bases_datos'
     paginate_by = 10
 
-@method_decorator([login_required, vicerrector_required], name='dispatch')   
+@method_decorator([login_required], name='dispatch')   
 class BasesDatosDetail(LoginRequiredMixin, DetailView):
     model = Indexacion
     template_name = "BasesDatos/BasesDatos_detail.html" 
     context_object_name = 'base_datos'
 
-@method_decorator([login_required, vicerrector_required], name='dispatch')   
+@method_decorator([login_required], name='dispatch')   
 class BasesDatosUpdate(LoginRequiredMixin, UpdateView):
     model = Indexacion
     form_class = BasesDatosForm

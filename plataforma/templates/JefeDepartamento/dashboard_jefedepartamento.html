@@ -154,15 +154,14 @@
             </section>
 
             <!-- Investigators Table -->
-            <section id="tablaTramites" style="padding-top:30px; padding-bottom: 15px;">
-                <div class="card card-a p-3 h-100">
+            <section style="padding-top:15px; padding-bottom: 15px;">
                     <div class="card-header">
                         <h5 class="card-title title-t" style="text-align: start;">
                             Investigadores
                         </h5>
                     </div>
                     <table id="Investigadores" class="display table table-striped table-hover table-primary" style="width:100%; height: 100%;">
-                        <thead class="encabezado" style="background-color:#0d6efd;">
+                        <thead class="encabezado">
                             <tr>
                                 <th scope="col" style="color: white; text-align: center;">No</th>
                                 <th scope="col" style="color: white; text-align: center;">Investigador</th>
@@ -170,7 +169,6 @@
                                 <th scope="col" style="color: white; text-align: center;">Cargo</th>
                                 <th scope="col" style="color: white; text-align: center;">Categoría Docente</th>
                                 <th scope="col" style="color: white; text-align: center;">Categoría Científica</th>
-                                <th scope="col" style="color: white; text-align: center;">Área</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -182,12 +180,10 @@
                                     <td style="text-align: center;">{{ i.cargo }}</td>
                                     <td style="text-align: center;">{{ i.categoria_docente }}</td>
                                     <td style="text-align: center;">{{ i.categoria_cientifica }}</td>
-                                    <td style="text-align: center;">{{ i.area }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
                     </table>
-                </div>
             </section>
 
             <!-- Pending Items Chart -->
@@ -205,7 +201,6 @@
 
 <!-- Container JS -->
 {% block js %}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="{% static 'libs/Datatable/JS/jquery-3.7.1.js' %}"></script>
 <script src="{% static 'libs/Datatable/JS/dataTables.js' %}"></script>
 <script src="{% static 'libs/Datatable/JS/dataTables.bootstrap5.js' %}"></script>
@@ -229,6 +224,21 @@
 
 <script>
 $(document).ready(function() {
+    // -------------------------
+    // 1. Inicializar DataTable una sola vez
+    // -------------------------
+    if (!$.fn.DataTable.isDataTable('#Investigadores')) {
+        $('#Investigadores').DataTable({
+            responsive: true,
+            paging: true,
+            searching: true,
+            ordering: true,
+            order: [[0, 'asc']],
+            language: { url: '//cdn.datatables.net/plug-ins/1.13.5/i18n/es-ES.json' },
+            lengthMenu: [10, 25, 50, 100],
+            pageLength: 10
+        });
+    }
     // Global chart variables
     let investigadoresChart, pendientesChart;
     let loadingTimeout;

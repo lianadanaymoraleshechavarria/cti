@@ -2030,79 +2030,51 @@ class ArticuloCreate(LoginRequiredMixin, CreateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user  
-
-        # Procesar los autores del POST si existen
-        if self.request.method == 'POST':
-            autores_ids = self.request.POST.getlist('autores')
-            if autores_ids:
-                usuario_ids = [
-                    aid.split('-')[1]
-                    for aid in autores_ids
-                    if aid.startswith('usuario-')
-                ]
-                usuarios_extra = Usuario.objects.filter(id__in=usuario_ids)
-                kwargs['extra_usuarios'] = usuarios_extra
-
+        kwargs['user'] = self.request.user
         return kwargs
 
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['request'] = self.request
+        context['proyectos'] = Proyecto.objects.filter(aprobacion='Aprobado')
+        return context
+    
     def form_valid(self, form):
         user = self.request.user
         form.instance.usuario = user
         form.instance.area = user.area
         form.instance.departamento = user.departamento
 
-        # Guardar artículo
         response = super().form_valid(form)
         articulo = self.object
 
-        # Agregar el autor principal (usuario autenticado)
+        # Autor principal
         ArticuloAutor.objects.create(articulo=articulo, usuario=user)
 
-        # Agregar otros autores si los hay
-        autores = form.cleaned_data.get('autores', [])
-        print("Autores seleccionados en POST:", autores)
-        for seleccionado in autores:
-            tipo, id_str = seleccionado.split('-')
-            if tipo == 'usuario':
-                usuario = Usuario.objects.get(id=int(id_str))
-                if usuario.id != user.id:  # evitar duplicar al creador
+        # Otros autores
+        for seleccionado in form.cleaned_data.get("autores", []):
+            try:
+                tipo, id_str = seleccionado.split("-", 1)
+            except ValueError:
+                tipo, id_str = "usuario", seleccionado
+
+            if tipo == "usuario":
+                usuario = Usuario.objects.filter(id=int(id_str)).first()
+                if usuario and usuario.id != user.id:
                     ArticuloAutor.objects.get_or_create(articulo=articulo, usuario=usuario)
-            elif tipo == 'colaborador':
-                colaborador = Colaborador.objects.get(id=int(id_str))
-                ArticuloAutor.objects.get_or_create(articulo=articulo, colaborador=colaborador)
+            elif tipo == "colaborador":
+                colaborador = Colaborador.objects.filter(id=int(id_str)).first()
+                if colaborador:
+                    ArticuloAutor.objects.get_or_create(articulo=articulo, colaborador=colaborador)
 
         messages.success(self.request, "Artículo creado exitosamente.")
         return response
 
-
     def form_invalid(self, form):
-        errores = []
-        for field, field_errors in form.errors.items():
-            if field == '__all__':
-                errores.extend(field_errors)
-            else:
-                field_label = form.fields.get(field).label or field.replace('_', ' ').capitalize()
-                for error in field_errors:
-                    errores.append(f"{field_label}: {error}")
-
-        mensaje_error = "Hubo un error al crear el Artículo. Corrige los siguientes campos: "
-        mensaje_error += " ".join(f"• {e}" for e in errores)
-
-        messages.error(self.request, mensaje_error)
-        print("Errores de formulario:", form.errors)
-
+        messages.error(self.request, f"Errores en el formulario: {form.errors.as_json()}")
         return super().form_invalid(form)
-
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['proyectos'] = Proyecto.objects.filter(aprobacion='Aprobado')
-        context['PAIS'] = PAIS
-        context['IDIOMA'] = IDIOMA
-        return context
-    
+   
 
 class Articulo_List_Investigador(LoginRequiredMixin, ListView):
     model = Articulo
@@ -2141,9 +2113,6 @@ class Articulo_Detail_Investigador(LoginRequiredMixin, DetailView):
         articulo = self.get_object()
 
         Articulo.objects.filter(usuario=self.request.user)
-    #Variables para controlar qué formularios mostrar
-        context['Articulo_Revista'] = articulo.doi and articulo.issn.strip()!= ''#Variables para controlar qué formularios mostrar
-        context['Articulo_Publicacion'] = articulo.volumen and articulo.capitulo.strip()!= ''
         return context
 
 
@@ -2182,21 +2151,41 @@ def Articulo_Revista_Update_Investigador(request, articulo_id):
 
 def Articulo_Publicacion_Update_Investigador(request, articulo_id):
     articulo = get_object_or_404(Articulo, pk=articulo_id)
-    
+
     if request.method == 'POST':
-        form = ArticuloForm(request.POST, request.FILES, instance=articulo)
+        form = ArticuloForm(request.POST, request.FILES, instance=articulo, user=request.user)
         if form.is_valid():
-            articulo = form.save()
+            # Guardar datos principales del artículo
+            articulo = form.save(commit=False)
+            articulo.save()
+
+            # Guardar autores / colaboradores seleccionados
+            autores_ids = request.POST.getlist('autores')  # vienen como "usuario-3" o "colaborador-5"
+            articulo.autores.clear()  # Limpiar autores previos
+            for val in autores_ids:
+                try:
+                    tipo, id_str = val.split('-')
+                    if tipo == 'usuario':
+                        usuario = User.objects.get(pk=id_str)
+                        articulo.autores.add(usuario)
+                    elif tipo == 'colaborador':
+                        colaborador = Colaborador.objects.get(pk=id_str)
+                        articulo.autores.add(colaborador)
+                except Exception as e:
+                    # opcional: registrar error pero continuar
+                    print(f"Error al agregar autor {val}: {e}")
+
             messages.success(request, "Artículo de publicación actualizado exitosamente.")
             return redirect('Articulo_List_Investigador')
         else:
             messages.error(request, "Error al actualizar el artículo. Verifique los datos.")
+
     else:
-        form = ArticuloForm(instance=articulo)
-    
+        form = ArticuloForm(instance=articulo, user=request.user)
+
     # Obtener proyectos aprobados para el contexto
     proyectos = Proyecto.objects.filter(aprobacion='Aprobado')
-    
+
     return render(request, 'Articulo/articulo_publicacion_update_investigador.html', {
         'form': form,
         'articulo': articulo,

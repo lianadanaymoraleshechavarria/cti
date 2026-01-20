@@ -22,7 +22,7 @@ class Revista_Libro_Conferencia_Form(forms.ModelForm):
             'editorial': forms.TextInput(attrs={'type':'text','name':'editorial','id':'editorial','class':'form-control', 'placeholder': 'Coloque el nombre de la editorial'}),
             'issn': forms.NumberInput(attrs={'type':'text','name':'issn','id':'issn','class':'form-control','placeholder':'Introduzca el ISSN'}),
             'isbn': forms.TextInput(attrs={'type':'text','name':'isbn','id':'isbn','class':'form-control','placeholder':'Introduzca el ISBN'}),
-            'pais': forms.Select(attrs={'class': 'form-control','placeholder':'Introduzca el pais de origen'}),
+            'pais': forms.TextInput(attrs={'class': 'form-control','placeholder':'Introduzca el pais de origen'}),
             'index': forms.Select(attrs={'class': 'form-control','placeholder':'Index'}),
             'url': forms.URLInput(attrs={'name':'url','id':'url','class':'form-control', 'placeholder':'Introduzca la url'}),
         }
@@ -976,6 +976,27 @@ class Perfil_Form(forms.ModelForm):
 
 
 class ArticuloForm(forms.ModelForm):
+    
+    autores = AnyValueMultipleChoiceField(
+        required=False,
+        widget=forms.SelectMultiple(attrs={'style': 'display:none;'})
+    )
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
+        super().__init__(*args, **kwargs)
+
+        # Si estamos editando un articulo ya existente
+        if self.instance and self.instance.pk:
+            valores = []
+            for ea in self.instance.articulos_set.all():
+                if ea.usuario:
+                    valores.append(f"usuario-{ea.usuario.id}")
+                elif ea.colaborador:
+                    valores.append(f"colaborador-{ea.colaborador.id}")
+            self.initial["autores"] = valores
+    
+        
     class Meta:
         model = Articulo
         fields = [
@@ -1018,13 +1039,6 @@ class ArticuloForm(forms.ModelForm):
             "archivo": forms.ClearableFileInput(attrs={"class": "form-control"}),
             "forma_citar": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
         }
-
-    def __init__(self, *args, **kwargs):
-        user = kwargs.pop("user", None)  # por si quieres filtrar campos según el usuario
-        super().__init__(*args, **kwargs)
-
-        # Si quieres inicializar usuario automáticamente y ocultarlo del fo
-
 
 # class Articulo_Publicacion_Form(BaseArticuloForm):
 #     class Meta(BaseArticuloForm.Meta):

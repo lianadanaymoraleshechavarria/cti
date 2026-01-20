@@ -628,7 +628,6 @@ class Articulo(models.Model):
     def __str__(self):
         return self.titulo 
 
-
 class ArticuloAutor(models.Model):
     articulo = models.ForeignKey(Articulo, on_delete=models.CASCADE, related_name="articulos_set")
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, null=True, blank=True)

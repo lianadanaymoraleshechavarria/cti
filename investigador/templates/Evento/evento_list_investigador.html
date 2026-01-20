@@ -39,11 +39,11 @@
     <tbody>
       {% for e in eventos %}
       <tr class="{% if not e.es_creador %}row-colaborador{% endif %}">
-        <td style=" text-align:center;">{{forloop.counter}}</td>
-        <td style=" text-align:start;">{{e.titulo}}</td>
-        <td style=" text-align:start;">{{e.tipo}}</td>
-        <td style=" text-align:start;">{{e.modalidad}}</td>
-        <td style=" text-align:start;">{{e.institucion}}</td>
+        <td style="text-align:center;">{{forloop.counter}}</td>
+        <td style="text-align:start;">{{e.titulo}}</td>
+        <td style="text-align:start;">{{e.tipo}}</td>
+        <td style="text-align:start;">{{e.modalidad}}</td>
+        <td style="text-align:start;">{{e.institucion}}</td>
         <td style="text-align:start;">{{ e.fecha_create|date:"d/m/Y" }}</td>
         <td style="text-align:start;">
           {% if e.autores %}
@@ -93,7 +93,7 @@
           {% if e.aprobacion != "Aprobado" and e.es_creador %}
           <a href="{% url 'Evento_Update_Investigador' e.id %}"> 
             <i class="update fas fa-solid fa-pen-to-square mx-1 fs-6"></i></a>
-          <a class="iconos" data-bs-toggle="modal" data-bs-target="#Eventos{{ e.id }}">
+          <a data-bs-toggle="modal" data-bs-target="#Eventos{{ e.id }}">
             <i class="delete fas fa-solid fa-trash-can mx-1 fs-6"></i></a>
           {% endif %}
         </td>

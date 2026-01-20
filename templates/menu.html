@@ -13,7 +13,6 @@
                 <img src="{% static 'img/Id UHo-03-white.png' %}" width="100" height="40px"
                     alt="Universidad de Holguín">
             </a>
-
             {% elif user.rol == 'Vicerrector' %}
             <a href="{% url 'Dashboard_Vicerrector' %}" %}>
                 <img src="{% static 'img/Id UHo-03-white.png' %}" width="100" height="40px"
@@ -76,7 +75,18 @@
                                         Científicas</a></li>
                                 <li><a class="dropdown-item" href="{% url 'CategoriaDocenteList' %}">Categorías
                                         Docentes</a></li>
-                                <li><a class="dropdown-item" href="{% url 'BasesDatosList' %}">Bases de Datos</a></li>
+                                <!-- Submenú de Artículos -->
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">
+                                        <i class="fa-solid fa-scroll"></i> Artículos
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="{% url 'BasesDatosList' %}">Indexación de
+                                                Artículos</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'Revista_Libro_Conferencia_List' %}">
+                                                Revistas</a></li>
+                                    </ul>
+                                </li>
                                 <!-- Submenú de Eventos -->
                                 <li class="dropdown-submenu">
                                     <a class="dropdown-item dropdown-toggle" href="#">
@@ -105,8 +115,6 @@
                                                 de Premios</a></li>
                                     </ul>
                                 </li>
-                                <li><a class="dropdown-item" href="{% url 'Revista_Libro_Conferencia_List' %}">Crear
-                                        Revistas, Libros u Otros</a></li>
                                 <!-- Submenú de Programas -->
                                 <li class="dropdown-submenu">
                                     <a class="dropdown-item dropdown-toggle" href="#">
@@ -167,7 +175,18 @@
                                         Científicas</a></li>
                                 <li><a class="dropdown-item" href="{% url 'CategoriaDocenteList' %}">Categorías
                                         Docentes</a></li>
-                                <li><a class="dropdown-item" href="{% url 'BasesDatosList' %}">Bases de Datos</a></li>
+                                <!-- Submenú de Artículos -->
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">
+                                        <i class="fa-solid fa-scroll"></i> Artículos
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="{% url 'BasesDatosList' %}">Indexación de
+                                                Artículos</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'Revista_Libro_Conferencia_List' %}">
+                                                Revistas</a></li>
+                                    </ul>
+                                </li>
                                 <!-- Submenú de Eventos -->
                                 <li class="dropdown-submenu">
                                     <a class="dropdown-item dropdown-toggle" href="#">
@@ -196,8 +215,6 @@
                                                 de Premios</a></li>
                                     </ul>
                                 </li>
-                                <li><a class="dropdown-item" href="{% url 'Revista_Libro_Conferencia_List' %}">Crear
-                                        Revistas, Libros u Otros</a></li>
                                 <!-- Submenú de Programas -->
                                 <li class="dropdown-submenu">
                                     <a class="dropdown-item dropdown-toggle" href="#">
@@ -252,7 +269,18 @@
                                         Científicas</a></li>
                                 <li><a class="dropdown-item" href="{% url 'CategoriaDocenteList' %}">Categorías
                                         Docentes</a></li>
-                                <li><a class="dropdown-item" href="{% url 'BasesDatosList' %}">Bases de Datos</a></li>
+                                <!-- Submenú de Artículos -->
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">
+                                        <i class="fa-solid fa-scroll"></i> Artículos
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="{% url 'BasesDatosList' %}">Indexación de
+                                                Artículos</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'Revista_Libro_Conferencia_List' %}">
+                                                Revistas</a></li>
+                                    </ul>
+                                </li>
                                 <!-- Submenú de Eventos -->
                                 <li class="dropdown-submenu">
                                     <a class="dropdown-item dropdown-toggle" href="#">
@@ -281,8 +309,7 @@
                                                 de Premios</a></li>
                                     </ul>
                                 </li>
-                                <li><a class="dropdown-item" href="{% url 'Revista_Libro_Conferencia_List' %}">Crear
-                                        Revistas, Libros u Otros</a></li>
+
                                 <!-- Submenú de Programas -->
                                 <li class="dropdown-submenu">
                                     <a class="dropdown-item dropdown-toggle" href="#">
@@ -338,6 +365,75 @@
                 Bienvenido, <strong>{{ user.username }}</strong>
             </a>
         </li>
+        <li>
+            <a class="nav-link text-white " data-bs-toggle="collapse" aria-expanded="false"
+                data-bs-target="#Perfil-collapse" aria-controls="contents-collapse">
+                <i class="fas fa-user-graduate text-white"></i>
+                Mi Perfil Académico
+                <i class="fas fa-angle-down text-white"></i>
+            </a>
+        </li>
+        <ul class="list-unstyled ps-3 collapse" id="Perfil-collapse">
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Perfil_Detail_Investigador' %}" class="">
+                    <i class="fas fa-user"></i>
+                    Perfil
+                </a>
+            </li>
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Colaboradores_List' %}" class="">
+                    <i class="fas  fa-people-group"></i>
+                    Colaboradores
+                </a>
+            </li>
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Colaboradores_List' %}" class="">
+                    <i class="fas fa-chart-bar"></i>
+                    Resultados en Proyectos
+                </a>
+            </li>
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Colaboradores_List' %}" class="">
+                    <i class="fas  fa-school"></i>
+                    Programas
+                </a>
+            </li>
+        </ul>
+
+        <li>
+            <a class="nav-link text-white " data-bs-toggle="collapse" aria-expanded="false"
+                data-bs-target="#Publicaciones-collapse" aria-controls="contents-collapse">
+                <i class="fas fa-list text-white"></i> Mis Marcadores <i class="fas fa-angle-down text-white"></i>
+            </a>
+        </li>
+        <ul class="list-unstyled ps-3 collapse" id="Publicaciones-collapse">
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Curriculo_List_Investigador' %}" class="">
+                    <i class="fas  fa-id-card text-white"></i>
+                    Mi Currículo
+                </a>
+            </li>
+
+            <li class="nav-item mb-1" aria-label="Artículos">
+                <a href="{% url 'Articulo_List_Investigador' %}" class="">
+                    <i class="fa-solid fa-scroll"></i>
+                    Mis Artículos
+                </a>
+            </li>
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Evento_List_Investigador' %}" class="">
+                    <i class="fas fa-calendar"></i>
+                    Mis Eventos
+                </a>
+            </li>
+
+            <li class="nav-item mb-1" aria-label="InfoPersonal">
+                <a href="{% url 'Premio_List_Investigador' %}" class="">
+                    <i class="fas  fa-award"></i>
+                    Mis Premios
+                </a>
+            </li>
+        </ul>
         <li class="nav-item mb-1" aria-label="Artículos">
             <a href="{% url 'Articulo_List_Admin' %}" class="">
                 <i class="fa-solid fa-scroll"></i>

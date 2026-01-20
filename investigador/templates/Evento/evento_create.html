@@ -153,18 +153,17 @@
                         <div class="seccion-formulario">
                           <h5>Información adicional</h5>
                           <div class="col-md-12">
-                            <div class="mt-3">
-                              <div class="switch-container">
-                                <label class="switch">
-                                  <input type="checkbox" id="proyecto-switch" {% if form.proyecto.value %}checked{% endif %}>
-                                  <span class="slider"></span>
-                                </label>
-                                <label for="proyecto-switch" class="form-control-label">Artículo asociado a un resultado de
-                                  proyecto:
-                                  <strong id="proyecto-status">{% if form.proyecto.value %}Sí{% else %}No{% endif %}</strong>
-                                </label>
-                              </div>
-                              <div id="proyecto-select-container"
+                            <div class="switch-container">
+                            <label class="switch">
+                              <input type="checkbox" id="proyecto-switch" {% if form.proyecto.value %}checked{% endif %}>
+                              <span class="slider"></span>
+                            </label>
+                            <label for="proyecto-switch" class="form-control-label">Artículo asociado a un resultado de
+                              proyecto:
+                              <strong id="proyecto-status">{% if form.proyecto.value %}Sí{% else %}No{% endif %}</strong>
+                            </label>
+                          </div>
+                          <div id="proyecto-select-container"
                                 class="proyecto-select-container {% if form.proyecto.value %}visible{% endif %}">
                                 <label class="form-control-label">¿Cuál proyecto?</label>
                                 <select name="proyecto" id="id_proyecto" class="form-control">
@@ -175,8 +174,7 @@
                                       </option>
                                     {% endfor %}
                                 </select>
-                              </div>
-                            </div>
+                          </div>
                           </div>
                         </div>
                       </div>

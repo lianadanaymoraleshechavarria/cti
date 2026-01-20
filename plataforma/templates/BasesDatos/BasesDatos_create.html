@@ -1,174 +1,158 @@
 {% extends "base.html" %}
 {% load static %}
 
-<!-- Container CSS -->
 {% block css %}
-<link rel="stylesheet" href="{% static 'Plataforma/css/estilobeta.css' %}">
-
-<style>
-    .error-message {
-        color: #dc3545;
-        font-size: 0.875rem;
-        margin-top: 0.25rem;
-    }
-
-</style>
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
 {% endblock %}
-<!-- End Container CSS -->
 
 {% block content %}
-<div id="error-container">
-    {% if messages %}
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        {% endfor %}
-    {% endif %}
-    
-    {% if form.errors %}
-        <div class="alert alert-danger">
-            <strong>Por favor corrige los siguientes errores:</strong>
-            <ul>
-                {% for field in form %}
-                    {% for error in field.errors %}
-                        <li>{{ field.label }}: {{ error }}</li>
-                    {% endfor %}
-                {% endfor %}
-                {% for error in form.non_field_errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-    {% endif %}
-</div>
+<div class="content">
+    <div class="col">
+        <div class="container-form">
+            <div class="form">
+                <div class="container-fluid py-4">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="title">
+                                    <h3 class="title-text p-3">Nueva Indexación de Revista</h3>
+                                </div>
+                                <form action="." method="POST" id="bases-datos-form">
+                                    {% csrf_token %}
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="seccion-formulario">
+                                                    <h5>Datos de la Indexación</h5>
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="form-group icon-input">
+                                                                <label
+                                                                    class="form-control-label required-field">Nombre</label>
+                                                                <div class="input-wrapper">
+                                                                    {{form.nombre_base_datos}}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12">
+                                                            <div class="form-group icon-input">
+                                                                <label
+                                                                    class="form-control-label required-field">Grupo</label>
+                                                                <div class="input-wrapper">
+                                                                    {{form.grupo}}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12">
+                                                            <div class="form-group icon-input">
+                                                                <label
+                                                                    class="form-control-label required-field">URL</label>
+                                                                <div class="input-wrapper">
+                                                                    {{form.url}}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-md-12 text-center">
+                                            <a href="{% url 'BasesDatosList' %}"
+                                                class="btn btn-cancelar ml-3">Cancelar</a>
+                                            <button type="submit" class="btn boton-form"><i class="fas fa-check"></i>
+                                                Guardar</button>
+                                        </div>
+                                    </div>
+                                </form>
 
-<div class="container-form">
-    <div class="form">
-        <div class="contact-form">
-          
-            <form action="." method="POST" id="bases-datos-form">
-                {% csrf_token %}
-                <h3 class="title">Crear Base de Datos</h3>
-                
-                <div class="input-container">
-                    {{ form.nombre_base_datos }}
-                    <label for="id_nombre_base_datos">Nombre de la base de datos</label>
-                    <div class="help-text">{{ form.nombre_base_datos.help_text }}</div>
-                         
-                    <span>Nombre de la base de datos</span>
-                    <div id="nombre-error" class="error-message"></div>
-                </div>
+                            </div>
+                        </div>
+                        {% endblock %}
 
+                        <!-- Container JS -->
+                        {% block js %}
+                        <script src="{% static 'Plataforma/js/FormularioSelect.js' %}"></script>
+                        <script>
+                            $(document).ready(function () {
+                                // Form validation
+                                $('#bases-datos-form').on('submit', function (e) {
+                                    let isValid = true;
+                                    const nombre = $('#id_nombre_base_datos').val().trim();
+                                    const grupo = $('#id_grupo').val();
+                                    const url = $('#id_url').val().trim();
 
-  
+                                    // Clear previous errors
+                                    $('.error-message').text('');
 
+                                    // Validate nombre_base_datos
+                                    if (nombre === '') {
+                                        $('#nombre-error').text('Este campo es obligatorio');
+                                        isValid = false;
+                                    } else if (nombre.length > 50) {
+                                        $('#nombre-error').text('El nombre no puede exceder los 50 caracteres');
+                                        isValid = false;
+                                    }
 
+                                    // Validate grupo
+                                    if (grupo === 'Seleccione...') {
+                                        $('#grupo-error').text('Debe seleccionar un grupo');
+                                        isValid = false;
+                                    }
 
-                <div class="input-container">
-                    {{ form.grupo }}
-                    <label for="id_grupo">Grupo</label>
-                    <span>Grupo</span>
-                    <div id="grupo-error" class="error-message"></div>
-                </div>
-                
-                <div class="input-container">
-                    {{ form.url }}
-                    <label for="id_url">URL</label>
-                    <span>URL</span>
-                    <div id="url-error" class="error-message"></div>
-                </div>
-                
-                <input type="submit" value="Crear Base de Datos" class="btn1" id="boton">
-            </form>
-       
-    </div>
-</div>
-{% endblock %}
+                                    // Validate URL
+                                    if (url === '') {
+                                        $('#url-error').text('Este campo es obligatorio');
+                                        isValid = false;
+                                    } else if (url.length > 200) {
+                                        $('#url-error').text('La URL no puede exceder los 200 caracteres');
+                                        isValid = false;
+                                    } else if (!isValidURL(url)) {
+                                        $('#url-error').text('Ingrese una URL válida');
+                                        isValid = false;
+                                    }
 
-<!-- Container JS -->
-{% block js %}
-<script src="{% static 'Plataforma/js/FormularioSelect.js' %}"></script>
-<script>
-$(document).ready(function() {
-    // Form validation
-    $('#bases-datos-form').on('submit', function(e) {
-        let isValid = true;
-        const nombre = $('#id_nombre_base_datos').val().trim();
-        const grupo = $('#id_grupo').val();
-        const url = $('#id_url').val().trim();
-        
-        // Clear previous errors
-        $('.error-message').text('');
-        
-        // Validate nombre_base_datos
-        if (nombre === '') {
-            $('#nombre-error').text('Este campo es obligatorio');
-            isValid = false;
-        } else if (nombre.length > 50) {
-            $('#nombre-error').text('El nombre no puede exceder los 50 caracteres');
-            isValid = false;
-        }
-        
-        // Validate grupo
-        if (grupo === 'Seleccione...') {
-            $('#grupo-error').text('Debe seleccionar un grupo');
-            isValid = false;
-        }
-        
-        // Validate URL
-        if (url === '') {
-            $('#url-error').text('Este campo es obligatorio');
-            isValid = false;
-        } else if (url.length > 200) {
-            $('#url-error').text('La URL no puede exceder los 200 caracteres');
-            isValid = false;
-        } else if (!isValidURL(url)) {
-            $('#url-error').text('Ingrese una URL válida');
-            isValid = false;
-        }
-        
-        if (!isValid) {
-            e.preventDefault();
-        }
-    });
-    
-    // URL validation function
-    function isValidURL(url) {
-        try {
-            new URL(url);
-            return true;
-        } catch (_) {
-            return false;
-        }
-    }
+                                    if (!isValid) {
+                                        e.preventDefault();
+                                    }
+                                });
 
-    // Input animation
-    const inputs = document.querySelectorAll(".input");
-    
-    function focusFunc() {
-        let parent = this.parentNode;
-        parent.classList.add("focus");
-    }
-    
-    function blurFunc() {
-        let parent = this.parentNode;
-        if (this.value == "") {
-            parent.classList.remove("focus");
-        }
-    }
-    
-    inputs.forEach((input) => {
-        input.addEventListener("focus", focusFunc);
-        input.addEventListener("blur", blurFunc);
-    });
-    
-    // Initialize select fields with focus if they have a value
-    if ($('#id_grupo').val() !== 'Seleccione...') {
-        $('#id_grupo').parent().addClass('focus');
-    }
-});
-</script>
-{% endblock %}
-<!-- End Container JS -->
+                                // URL validation function
+                                function isValidURL(url) {
+                                    try {
+                                        new URL(url);
+                                        return true;
+                                    } catch (_) {
+                                        return false;
+                                    }
+                                }
+
+                                // Input animation
+                                const inputs = document.querySelectorAll(".input");
+
+                                function focusFunc() {
+                                    let parent = this.parentNode;
+                                    parent.classList.add("focus");
+                                }
+
+                                function blurFunc() {
+                                    let parent = this.parentNode;
+                                    if (this.value == "") {
+                                        parent.classList.remove("focus");
+                                    }
+                                }
+
+                                inputs.forEach((input) => {
+                                    input.addEventListener("focus", focusFunc);
+                                    input.addEventListener("blur", blurFunc);
+                                });
+
+                                // Initialize select fields with focus if they have a value
+                                if ($('#id_grupo').val() !== 'Seleccione...') {
+                                    $('#id_grupo').parent().addClass('focus');
+                                }
+                            });
+                        </script>
+                        {% endblock %}
+                        <!-- End Container JS -->

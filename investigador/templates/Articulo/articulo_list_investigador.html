@@ -23,101 +23,115 @@
   <div class="table-responsive">
     <p><strong>Total:</strong> {{ articulo|length }} artículos</p>
     <table id="Articulos" class="display table table-striped table-hover" style="width:100%; height: 100%;">
-    <thead class="encabezado">
-      <tr>
-        <th scope="col">No</th>
-        <th scope="col">Título</th>
-        <th scope="col">Fecha</th>
-        <th scope="col">Autores</th>
-        <th scope="col">Rol</th>
-        <th scope="col">Estado</th>
-        <th scope="col" style="text-align: center;">Opciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for a in articulo %}
-      <tr class="{% if not a.es_creador %}row-colaborador{% endif %}">
-        <td style=" text-align: center;">{{forloop.counter}}</td>
-        <td style=" text-align: start;">{{a.titulo}}</td>
-        <td style=" text-align: start;">{{a.fecha_create|date:"d/m/Y"}}</td>
-        <td style=" text-align: start;">
-          {% if a.autores %}
-          <div class="participantes-tooltip">
-            <span class="autores-expandibles">
-              {{a.usuario}} y {{a.autores.all|length}} más
-            </span>
-            <div class="participantes-tooltip-content">
-              <ul class="participantes-lista">
-                <li class="participante-item participante-principal">
-                  {{a.usuario}} <span class="badge-rol badge-creador">Autor Principal</span>
-                </li>
-                {% for autor in a.autores.all %}
-                <li class="participante-item participante-secundario">
-                  {{autor.nombre}} {{autor.apellidos}}
-                  <span class="badge-rol badge-colaborador">Co-autor</span>
-                </li>
-                {% endfor %}
-              </ul>
+      <thead class="encabezado">
+        <tr>
+          <th scope="col">No</th>
+          <th scope="col">Título</th>
+          <th scope="col">Fecha</th>
+          <th scope="col">Autores</th>
+          <th scope="col">ISSN/ISBN</th>
+          <th scope="col">Estado</th>
+          <th scope="col" style="text-align: center;">Opciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in articulo %}
+        <tr class="{% if not a.es_creador %}row-colaborador{% endif %}">
+          <td style="text-align: center;">{{forloop.counter}}</td>
+          <td style="text-align: start;">{{a.titulo}}</td>
+          <td style="text-align: start;">{{a.fecha_create|date:"d/m/Y"}}</td>
+          <td style="text-align:start;">
+            {% if a.autores %}
+            <div class="participantes-tooltip">
+              <div class="participantes-info">
+                <span class="participantes-texto">{{ a.usuario }}</span>
+                <span class="participantes-contador">{{ a.autores.count }}</span>
+              </div>
+              <div class="participantes-tooltip-content">
+                <ul class="participantes-lista">
+                  <!-- Autor principal -->
+                  <li class="participante-item participante-principal">
+                    {{ a.usuario }}
+                    <span class="badge-rol badge-creador">Autor Principal</span>
+                  </li>
+
+                  <!-- Co-autores -->
+                  {% for autor in a.autores.all %}
+                  {% if autor.usuario and autor.usuario.id != a.usuario.id %}
+                  <li class="participante-item participante-secundario">
+                    {{ autor.usuario.get_full_name|default:autor.usuario.username }}
+                    <span class="badge-rol badge-colaborador">Co-autor</span>
+                  </li>
+                  {% elif autor.colaborador %}
+                  <li class="participante-item participante-secundario">
+                    {{ autor.colaborador.nombre }} {{ autor.colaborador.apellidos }}
+                    <span class="badge-rol badge-colaborador">Co-autor</span>
+                  </li>
+                  {% endif %}
+                  {% endfor %}
+                </ul>
+              </div>
             </div>
-          </div>
-          {% else %}
-          {{a.usuario}} <span class="participantes-contador">0</span>
-          {% endif %}
-          </ul>
-        </td>
-        <td style=" text-align: center;">
-          {% if a.es_creador %}
-          <span class="badge-rol badge-creador">Creador</span>
-          {% else %}
-          <span class="badge-rol badge-colaborador">Colaborador</span>
-          {% endif %}
-        </td>
-        <td style="text-align: start;">
-          <span
-            class="badge-{% if a.aprobacion == 'Aprobado' %}aprobado{% elif a.aprobacion == 'Rechazado' %}rechazado{% else %}pendiente{% endif %}">
+            {% else %}
+            {{ a.usuario }} <span class="participantes-contador">0</span>
+            {% endif %}
+          </td>
+          <td style="text-align: center;">
+            {{a.issn_isbn}}
+          </td>
+          <td style="text-align:start;">
+          <span style="display: inline-flex; align-items: center; gap: 0.3rem;" class="badge-{% if a.aprobacion == 'Aprobado' %}aprobado{% elif a.aprobacion == 'No Válido' %}rechazado{% else %}pendiente{% endif %}">
+            {% if a.aprobacion == 'Aprobado' %}
+            <i class="fas fa-check-circle me-1"></i>
+            {% elif a.aprobacion == 'No Válido' %}
+              <i class="fas fa-times-circle me-1"></i>
+            {% else %}
+              <i class="fas fa-hourglass-half me-1"></i>
+            {% endif %}
             {{a.aprobacion}}
           </span>
         </td>
-        <td style=" text-align: center;">
-          <a href="{% url 'Articulo_Detail_Investigador' a.id %}"> <i class="ico fas fa-solid fa-info-circle"></i></a>
-          {% if a.aprobacion != "Aprobado" and a.es_creador %}
-          <a
-            href="{% if a.es_tipo %}{% url 'Articulo_Revista_Update_Investigador' a.id %}{% else %}{% url 'Articulo_Publicacion_Update_Investigador' a.id %}{% endif %}">
-            <i class="ico fas fa-solid fa-pen-to-square"></i></a>
-          <a class="iconos" data-bs-toggle="modal" data-bs-target="#Articulo{{ a.id }}"><i
-              class="ico fas fa-solid fa-trash-can"></i></a>
-          {% endif %}
-        </td>
-      </tr>
-      <!-- Modal -->
-      <div class="modal fade" id="Articulo{{ a.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel" style="color:black"><i class="bi bi-exclamation-triangle"
-                  style="color:black"></i> Eliminar</h5>
-              <button type="button" class="btn-close cerrar" data-bs-dismiss="modal" aria-label="Close"
-                style="box-shadow: none"></button>
-            </div>
-            <div class="modal-body" style="color:black">
-              ¿Desea eliminar el Artículo seleccionado?
-              Esta acci&oacute;n ser&aacute; permanente.
-            </div>
-            <div class="modal-footer">
-              <a href="{% url 'Articulo_Delete_Investigador' a.id  %}" class="btn btn-success">Aceptar</a>
-              <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Cancelar</button>
+          <td style="text-align: center;">
+            <a href="{% url 'Articulo_Detail_Investigador' a.id %}">
+               <i class="detail fa-solid fa-info-circle mx-1 fs-6"></i></a>
+            {% if a.aprobacion != "Aprobado" and a.es_creador %}
+            <a
+              href="{% if a.es_tipo %}{% url 'Articulo_Revista_Update_Investigador' a.id %}{% else %}{% url 'Articulo_Publicacion_Update_Investigador' a.id %}{% endif %}">
+              <i class="update fas fa-solid fa-pen-to-square mx-1 fs-6"></i></a>
+            <a data-bs-toggle="modal" data-bs-target="#Articulo{{ a.id }}"><i
+                class="delete fas fa-solid fa-trash-can mx-1 fs-6"></i></a>
+            {% endif %}
+          </td>
+        </tr>
+        <!-- Modal -->
+        <div class="modal fade" id="Articulo{{ a.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+          aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel" style="color:black"><i class="bi bi-exclamation-triangle"
+                    style="color:black"></i> Eliminar</h5>
+                <button type="button" class="btn-close cerrar" data-bs-dismiss="modal" aria-label="Close"
+                  style="box-shadow: none"></button>
+              </div>
+              <div class="modal-body" style="color:black">
+                ¿Desea eliminar el Artículo seleccionado?
+                Esta acci&oacute;n ser&aacute; permanente.
+              </div>
+              <div class="modal-footer">
+                <a href="{% url 'Articulo_Delete_Investigador' a.id  %}" class="btn btn-success">Aceptar</a>
+                <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Cancelar</button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      {% endfor %}
-    </tbody>
-  </table>
+        {% endfor %}
+      </tbody>
+    </table>
 
-  <div class="option bgs">
-    <div class="bg-active" id="bg-active"></div>
-  </div>
+    <div class="option bgs">
+      <div class="bg-active" id="bg-active"></div>
+    </div>
 </section>
 {% endblock %}
 
